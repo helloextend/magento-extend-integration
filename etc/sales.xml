@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
+    <section name="quote">
+        <group name="totals">
+            <item name="shipping_protection" instance="Extend\Integration\Model\Quote\Total\ShippingProtection" sort_order="150"/>
+        </group>
+    </section>
+    <section name="order_invoice">
+        <group name="totals">
+            <item name="shipping_protection" instance="Extend\Integration\Model\Sales\Order\Invoice\Total\ShippingProtection" sort_order="150"/>
+        </group>
+    </section>
+    <section name="order_creditmemo">
+        <group name="totals">
+            <item name="shipping_protection" instance="Extend\Integration\Model\Sales\Order\Creditmemo\Total\ShippingProtection" sort_order="150"/>
+        </group>
+    </section>
+</config>

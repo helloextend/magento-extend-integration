@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="script-src">
+            <values>
+                <value id="extend-sdks" type="host">https://sdk.helloextend.com/</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="helloextend-apis" type="host">https://*.helloextend.com/</value>
+                <value id="extend-apis" type="host">https://*.extend.com/</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist> 

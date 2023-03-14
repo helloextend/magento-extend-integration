@@ -1,0 +1,9 @@
+<?php
+/** @var Magento\Framework\View\Element\Template $block */
+?>
+<script>
+    window.ExtendConfig = {
+        environment: "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
+        storeId: "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>"
+    }
+</script>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="extend_integration_sales_convert_quote">
+            <field name="shipping_protection">
+                <aspect name="to_order" targetField="shipping_protection"/>
+            </field>
+        </fieldset>
+        <fieldset id="extend_integration_sales_convert_order">
+            <field name="shipping_protection">
+                <aspect name="to_invoice" targetField="shipping_protection"/>
+                <aspect name="to_cm" targetField="shipping_protection"/>
+            </field>
+        </fieldset>
+    </scope>
+</config>

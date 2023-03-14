@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+
+<integrations>
+    <integration name="Extend Integration - Production">
+        <resources>
+            <resource name="Extend_Integration::manage" />
+            <resource name="Magento_Sales::actions_view" />
+            <resource name="Magento_Sales::shipment" />
+            <resource name="Magento_Backend::store" />
+            <resource name="Magento_Catalog::products" />
+        </resources>
+    </integration>
+    <integration name="Extend Integration - Demo">
+        <resources>
+            <resource name="Extend_Integration::manage" />
+            <resource name="Magento_Sales::actions_view" />
+            <resource name="Magento_Sales::shipment" />
+            <resource name="Magento_Backend::store" />
+            <resource name="Magento_Catalog::products" />
+        </resources>
+    </integration>
+</integrations>

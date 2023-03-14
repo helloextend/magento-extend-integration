@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<integrations>
+    <integration name="Extend Integration - Production">
+        <email>magento@extend.com</email>
+        <endpoint_url>https://integ-mage.extend.com/auth/start</endpoint_url>
+        <identity_link_url>https://merchants.extend.com/magento</identity_link_url>
+    </integration>
+    <integration name="Extend Integration - Demo">
+        <email>magento@extend.com</email>
+        <endpoint_url>https://integ-mage-demo.extend.com/auth/start</endpoint_url>
+        <identity_link_url>https://merchants.demo.extend.com/magento</identity_link_url>
+    </integration>
+</integrations>

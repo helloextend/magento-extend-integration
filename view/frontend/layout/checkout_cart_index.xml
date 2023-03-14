@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.totals">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="block-totals" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <!-- Start of the main content that needs to be added-->
+                                <item name="shipping_protection" xsi:type="array">
+                                    <!-- The path to our js file-->
+                                    <item name="component" xsi:type="string">Extend_Integration/js/view/checkout/summary/shipping-protection</item>
+                                    <item name="sortOrder" xsi:type="string">24</item>
+                                    <item name="config" xsi:type="array">
+                                        <!-- Show custom shipping protection on order summary-->
+                                        <item name="template" xsi:type="string">Extend_Integration/checkout/summary/shipping-protection</item>
+                                        <item name="title" xsi:type="string" translate="true">Shipping Protection</item>
+                                    </item>
+                                </item>
+                                <!--  End-->
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

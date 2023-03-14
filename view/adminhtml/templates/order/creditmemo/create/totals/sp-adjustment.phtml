@@ -1,0 +1,86 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+
+    <tr>
+        <td class="label">
+            <?= $block->escapeHtml(__('Shipping Protection')) ?>
+            <div id="shipping_protection_adv"></div>
+            <?php if ($block->getOriginalShippingProtection() > 0): ?>
+                <div class="sp-buttons-container">
+                    <button name="full" type="button" class="full"><?=__('Full')?></button>
+                    <button name="zero" type="button" class="zero"><?=__('0')?></button>
+                </div>
+            <?php endif; ?>
+        </td>
+        <td>
+            <input type="text"
+                   name="creditmemo[shipping_protection]"
+                   data-full="<?= /* @noEscape */ $block->getOriginalShippingProtection() ?>"
+                   value="<?= /* @noEscape */ $block->getShippingProtection() ?>"
+                   class="input-text admin__control-text not-negative-amount"
+                   readonly="readonly"
+                   id="shipping_protection"/>
+            <?php $scriptString = <<<script
+                require(['prototype'], function(){
+
+                //<![CDATA[
+                Validation.addAllThese([
+                    [
+                        'not-negative-amount',
+                        '{$block->escapeJs(__('Please enter a positive number in this field.'))}',
+                        function (v) {
+                            if (v.length)
+                                return /^\s*\d+([,.]\d+)*\s*%?\s*$/.test(v);
+                            else
+                                return true;
+                        }
+                    ]
+                ]);
+                
+                const spFull = document.querySelectorAll('.sp-buttons-container .full')[0];
+                const spZero = document.querySelectorAll('.sp-buttons-container .zero')[0];
+                const shippingProtectionInput = document.querySelectorAll('#shipping_protection')[0];
+                const updateTotalsButton = document.querySelectorAll('.update-totals-button')[0];
+                
+                spFull.addEventListener('click', () => {
+                    shippingProtectionInput.value = shippingProtectionInput.getAttribute('data-full');
+                    updateTotalsButton.removeAttribute('disabled');
+                    updateTotalsButton.classList.remove('disabled');
+                });
+                
+                spZero.addEventListener('click', () => {
+                    shippingProtectionInput.value = 0;
+                    updateTotalsButton.removeAttribute('disabled');
+                    updateTotalsButton.classList.remove('disabled');
+                });
+
+                if ($('shipping_protection')) {
+                    $('shipping_protection').advaiceContainer = $('shipping_protection_adv');
+                    unblockSubmit('shipping_protection');
+                }
+
+                function unblockSubmit(id) {
+                    $(id).observe('focus', function(event) {
+                        if ($$('button[class="scalable update-button disabled"]').size() > 0) {
+                            enableElements('submit-button');
+                        }
+                    });
+                    $(id).observe('change', function (event) {
+                        enableElements('submit-button');
+                    });
+                }
+                //]]>
+
+                });
+script;
+            ?>
+            <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+        </td>
+    </tr>
+
