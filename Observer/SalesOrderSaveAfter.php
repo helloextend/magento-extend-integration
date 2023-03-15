@@ -11,6 +11,7 @@ use Extend\Integration\Service\Api\OrderObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 
 class SalesOrderSaveAfter implements ObserverInterface
@@ -52,11 +53,14 @@ class SalesOrderSaveAfter implements ObserverInterface
      * @return void
      */
     public function execute(Observer $observer)
-    {
+    {   
+        $order = $observer->getEvent()->getOrder();
+        $endpoint = $this->resolveEndpoint($order);
+
         try {
             $this->orderObserverHandler->execute(
-                ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
-                $observer->getEvent()->getOrder(),
+                $endpoint,
+                $order,
                 []
             );
         } catch (\Exception $exception) {
@@ -64,5 +68,18 @@ class SalesOrderSaveAfter implements ObserverInterface
             $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
             $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @return array
+     */
+    private function resolveEndpoint(OrderInterface $order): array
+    {
+      if ($order->isObjectNew()) {
+        return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'], 'type' => 'middleware'];
+      }
+
+      return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'];
     }
 }
