@@ -76,7 +76,7 @@ class SalesOrderSaveAfter implements ObserverInterface
      */
     private function resolveEndpoint(OrderInterface $order): array
     {
-      if ($order->isObjectNew()) {
+      if (!$order->getOriginalIncrementId()) {
         return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'], 'type' => 'middleware'];
       }
 
