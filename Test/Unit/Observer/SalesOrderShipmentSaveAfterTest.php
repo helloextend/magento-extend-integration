@@ -94,11 +94,7 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
       ->getMockForAbstractClass();
     $this->storeManager->expects($this->any())->method('getStore')
       ->willReturn($this->store);
-    $this->shipmentMock = $this->getMockBuilder(Shipment::class)
-      ->onlyMethods(['getIncrementId'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->shipmentMock->expects($this->any())->method('getIncrementId')->willReturn(null);
+    $this->shipmentMock = $this->getMockBuilder(Shipment::class)->getMock();
     $this->event = $this->getMockBuilder(Event::class)
       ->addMethods(['getShipment'])
       ->disableOriginalConstructor()

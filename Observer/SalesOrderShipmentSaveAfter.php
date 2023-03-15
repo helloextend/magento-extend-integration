@@ -11,7 +11,6 @@ use Extend\Integration\Service\Api\ShipmentObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Sales\Model\Order\Shipment;
 use Psr\Log\LoggerInterface;
 
 class SalesOrderShipmentSaveAfter implements ObserverInterface
@@ -56,25 +55,12 @@ class SalesOrderShipmentSaveAfter implements ObserverInterface
   {
     try {
       $shipment = $observer->getEvent()->getShipment();
-      $endpoint = $this->resolveEndpoint($shipment);
+      $endpoint = ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_create'], 'type' => 'middleware'];
       $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
     } catch (\Exception $exception) {
       // silently handle errors
       $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
       $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
     }
-  }
-
-  /**
-   * @param Shipment $shipment
-   * @return array
-   */
-  private function resolveEndpoint($shipment): array
-  {
-    if (!$shipment->getIncrementId()) {
-      return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_create'], 'type' => 'middleware'];
-    }
-
-    return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'], 'type' => 'middleware'];
   }
 }
