@@ -2,7 +2,7 @@
     "name": "helloextend/integration",
     "description": "",
     "require": {
-        "php": "^7.3||^8.0"
+        "php": "^7.3||^8.0",
         "magento/magento-composer-installer": "*",
         "magento/module-integration": "2.0.0"
     },
