@@ -21,7 +21,7 @@ class Integration
         'webhooks_orders_cancel' => '/webhooks/orders/cancel',
         'webhooks_orders_update' => '/webhooks/orders/update',
         'webhooks_shipments_create' => '/webhooks/shipments/create',
-        'webhooks_shipments_update' => '/webhooks/shipment/update',
+        'webhooks_shipments_update' => '/webhooks/shipments/update',
         'webhooks_products_create' => '/webhooks/products/create',
         'webhooks_products_update' => '/webhooks/products/update',
         'webhooks_products_delete' => '/webhooks/products/delete',
