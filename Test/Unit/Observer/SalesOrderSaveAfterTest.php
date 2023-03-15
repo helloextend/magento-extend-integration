@@ -93,7 +93,12 @@ class SalesOrderSaveAfterTest extends TestCase
           ->getMockForAbstractClass();
       $this->storeManager->expects($this->any())->method('getStore')
           ->willReturn($this->store);
-      $this->orderMock = $this->createMock(Order::class);
+      $this->orderMock = $this->getMockBuilder(Order::class)
+        ->onlyMethods(['getCreatedAt', 'getUpdatedAt'])->disableOriginalConstructor()
+        ->getMock();
+      $mockDate = '2021-01-01 00:00:00';
+      $this->orderMock->expects($this->any())->method('getCreatedAt')->willReturn($mockDate);
+      $this->orderMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockDate);
       $this->event = $this->getMockBuilder(Event::class)
           ->addMethods(['getOrder'])
           ->disableOriginalConstructor()
@@ -117,7 +122,7 @@ class SalesOrderSaveAfterTest extends TestCase
       $this->orderObserverHandler->expects($this->once())
           ->method('execute')
           ->with(
-              $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware']),
+              $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'], 'type' => 'middleware']),
               $this->equalTo($this->orderMock),
               $this->equalTo([])
           );
