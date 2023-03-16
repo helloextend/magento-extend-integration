@@ -55,33 +55,22 @@ class SalesOrderSaveAfter implements ObserverInterface
     public function execute(Observer $observer)
     {   
         $order = $observer->getEvent()->getOrder();
-        $endpoint = $this->resolveEndpoint($order);
 
-        try {
-            $this->orderObserverHandler->execute(
-                $endpoint,
-                $order,
-                []
-            );
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+        $orderCreatedAt = $order->getCreatedAt();
+        $orderUpdatedAt = $order->getUpdatedAt();
+
+        if ($orderCreatedAt != $orderUpdatedAt) {
+            try {
+                $this->orderObserverHandler->execute(
+                    ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
+                    $order,
+                    []
+                );
+            } catch (\Exception $exception) {
+                // silently handle errors
+                $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
+                $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            }
         }
-    }
-
-    /**
-     * @param OrderInterface $order
-     * @return array
-     */
-    private function resolveEndpoint(OrderInterface $order): array
-    {
-        $createdAt = $order->getCreatedAt();
-        $updatedAt = $order->getUpdatedAt();
-        if ($createdAt == $updatedAt) {
-          return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'], 'type' => 'middleware'];
-        }
-
-        return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'];
     }
 }
