@@ -96,10 +96,6 @@ class SalesOrderSaveAfterTest extends TestCase
       $this->orderMock = $this->getMockBuilder(Order::class)
         ->onlyMethods(['getCreatedAt', 'getUpdatedAt'])->disableOriginalConstructor()
         ->getMock();
-      $mockCreateDate = '2021-01-01 00:00:00';
-      $mockUpdateDate = '2021-02-03 00:00:00';
-      $this->orderMock->expects($this->any())->method('getCreatedAt')->willReturn($mockCreateDate);
-      $this->orderMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockUpdateDate);
       $this->event = $this->getMockBuilder(Event::class)
           ->addMethods(['getOrder'])
           ->disableOriginalConstructor()
@@ -119,7 +115,20 @@ class SalesOrderSaveAfterTest extends TestCase
       );
     }
 
-    public function testExecutesOrdersObserver() {
+    public function testExecutesOrdersCreateHandlerWhenOrderIsBeingCreated() {
+      $mockCreateDate = '2021-01-01 00:00:00';
+      $mockUpdateDate = '2021-01-01 00:00:00';
+      $this->orderMock->expects($this->any())->method('getCreatedAt')->willReturn($mockCreateDate);
+      $this->orderMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockUpdateDate);
+      $this->orderObserverHandler->expects($this->never())->method('execute');
+      $this->import->execute($this->observer);
+    }
+
+    public function testExecutesOrdersObserveHandlerWhenOrderIsBeingUpdated() {
+      $mockCreateDate = '2021-01-01 00:00:00';
+      $mockUpdateDate = '2021-02-03 00:00:00';
+      $this->orderMock->expects($this->any())->method('getCreatedAt')->willReturn($mockCreateDate);
+      $this->orderMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockUpdateDate);
       $this->orderObserverHandler->expects($this->once())
           ->method('execute')
           ->with(
@@ -131,6 +140,10 @@ class SalesOrderSaveAfterTest extends TestCase
     }
 
     public function testLogsErrorsToLoggingService() {
+      $mockCreateDate = '2021-01-01 00:00:00';
+      $mockUpdateDate = '2021-02-03 00:00:00';
+      $this->orderMock->expects($this->any())->method('getCreatedAt')->willReturn($mockCreateDate);
+      $this->orderMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockUpdateDate);
       $this->orderObserverHandler->expects($this->once())
           ->method('execute')
           ->willThrowException(new Exception());
