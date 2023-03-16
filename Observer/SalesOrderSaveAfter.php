@@ -59,7 +59,7 @@ class SalesOrderSaveAfter implements ObserverInterface
         $orderCreatedAt = $order->getCreatedAt();
         $orderUpdatedAt = $order->getUpdatedAt();
 
-        if ($orderCreatedAt != $orderUpdatedAt) {
+        if ($orderCreatedAt !== $orderUpdatedAt) {
             try {
                 $this->orderObserverHandler->execute(
                     ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
