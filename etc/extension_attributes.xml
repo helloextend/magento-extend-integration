@@ -10,6 +10,21 @@
     <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
         <attribute code="shipping_protection" type="array" />
     </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="extend_shipping_protection_base_price" type="float" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="extend_shipping_protection_base_currency" type="string" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="extend_shipping_protection_price" type="float" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="extend_shipping_protection_currency" type="string" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="extend_shipping_protection_quote_id" type="string" />
+    </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceInterface">
         <attribute code="shipping_protection" type="array" />
     </extension_attributes>

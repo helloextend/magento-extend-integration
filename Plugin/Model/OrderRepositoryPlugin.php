@@ -60,6 +60,11 @@ class OrderRepositoryPlugin
                 'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
             ]
         );
+        $extensionAttributes->setExtendShippingProtectionBase($shippingProtectionTotal->getShippingProtectionBasePrice());
+        $extensionAttributes->setExtendShippingProtectionBaseCurrency($shippingProtectionTotal->getShippingProtectionBaseCurrency());
+        $extensionAttributes->setExtendShippingProtectionPrice($shippingProtectionTotal->getShippingProtectionPrice());
+        $extensionAttributes->setExtendShippingProtectionCurrency($shippingProtectionTotal->getShippingProtectionCurrency());
+        $extensionAttributes->setExtendShippingProtectionQuoteId($shippingProtectionTotal->getSpQuoteId());
         $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
@@ -125,6 +130,11 @@ class OrderRepositoryPlugin
                         'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
                     ]
                 );
+                $extensionAttributes->setExtendShippingProtectionBasePrice($shippingProtectionTotal->getShippingProtectionBasePrice());
+                $extensionAttributes->setExtendShippingProtectionBaseCurrency($shippingProtectionTotal->getShippingProtectionBaseCurrency());
+                $extensionAttributes->setExtendShippingProtectionPrice($shippingProtectionTotal->getShippingProtectionPrice());
+                $extensionAttributes->setExtendShippingProtectionCurrency($shippingProtectionTotal->getShippingProtectionCurrency());
+                $extensionAttributes->setExtendShippingProtectionQuoteId($shippingProtectionTotal->getSpQuoteId());
                 $order->setExtensionAttributes($extensionAttributes);
             }
         }
