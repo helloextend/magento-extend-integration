@@ -11,6 +11,7 @@ use Extend\Integration\Service\Api\OrderObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 
 class SalesOrderSaveAfter implements ObserverInterface
@@ -52,17 +53,24 @@ class SalesOrderSaveAfter implements ObserverInterface
      * @return void
      */
     public function execute(Observer $observer)
-    {
-        try {
-            $this->orderObserverHandler->execute(
-                ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
-                $observer->getEvent()->getOrder(),
-                []
-            );
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+    {   
+        $order = $observer->getEvent()->getOrder();
+
+        $orderCreatedAt = $order->getCreatedAt();
+        $orderUpdatedAt = $order->getUpdatedAt();
+
+        if ($orderCreatedAt !== $orderUpdatedAt) {
+            try {
+                $this->orderObserverHandler->execute(
+                    ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
+                    $order,
+                    []
+                );
+            } catch (\Exception $exception) {
+                // silently handle errors
+                $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
+                $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            }
         }
     }
 }
