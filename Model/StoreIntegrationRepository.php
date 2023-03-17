@@ -187,8 +187,8 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
             $this->storeIntegrationResource->save($storeIntegration);
         } else {
             $storeCode = $this->storeManager->getStore($storeId)->getCode();
-            $legacyExtendProductionStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID, $this->scopeConfig::SCOPE_STORES, $storeCode);
-            $legacyExtendSandboxStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID, $this->scopeConfig::SCOPE_STORES, $storeCode);
+            $legacyExtendProductionStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID, 'store', $storeCode);
+            $legacyExtendSandboxStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID, 'store', $storeCode);
             $integration = $this->integrationService->get($integrationId);
             $environment = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
             $storeIntegration = $this->storeIntegrationFactory->create();
