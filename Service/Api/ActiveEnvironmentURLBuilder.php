@@ -63,7 +63,7 @@ class ActiveEnvironmentURLBuilder {
     }
 
     private function isProductionURL(string $url): bool {
-        return substr_count($url, '-') < 2;
+        return $this->getEnvironmentFromURL($url) === 'prod';
     }
 
     public function getEnvironmentFromURL(string $url): string {
