@@ -62,13 +62,19 @@ class ActiveEnvironmentURLBuilder {
         return 'https://api' . $environment . '.helloextend.com';
     }
 
-    private static function isProductionURL(string $url): bool {
-        return substr_count($url, '-') < 2;
+    private function isProductionURL(string $url): bool {
+        return $this->getEnvironmentFromURL($url) === 'prod';
     }
 
-    private static function getEnvironmentFromURL(string $url): string {
-        $urlParts = explode('https://integ-mage-', $url);
-        $urlParts = explode('.', $urlParts[1]);
-        return $urlParts[0];
+    public function getEnvironmentFromURL(string $url): string {
+        if (str_contains($url, 'https://integ-mage-')) {
+            $urlParts = explode('https://integ-mage-', $url);
+            $urlParts = explode('.', $urlParts[1]);
+            return $urlParts[0];
+        }
+        if (str_contains($url, 'https://integ-mage.')) {
+            return 'prod';
+        }
+        return '';
     }
 }

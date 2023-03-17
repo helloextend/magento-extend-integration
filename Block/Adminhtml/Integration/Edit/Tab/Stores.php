@@ -174,7 +174,9 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements \Mage
         $stores = $this->storeRepository->getList();
 
         foreach ($stores as $store) {
-            $options[] = ['value' => $store->getStoreId(), 'label' => $store->getName()];
+            if ($store->getCode() !== 'admin') {
+                $options[] = ['value' => $store->getStoreId(), 'label' => $store->getName()];
+            }
         }
 
         return $options;
