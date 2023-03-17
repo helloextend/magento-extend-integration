@@ -11,6 +11,7 @@ use Extend\Integration\Model\ResourceModel\StoreIntegration as StoreIntegrationR
 use Extend\Integration\Model\ResourceModel\StoreIntegration\Collection;
 use Extend\Integration\Model\ResourceModel\StoreIntegration\CollectionFactory;
 use Extend\Integration\Model\StoreIntegrationFactory;
+use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject\IdentityService;
@@ -23,36 +24,42 @@ use Magento\Store\Model\StoreManager;
 
 class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegrationRepositoryInterface
 {
+    const LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID = 'warranty/authentication/store_id';
+    const LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID = 'warranty/authentication/sandbox_store_id';
+
     private StoreManager $storeManager;
     private IdentityService $identityService;
-    private StoreIntegrationFactory $storeIntegration;
+    private StoreIntegrationFactory $storeIntegrationFactory;
     private StoreIntegrationResource $storeIntegrationResource;
     private OauthServiceInterface $oauthService;
     private IntegrationServiceInterface $integrationService;
     private CollectionFactory $storeIntegrationCollectionFactory;
     private ScopeConfigInterface $scopeConfig;
     private EncryptorInterface $encryptor;
+    private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
 
     public function __construct(
-        StoreManager $storeManager,
-        IdentityService $identityService,
-        StoreIntegrationFactory $storeIntegration,
-        StoreIntegrationResource $storeIntegrationResource,
-        OauthServiceInterface $oauthService,
+        StoreManager                $storeManager,
+        IdentityService             $identityService,
+        StoreIntegrationFactory     $storeIntegrationFactory,
+        StoreIntegrationResource    $storeIntegrationResource,
+        OauthServiceInterface       $oauthService,
         IntegrationServiceInterface $integrationService,
-        CollectionFactory $storeIntegrationCollectionFactory,
-        ScopeConfigInterface $scopeConfig,
-        EncryptorInterface $encryptor
+        CollectionFactory           $storeIntegrationCollectionFactory,
+        ScopeConfigInterface        $scopeConfig,
+        EncryptorInterface          $encryptor,
+        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
     ) {
         $this->storeManager = $storeManager;
         $this->identityService = $identityService;
-        $this->storeIntegration = $storeIntegration;
+        $this->storeIntegrationFactory = $storeIntegrationFactory;
         $this->storeIntegrationResource = $storeIntegrationResource;
         $this->oauthService = $oauthService;
         $this->integrationService = $integrationService;
         $this->storeIntegrationCollectionFactory = $storeIntegrationCollectionFactory;
         $this->scopeConfig = $scopeConfig;
         $this->encryptor = $encryptor;
+        $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
     }
 
     /**
@@ -106,7 +113,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      */
     public function getByUuid(string $storeUuid): StoreIntegrationInterface
     {
-        $storeIntegration = $this->storeIntegration->create();
+        $storeIntegration = $this->storeIntegrationFactory->create();
         $this->storeIntegrationResource->load($storeIntegration, $storeUuid, 'store_uuid');
 
         return $storeIntegration;
@@ -120,7 +127,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      */
     public function getByExtendUuid(string $extendStoreUuid): StoreIntegrationInterface
     {
-        $storeIntegration = $this->storeIntegration->create();
+        $storeIntegration = $this->storeIntegrationFactory->create();
         $this->storeIntegrationResource->load($storeIntegration, $extendStoreUuid, 'extend_store_uuid');
 
         return $storeIntegration;
@@ -175,11 +182,22 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
     public function saveStoreToIntegration(int $integrationId, int $storeId): void
     {
         $storeIntegration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
-        if ($storeIntegration->getData()) {
+        if ($storeIntegration->getData('disabled') == 1) {
             $storeIntegration->setDisabled(0);
             $this->storeIntegrationResource->save($storeIntegration);
         } else {
-            $storeIntegration = $this->storeIntegration->create();
+            $storeCode = $this->storeManager->getStore($storeId)->getCode();
+            $legacyExtendProductionStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID, $this->scopeConfig::SCOPE_STORES, $storeCode);
+            $legacyExtendSandboxStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID, $this->scopeConfig::SCOPE_STORES, $storeCode);
+            $integration = $this->integrationService->get($integrationId);
+            $environment = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
+            $storeIntegration = $this->storeIntegrationFactory->create();
+            if ($legacyExtendProductionStoreId && $environment == 'prod') {
+                $storeIntegration->setExtendStoreUuid($legacyExtendProductionStoreId);
+            }
+            if ($legacyExtendSandboxStoreId && $environment == 'demo') {
+                $storeIntegration->setExtendStoreUuid($legacyExtendSandboxStoreId);
+            }
             $storeIntegration->setStoreId($storeId);
             $storeIntegration->setIntegrationId($integrationId);
             $this->storeIntegrationResource->save($storeIntegration);
