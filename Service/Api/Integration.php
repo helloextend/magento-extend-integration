@@ -21,7 +21,7 @@ class Integration
         'webhooks_orders_cancel' => '/webhooks/orders/cancel',
         'webhooks_orders_update' => '/webhooks/orders/update',
         'webhooks_shipments_create' => '/webhooks/shipments/create',
-        'webhooks_shipments_update' => '/webhooks/shipment/update',
+        'webhooks_shipments_update' => '/webhooks/shipments/update',
         'webhooks_products_create' => '/webhooks/products/create',
         'webhooks_products_update' => '/webhooks/products/update',
         'webhooks_products_delete' => '/webhooks/products/delete',
@@ -84,7 +84,13 @@ class Integration
             $this->logger->info('Curl request to ' . $fullUrl . ' provided the following response: ' . $response);
 
             if ($status >= 400) {
-                $this->logErrorToLoggingService($response, $this->storeManager->getStore()->getId(), 'error');
+                $errorMessage = 'Curl request to ' . $fullUrl . ' provided the following unsuccessful response: ' . $response;
+                
+                $this->logErrorToLoggingService(
+                    $errorMessage,
+                    $this->storeManager->getStore()->getId(),
+                    'error'
+                );
             }
 
             if ($getBody) {

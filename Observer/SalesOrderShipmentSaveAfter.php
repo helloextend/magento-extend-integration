@@ -11,6 +11,7 @@ use Extend\Integration\Service\Api\ShipmentObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Sales\Model\Order\Shipment;
 use Psr\Log\LoggerInterface;
 
 class SalesOrderShipmentSaveAfter implements ObserverInterface
@@ -55,24 +56,28 @@ class SalesOrderShipmentSaveAfter implements ObserverInterface
   {
     try {
       $shipment = $observer->getEvent()->getShipment();
-
-      if ($shipment->isObjectNew()) {
-        $this->shipmentObserverHandler->execute(
-          ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_create'], 'type' => 'middleware'],
-          $shipment,
-          []
-        );
-      } else {
-        $this->shipmentObserverHandler->execute(
-          ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'], 'type' => 'middleware'],
-          $shipment,
-          []
-        );
-      }
+      $endpoint = $this->resolveEndpoint($shipment);
+      $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
     } catch (\Exception $exception) {
       // silently handle errors
-      $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
+      $this->logger->error('Extend Shipment Observer Handler encountered the following error: ' . $exception->getMessage());
       $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
     }
+  }
+
+  /**
+   * @param Shipment $shipment
+   * @return array
+   */
+  private function resolveEndpoint($shipment): array
+  {
+    $createdAt = $shipment->getCreatedAt();
+    $updatedAt = $shipment->getUpdatedAt();
+
+    if ($createdAt === $updatedAt) {
+      return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_create'], 'type' => 'middleware'];
+    }
+
+    return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'], 'type' => 'middleware'];
   }
 }

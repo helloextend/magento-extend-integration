@@ -94,7 +94,12 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
       ->getMockForAbstractClass();
     $this->storeManager->expects($this->any())->method('getStore')
       ->willReturn($this->store);
-    $this->shipmentMock = $this->createMock(Shipment::class);
+    $this->shipmentMock = $this->getMockBuilder(Shipment::class)
+      ->onlyMethods(['getCreatedAt', 'getUpdatedAt'])->disableOriginalConstructor()
+      ->getMock();
+    $mockDate = '2021-01-01 00:00:00';
+    $this->shipmentMock->expects($this->any())->method('getCreatedAt')->willReturn($mockDate);
+    $this->shipmentMock->expects($this->any())->method('getUpdatedAt')->willReturn($mockDate);
     $this->event = $this->getMockBuilder(Event::class)
       ->addMethods(['getShipment'])
       ->disableOriginalConstructor()
@@ -119,7 +124,7 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
     $this->shipmentObserverHandler->expects($this->once())
       ->method('execute')
       ->with(
-        $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'], 'type' => 'middleware']),
+        $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_create'], 'type' => 'middleware']),
         $this->equalTo($this->shipmentMock),
         $this->equalTo([])
       );
