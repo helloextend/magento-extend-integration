@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Controller\AbstractController;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Model\ShippingProtectionFactory;
 use Magento\Framework\Registry;
 
 class OrderLoaderPlugin
@@ -17,7 +18,8 @@ class OrderLoaderPlugin
 
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        Registry $registry
+        Registry $registry,
+        ShippingProtectionFactory $shippingProtectionFactory
     ){
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->registry = $registry;
@@ -31,24 +33,11 @@ class OrderLoaderPlugin
             return $result;
         }
 
-        $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($orderId, ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID);
-
-        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-            return $result;
-
-        $order = $this->registry->registry('current_order');
-
-        $extensionAttributes = $order->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-            ]
+        $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+            $orderId,
+            ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
+            $this->registry->registry('current_order')
         );
-        $order->setExtensionAttributes($extensionAttributes);
 
         return $result;
     }

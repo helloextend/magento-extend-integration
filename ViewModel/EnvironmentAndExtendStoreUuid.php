@@ -34,7 +34,6 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
     public function getActiveEnvironment()
     {
         $activeEnvironmentUrl = $this->activeEnvironmentURLBuilder->getIntegrationURL();
-
         return $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($activeEnvironmentUrl);
     }
 

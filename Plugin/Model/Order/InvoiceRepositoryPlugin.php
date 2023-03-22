@@ -47,22 +47,11 @@ class InvoiceRepositoryPlugin
      */
     public function afterGet(\Magento\Sales\Model\Order\InvoiceRepository $subject, $result, $invoiceId)
     {
-        $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($invoiceId, ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID);
-
-        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-            return $result;
-
-        $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-            ]
+        $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+            $invoiceId,
+            ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
+            $result
         );
-        $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
     }
@@ -82,20 +71,14 @@ class InvoiceRepositoryPlugin
             $extensionAttributes = $this->invoiceExtensionFactory->create();
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
-        $this->shippingProtectionTotalRepository->save($result->getEntityId(), ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID, $shippingProtection['sp_quote_id'], $shippingProtection['price'], $shippingProtection['currency'], $shippingProtection['base'], $shippingProtection['base_currency']);
 
-        $resultExtensionAttributes = $result->getExtensionAttributes();
-        $resultExtensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtection['base'],
-                'base_currency' => $shippingProtection['base_currency'],
-                'price' => $shippingProtection['price'],
-                'currency' => $shippingProtection['currency'],
-                'sp_quote_id' => $shippingProtection['sp_quote_id']
-            ]
-        );
-        $result->setExtensionAttributes($resultExtensionAttributes);
-
+        if ($result && $shippingProtection) {
+            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                $shippingProtection,
+                $result,
+                ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
+            );
+        }
         return $result;
     }
 }

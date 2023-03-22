@@ -60,11 +60,13 @@ class SavePlugin
                 $invoiceExtensionAttributes = $this->invoiceExtensionFactory->create();
             }
             $shippingProtection = $invoiceExtensionAttributes->getShippingProtection();
-
-            if (!$shippingProtection || count($shippingProtection) === 0)
-                return $result;
-
-            $this->shippingProtectionTotalRepository->save($invoice->getId(), ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID, $shippingProtection['sp_quote_id'], $shippingProtection['price'], $shippingProtection['currency'], $shippingProtection['base'], $shippingProtection['base_currency']);
+            if ($result && $shippingProtection) {
+                $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                    $shippingProtection,
+                    $invoice,
+                    ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
+                );
+            }
         }
         return $result;
     }

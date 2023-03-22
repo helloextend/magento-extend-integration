@@ -10,6 +10,7 @@ use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Quote\Api\Data\CartExtensionFactory;
 use Magento\Quote\Model\QuoteRepository;
+use Extend\Integration\Model\ShippingProtectionFactory;
 
 class QuoteRepositoryPlugin
 {
@@ -22,13 +23,16 @@ class QuoteRepositoryPlugin
      * @var CartExtensionFactory
      */
     private CartExtensionFactory $cartExtensionFactory;
+    private ShippingProtectionFactory $shippingProtectionFactory;
 
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        CartExtensionFactory $cartExtensionFactory
+        CartExtensionFactory $cartExtensionFactory,
+        ShippingProtectionFactory $shippingProtectionFactory
     ) {
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->cartExtensionFactory = $cartExtensionFactory;
+        $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
 
     /**
@@ -41,22 +45,11 @@ class QuoteRepositoryPlugin
      */
     public function afterGet(\Magento\Quote\Model\QuoteRepository $subject, $result, $cartId)
     {
-        $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($cartId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID);
-
-        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-            return $result;
-
-        $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-            ]
+        $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+            $cartId,
+            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID,
+            $result
         );
-        $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
     }
@@ -77,16 +70,13 @@ class QuoteRepositoryPlugin
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (
-            isset($shippingProtection['base']) &&
-            isset($shippingProtection['base_currency']) &&
-            isset($shippingProtection['price']) &&
-            isset($shippingProtection['currency']) &&
-            isset($shippingProtection['sp_quote_id'])
-        ) {
-            $this->shippingProtectionTotalRepository->save($quote->getEntityId(), ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID, $shippingProtection['sp_quote_id'], $shippingProtection['price'], $shippingProtection['currency'], $shippingProtection['base'], $shippingProtection['base_currency']);
+        if ($result && $shippingProtection) {
+            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                $shippingProtection,
+                $result,
+                ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+            );
         }
-
         return $result;
     }
 }
