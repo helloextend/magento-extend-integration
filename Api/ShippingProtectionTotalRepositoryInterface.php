@@ -6,7 +6,9 @@
 
 namespace Extend\Integration\Api;
 
+use Extend\Integration\Api\Data\ShippingProtectionInterface;
 use Extend\Integration\Model\ShippingProtectionTotal;
+use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -70,4 +72,27 @@ interface ShippingProtectionTotalRepositoryInterface
      * @return void
      */
     public function delete(): void;
+
+    /**
+     * Get Shipping Protection Quote Record and Saturate Shipping Protection Extension Attributes -
+     * supports Quote, Order, Invoice, and Credit Memo entities
+     *
+     * @param int $entityId
+     * @param int $entityTypeId
+     * @param ExtensibleDataInterface $result
+     * @return void
+     */
+    public function getAndSaturateExtensionAttributes(int $entityId, int $entityTypeId, ExtensibleDataInterface $result): void;
+
+    /**
+     * Save Shipping Protection extension attribute to Shipping Protection table and
+     * resaturate Shipping Protection Extension Attributes -
+     * supports Quote, Order, Invoice, and Credit Memo entities
+     *
+     * @param ShippingProtectionInterface $shippingProtectionExtensionAttribute
+     * @param ExtensibleDataInterface $result
+     * @param int $entityTypeId
+     * @return void
+     */
+    public function saveAndResaturateExtensionAttribute(ShippingProtectionInterface $shippingProtectionExtensionAttribute, \Magento\Framework\Api\ExtensibleDataInterface $result, int $entityTypeId): void;
 }
