@@ -34,10 +34,7 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
     public function getActiveEnvironment()
     {
         $activeEnvironmentUrl = $this->activeEnvironmentURLBuilder->getIntegrationURL();
-        $urlParts = explode("integ-mage", $activeEnvironmentUrl);
-        $activeEnvironment = explode(".extend.com", $urlParts[1]);
-
-        return $activeEnvironment[0] ? str_replace("-", "", $activeEnvironment[0]) : 'prod';
+        return $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($activeEnvironmentUrl);
     }
 
     public function getExtendStoreUuid(): ?string
