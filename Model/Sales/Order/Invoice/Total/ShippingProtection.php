@@ -6,8 +6,10 @@
 
 namespace Extend\Integration\Model\Sales\Order\Invoice\Total;
 
+use Extend\Integration\Api\Data\ShippingProtectionInterface;
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Model\ShippingProtectionFactory;
 use Magento\Sales\Model\Order\Invoice;
 
 class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\AbstractTotal
@@ -16,15 +18,18 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
      * @var ShippingProtectionTotalRepositoryInterface
      */
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
+    private ShippingProtectionFactory $shippingProtectionFactory;
 
     /**
      * @param ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
      */
     public function __construct(
-        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
+        ShippingProtectionFactory $shippingProtectionFactory
     ) {
         parent::__construct();
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
 
     /**
@@ -48,8 +53,8 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
 
             foreach ($invoice->getAllItems() as $item) {
                 if ((int)$item->getQty() > 0 && $item->getOrderItem()->getIsVirtual() == "0") {
-                    $shippingProtectionBasePrice = $shippingProtection['base'];
-                    $shippingProtectionPrice = $shippingProtection['price'];
+                    $shippingProtectionBasePrice = $shippingProtection->getBase();
+                    $shippingProtectionPrice = $shippingProtection->getPrice();
 
                     $invoice->setBaseShippingProtection($shippingProtectionBasePrice);
                     $invoice->setShippingProtection($shippingProtectionPrice);
@@ -73,10 +78,10 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
      * which will persist to the database.
      *
      * @param Invoice $invoice
-     * @param array $shippingProtection
+     * @param ShippingProtectionInterface $shippingProtection
      * @return void
      */
-    private function zeroOutShippingProtection(Invoice $invoice, array $shippingProtection)
+    private function zeroOutShippingProtection(Invoice $invoice, \Extend\Integration\Api\Data\ShippingProtectionInterface $shippingProtectionTotal)
     {
         $invoice->setBaseShippingProtection(0.00);
         $invoice->setShippingProtection(0.00);
@@ -84,13 +89,12 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
         $invoice->setGrandTotal($invoice->getGrandTotal() + $invoice->getShippingProtection());
         $invoice->setBaseGrandTotal($invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection());
 
-        $shippingProtection = [
-            'base' => 0.00,
-            'base_currency' => $shippingProtection['base_currency'],
-            'price' => 0.00,
-            'currency' => $shippingProtection['currency'],
-            'sp_quote_id' => $shippingProtection['sp_quote_id']
-        ];
+        $shippingProtection = $this->shippingProtectionFactory->create();
+        $shippingProtection->setBase(0.00);
+        $shippingProtection->setBaseCurrency($shippingProtectionTotal->getBaseCurrency());
+        $shippingProtection->setPrice(0.00);
+        $shippingProtection->setCurrency($shippingProtectionTotal->getCurrency());
+        $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
         $extensionAttributes = $invoice->getExtensionAttributes();
         $extensionAttributes->setShippingProtection($shippingProtection);
         $invoice->setExtensionAttributes($extensionAttributes);

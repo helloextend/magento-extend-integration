@@ -21,8 +21,8 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Total\AbstractTotal
     {
 
         if ($shippingProtection = $order->getOrder()->getExtensionAttributes()->getShippingProtection()) {
-            $shippingProtectionBasePrice = $shippingProtection['base'];
-            $shippingProtectionPrice = $shippingProtection['price'];
+            $shippingProtectionBasePrice = $shippingProtection->getBase();
+            $shippingProtectionPrice = $shippingProtection->getPrice();
 
             $order->setBaseShippingProtection($shippingProtectionBasePrice);
             $order->setShippingProtection($shippingProtectionPrice);

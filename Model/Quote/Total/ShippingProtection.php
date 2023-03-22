@@ -67,9 +67,9 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (isset($shippingProtection['price']) && $shippingProtection['price'] > 0) {
-            $total->addTotalAmount($this->getCode(), $shippingProtection['price']);
-            $total->addBaseTotalAmount($this->getCode(), $shippingProtection['base'] ?: $shippingProtection['price']);
+        if ($shippingProtection && $shippingProtection->getPrice() > 0) {
+            $total->addTotalAmount($this->getCode(), $shippingProtection->getPrice());
+            $total->addBaseTotalAmount($this->getCode(), $shippingProtection->getBase() ?: $shippingProtection->getPrice());
         }
 
         return $this;
@@ -92,15 +92,13 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (!isset($shippingProtection['price']))
+        if (!$shippingProtection || !$shippingProtection->getPrice())
             return [];
-
-        $shippingProtectionPrice = $shippingProtection['price'];
 
         return [
             'code' => $this->getCode(),
             'title' => $this->getLabel(),
-            'value' => $shippingProtectionPrice
+            'value' => $shippingProtection->getPrice()
         ];
     }
 }
