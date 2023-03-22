@@ -94,11 +94,11 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (!$shippingProtection || !isset($shippingProtection['price'])) {
+        if (!$shippingProtection || !$shippingProtection->getPrice()) {
             return 0;
         }
 
-        return (float)$shippingProtection['price'];
+        return (float)$shippingProtection->getPrice();
     }
 
     /**

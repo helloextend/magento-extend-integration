@@ -65,9 +65,6 @@ class SaveOrderBeforeSalesModelQuote implements ObserverInterface
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->orderExtensionFactory->create();
             }
-            if ($extensionAttributes->getShippingProtection() === null) {
-                $extensionAttributes->setShippingProtection([]);
-            }
             $order->setExtensionAttributes($extensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_quote', 'to_order', $quote, $order);

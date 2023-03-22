@@ -92,8 +92,8 @@ class Totals extends \Magento\Framework\View\Element\Template
                 }
             }
             $shippingProtection = $extensionAttributes->getShippingProtection();
-            if ($shippingProtection && isset($shippingProtection['price'])) {
-                return (float) $shippingProtection['price'];
+            if ($shippingProtection && $shippingProtection->getPrice()) {
+                return (float) $shippingProtection->getPrice();
             } else {
                 return 0;
             }
