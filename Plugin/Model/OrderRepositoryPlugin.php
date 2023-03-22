@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Plugin\Model;
 
+use Extend\Integration\Model\ShippingProtectionFactory;
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
@@ -22,6 +23,7 @@ class OrderRepositoryPlugin
      * @var ShippingProtectionTotalRepositoryInterface
      */
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
+    private ShippingProtectionFactory $shippingProtectionFactory;
 
     /**
      * @param OrderExtensionFactory $orderExtensionFactory
@@ -29,10 +31,12 @@ class OrderRepositoryPlugin
      */
     public function __construct(
         OrderExtensionFactory $orderExtensionFactory,
-        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
+        ShippingProtectionFactory $shippingProtectionFactory
     ) {
         $this->orderExtensionFactory = $orderExtensionFactory;
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
 
     /**
@@ -45,22 +49,11 @@ class OrderRepositoryPlugin
      */
     public function afterGet(\Magento\Sales\Model\OrderRepository $subject, $result, $orderId)
     {
-        $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($orderId, ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID);
-
-        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-            return $result;
-
-        $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-            ]
+        $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+            $orderId,
+            ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
+            $result
         );
-        $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
     }
@@ -80,28 +73,14 @@ class OrderRepositoryPlugin
             $extensionAttributes = $this->orderExtensionFactory->create();
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
-        if (
-            isset($shippingProtection['base']) &&
-            isset($shippingProtection['base_currency']) &&
-            isset($shippingProtection['price']) &&
-            isset($shippingProtection['currency']) &&
-            isset($shippingProtection['sp_quote_id'])
-        ) {
-            $this->shippingProtectionTotalRepository->save($result->getEntityId(), ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID, $shippingProtection['sp_quote_id'], $shippingProtection['price'], $shippingProtection['currency'], $shippingProtection['base'], $shippingProtection['base_currency']);
 
-            $resultExtensionAttributes = $result->getExtensionAttributes();
-            $resultExtensionAttributes->setShippingProtection(
-                [
-                    'base' => $shippingProtection['base'],
-                    'base_currency' => $shippingProtection['base_currency'],
-                    'price' => $shippingProtection['price'],
-                    'currency' => $shippingProtection['currency'],
-                    'sp_quote_id' => $shippingProtection['sp_quote_id']
-                ]
+        if ($result && $shippingProtection) {
+            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                $shippingProtection,
+                $result,
+                ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID
             );
-            $result->setExtensionAttributes($resultExtensionAttributes);
         }
-
         return $result;
     }
 
@@ -110,22 +89,11 @@ class OrderRepositoryPlugin
         $orders = $result->getItems();
         if (!empty($orders)) {
             foreach ($orders as $order) {
-                $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($order->getId(), ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID);
-
-                if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-                    return $result;
-
-                $extensionAttributes = $order->getExtensionAttributes();
-                $extensionAttributes->setShippingProtection(
-                    [
-                        'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                        'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                        'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                        'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                        'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-                    ]
+                $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+                    $order->getId(),
+                    ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
+                    $order
                 );
-                $order->setExtensionAttributes($extensionAttributes);
             }
         }
         return $result;

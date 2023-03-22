@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Model\Convert;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Model\ShippingProtectionTotalRepository;
+use Extend\Integration\Model\ShippingProtectionFactory;
 use Magento\Framework\App\Request\Http;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
@@ -37,6 +38,7 @@ class OrderPlugin
      */
     private ShippingProtectionTotalRepository $shippingProtectionTotalRepository;
     private Http $http;
+    private ShippingProtectionFactory $shippingProtectionFactory;
 
     /**
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
@@ -49,7 +51,8 @@ class OrderPlugin
         OrderExtensionFactory $orderExtensionFactory,
         Copy $objectCopyService,
         ShippingProtectionTotalRepository $shippingProtectionTotalRepository,
-        Http $http
+        Http $http,
+        ShippingProtectionFactory $shippingProtectionFactory
     ) {
 
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
@@ -57,6 +60,7 @@ class OrderPlugin
         $this->orderExtensionFactory = $orderExtensionFactory;
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->http = $http;
+        $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
 
     /**
@@ -74,17 +78,16 @@ class OrderPlugin
             $orderExtensionAttributes = $this->orderExtensionFactory->create();
         }
         if ($orderExtensionAttributes->getShippingProtection() === null) {
+
             $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get($order->getEntityId(), ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID);
             if($shippingProtectionTotalData->getData()) {
-                $orderExtensionAttributes->setShippingProtection(
-                    [
-                        'base' => $shippingProtectionTotalData->getShippingProtectionBasePrice(),
-                        'base_currency' => $shippingProtectionTotalData->getShippingProtectionBaseCurrency(),
-                        'price' => $shippingProtectionTotalData->getShippingProtectionPrice(),
-                        'currency' => $shippingProtectionTotalData->getShippingProtectionCurrency(),
-                        'sp_quote_id' => $shippingProtectionTotalData->getSpQuoteId()
-                    ]
-                );
+                $shippingProtection = $this->shippingProtectionFactory->create();
+                $shippingProtection->setBase($shippingProtectionTotalData->getShippingProtectionBasePrice());
+                $shippingProtection->setBaseCurrency($shippingProtectionTotalData->getShippingProtectionBaseCurrency());
+                $shippingProtection->setPrice($shippingProtectionTotalData->getShippingProtectionPrice());
+                $shippingProtection->setCurrency($shippingProtectionTotalData->getShippingProtectionCurrency());
+                $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
+                $orderExtensionAttributes->setShippingProtection($shippingProtection);
             }
         }
         if($orderExtensionAttributes->getShippingProtection() !== null) {
@@ -94,9 +97,9 @@ class OrderPlugin
             if ($invoiceExtensionAttributes === null) {
                 $invoiceExtensionAttributes = $this->invoiceExtensionFactory->create();
             }
-            if ($invoiceExtensionAttributes->getShippingProtection() === null) {
-                $invoiceExtensionAttributes->setShippingProtection([]);
-            }
+//            if ($invoiceExtensionAttributes->getShippingProtection() === null) {
+//                $invoiceExtensionAttributes->setShippingProtection();
+//            }
             $result->setExtensionAttributes($invoiceExtensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_order', 'to_invoice', $order, $result);
@@ -121,15 +124,13 @@ class OrderPlugin
         if ($orderExtensionAttributes->getShippingProtection() === null) {
             $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get($order->getEntityId(), ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID);
             if($shippingProtectionTotalData->getData()) {
-                $orderExtensionAttributes->setShippingProtection(
-                    [
-                        'base' => $shippingProtectionTotalData->getShippingProtectionBasePrice(),
-                        'base_currency' => $shippingProtectionTotalData->getShippingProtectionBaseCurrency(),
-                        'price' => $shippingProtectionTotalData->getShippingProtectionPrice(),
-                        'currency' => $shippingProtectionTotalData->getShippingProtectionCurrency(),
-                        'sp_quote_id' => $shippingProtectionTotalData->getSpQuoteId()
-                    ]
-                );
+                $shippingProtection = $this->shippingProtectionFactory->create();
+                $shippingProtection->setBase($shippingProtectionTotalData->getShippingProtectionBasePrice());
+                $shippingProtection->setBaseCurrency($shippingProtectionTotalData->getShippingProtectionBaseCurrency());
+                $shippingProtection->setPrice($shippingProtectionTotalData->getShippingProtectionPrice());
+                $shippingProtection->setCurrency($shippingProtectionTotalData->getShippingProtectionCurrency());
+                $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
+                $orderExtensionAttributes->setShippingProtection($shippingProtection);
                 $result->setData('original_shipping_protection', $shippingProtectionTotalData->getShippingProtectionPrice());
             }
         }
@@ -141,15 +142,13 @@ class OrderPlugin
                     if ($creditMemoExtensionAttributes === null) {
                         $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
                     }
-                    $creditMemoExtensionAttributes->setShippingProtection(
-                        [
-                            'base' => $post['shipping_protection'],
-                            'base_currency' => $shippingProtectionTotalData->getShippingProtectionBaseCurrency(),
-                            'price' => $post['shipping_protection'],
-                            'currency' => $shippingProtectionTotalData->getShippingProtectionCurrency(),
-                            'sp_quote_id' => $shippingProtectionTotalData->getSpQuoteId()
-                        ]
-                    );
+                    $shippingProtection = $this->shippingProtectionFactory->create();
+                    $shippingProtection->setBase($post['shipping_protection']);
+                    $shippingProtection->setBaseCurrency($shippingProtectionTotalData->getShippingProtectionBaseCurrency());
+                    $shippingProtection->setPrice($post['shipping_protection']);
+                    $shippingProtection->setCurrency($shippingProtectionTotalData->getShippingProtectionCurrency());
+                    $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
+                    $creditMemoExtensionAttributes->setShippingProtection($shippingProtection);
                     $result->setExtensionAttributes($creditMemoExtensionAttributes);
 
                     return $result;
@@ -160,9 +159,9 @@ class OrderPlugin
             if ($creditMemoExtensionAttributes === null) {
                 $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
             }
-            if ($creditMemoExtensionAttributes->getShippingProtection() === null) {
-                $creditMemoExtensionAttributes->setShippingProtection([]);
-            }
+//            if ($creditMemoExtensionAttributes->getShippingProtection() === null) {
+//                $creditMemoExtensionAttributes->setShippingProtection([]);
+//            }
             $result->setExtensionAttributes($creditMemoExtensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_order', 'to_cm', $order, $result);

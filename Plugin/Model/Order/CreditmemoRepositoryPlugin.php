@@ -10,6 +10,7 @@ use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Sales\Model\Order\CreditmemoRepository;
+use Extend\Integration\Model\ShippingProtectionFactory;
 
 class CreditmemoRepositoryPlugin
 {
@@ -22,13 +23,16 @@ class CreditmemoRepositoryPlugin
      * @var CreditmemoExtensionFactory
      */
     private \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory;
+    private ShippingProtectionFactory $shippingProtectionFactory;
 
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory
+        \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory,
+        ShippingProtectionFactory $shippingProtectionFactory
     ){
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
+        $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
 
     /**
@@ -41,22 +45,11 @@ class CreditmemoRepositoryPlugin
      */
     public function afterGet(\Magento\Sales\Model\Order\CreditmemoRepository $subject, $result, $creditMemoId)
     {
-        $shippingProtectionTotal = $this->shippingProtectionTotalRepository->get($creditMemoId, ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID);
-
-        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
-            return $result;
-
-        $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtectionTotal->getShippingProtectionBasePrice(),
-                'base_currency' => $shippingProtectionTotal->getShippingProtectionBaseCurrency(),
-                'price' => $shippingProtectionTotal->getShippingProtectionPrice(),
-                'currency' => $shippingProtectionTotal->getShippingProtectionCurrency(),
-                'sp_quote_id' => $shippingProtectionTotal->getSpQuoteId()
-            ]
+        $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
+            $creditMemoId,
+            ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
+            $result
         );
-        $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
     }
@@ -76,20 +69,14 @@ class CreditmemoRepositoryPlugin
             $extensionAttributes = $this->creditmemoExtensionFactory->create();
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
-        $this->shippingProtectionTotalRepository->save($result->getEntityId(), ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID, $shippingProtection['sp_quote_id'], $shippingProtection['price'], $shippingProtection['currency'], $shippingProtection['base'], $shippingProtection['base_currency']);
 
-        $resultExtensionAttributes = $result->getExtensionAttributes();
-        $resultExtensionAttributes->setShippingProtection(
-            [
-                'base' => $shippingProtection['base'],
-                'base_currency' => $shippingProtection['base_currency'],
-                'price' => $shippingProtection['price'],
-                'currency' => $shippingProtection['currency'],
-                'sp_quote_id' => $shippingProtection['sp_quote_id']
-            ]
-        );
-        $result->setExtensionAttributes($resultExtensionAttributes);
-
+        if ($result && $shippingProtection) {
+            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                $shippingProtection,
+                $result,
+                ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID
+            );
+        }
         return $result;
     }
 }
