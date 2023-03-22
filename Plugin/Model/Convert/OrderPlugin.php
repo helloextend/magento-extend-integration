@@ -97,9 +97,6 @@ class OrderPlugin
             if ($invoiceExtensionAttributes === null) {
                 $invoiceExtensionAttributes = $this->invoiceExtensionFactory->create();
             }
-//            if ($invoiceExtensionAttributes->getShippingProtection() === null) {
-//                $invoiceExtensionAttributes->setShippingProtection();
-//            }
             $result->setExtensionAttributes($invoiceExtensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_order', 'to_invoice', $order, $result);
@@ -159,9 +156,6 @@ class OrderPlugin
             if ($creditMemoExtensionAttributes === null) {
                 $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
             }
-//            if ($creditMemoExtensionAttributes->getShippingProtection() === null) {
-//                $creditMemoExtensionAttributes->setShippingProtection([]);
-//            }
             $result->setExtensionAttributes($creditMemoExtensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_order', 'to_cm', $order, $result);
