@@ -114,7 +114,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements \Mage
     public function canShowTab()
     {
         $integrationData = $this->_coreRegistry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION);
-        if ($integrationData && str_contains($integrationData['endpoint'], 'extend.com') && str_contains($integrationData['endpoint'], 'integ-mage')) {
+        if (isset($integrationData['integration_id']) && str_contains($integrationData['endpoint'], 'extend.com') && str_contains($integrationData['endpoint'], 'integ-mage')) {
             return true;
         }
     }
