@@ -95,4 +95,20 @@ interface ShippingProtectionTotalRepositoryInterface
      * @return void
      */
     public function saveAndResaturateExtensionAttribute(ShippingProtectionInterface $shippingProtectionExtensionAttribute, \Magento\Framework\Api\ExtensibleDataInterface $result, int $entityTypeId): void;
+
+    /**
+     * Save Shipping Protection total using Magento quote ID and cart ID as provided via API
+     *
+     * @param string $cartId
+     * @param string $spQuoteId
+     * @param float $price
+     * @param string $currency
+     * @param float|null $basePrice
+     * @param string|null $baseCurrency
+     * @return void
+     * @throws AlreadyExistsException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void;
 }
