@@ -117,7 +117,7 @@ class SalesOrderShipmentTrackSaveAfterTest extends TestCase
     $this->observer->expects($this->any())->method('getEvent')->willReturn($this->event);
     $this->objectManager = new ObjectManager($this);
     $this->import = $this->objectManager->getObject(
-      SalesOrderShipmentSaveAfter::class,
+      SalesOrderShipmentTrackSaveAfter::class,
       [
         'logger' => $this->logger,
         'shipmentObserverHandler' => $this->shipmentObserverHandler,
