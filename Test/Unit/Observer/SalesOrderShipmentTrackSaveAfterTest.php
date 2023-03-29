@@ -8,7 +8,7 @@ namespace Extend\Integration\Test\Unit\Observer;
 
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\ShipmentObserverHandler;
-use Extend\Integration\Observer\SalesOrderShipmentSaveAfter;
+use Extend\Integration\Observer\SalesOrderShipmentTrackSaveAfter;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Store;
 use Magento\Sales\Model\Order\Shipment;
@@ -29,7 +29,7 @@ class SalesOrderShipmentTrackSaveAfterTest extends TestCase
   private $logger;
 
   /**
-   * @var SalesOrderShipmentSaveAfter
+   * @var SalesOrderShipmentTrackSaveAfter
    */
   private $import;
 
