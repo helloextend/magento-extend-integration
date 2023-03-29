@@ -161,7 +161,7 @@ class ShippingProtectionTotalRepository implements \Extend\Integration\Api\Shipp
     public function delete(): void
     {
         $entityId = $this->checkoutSession->getQuote()->getId();
-        $shippingProtection = $this->get($entityId,ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID);
+        $shippingProtection = $this->get($entityId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID);
         $this->shippingProtectionTotalResource->delete($shippingProtection);
     }
 
@@ -205,7 +205,7 @@ class ShippingProtectionTotalRepository implements \Extend\Integration\Api\Shipp
      * @return void
      * @throws AlreadyExistsException
      */
-    public function saveAndResaturateExtensionAttribute (
+    public function saveAndResaturateExtensionAttribute(
         ShippingProtectionInterface $shippingProtectionExtensionAttribute,
         ExtensibleDataInterface $result,
         int $entityTypeId
@@ -241,5 +241,24 @@ class ShippingProtectionTotalRepository implements \Extend\Integration\Api\Shipp
                 $result->setExtensionAttributes($extensionAttributesForResaturation);
             }
         }
+    }
+
+    /**
+     * Save Shipping Protection total using Magento quote ID and cart ID as provided via API
+     *
+     * @param string $cartId
+     * @param string $spQuoteId
+     * @param float $price
+     * @param string $currency
+     * @param float|null $basePrice
+     * @param string|null $baseCurrency
+     * @return void
+     * @throws AlreadyExistsException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void
+    {
+        $this->save($cartId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID, $spQuoteId, ($price / 100), $currency, ($basePrice / 100) ?: null, $baseCurrency ?: null);
     }
 }
