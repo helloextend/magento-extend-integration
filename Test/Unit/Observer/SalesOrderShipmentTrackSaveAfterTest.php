@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
 
-class SalesOrderShipmentSaveAfterTest extends TestCase
+class SalesOrderShipmentTrackSaveAfterTest extends TestCase
 {
   /**
    * @var LoggerInterface
