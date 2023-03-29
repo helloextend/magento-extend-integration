@@ -100,12 +100,12 @@ class SalesOrderShipmentTrackSaveAfterTest extends TestCase
       ->getMockForAbstractClass();
     $this->storeManager->expects($this->any())->method('getStore')
       ->willReturn($this->store);
+    $this->shipmentMock = $this->getMockBuilder(Shipment::class)->getMock();
     $this->trackMock = $this->getMockBuilder(Track::class)
       ->setMethods(['getShipment'])
       ->disableOriginalConstructor()
       ->getMockForAbstractClass();
     $this->trackMock->expects($this->any())->method('getShipment')->willReturn($this->shipmentMock);
-    $this->shipmentMock = $this->getMockBuilder(Shipment::class)->getMock();
     $this->event = $this->getMockBuilder(Event::class)
       ->addMethods(['getTrack'])
       ->disableOriginalConstructor()
