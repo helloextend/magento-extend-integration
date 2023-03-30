@@ -18,6 +18,9 @@
     <event name="sales_order_shipment_track_save_after">
         <observer instance="Extend\Integration\Observer\SalesOrderShipmentTrackSaveAfter" name="extend_sales_order_shipment_track_save_after" />
     </event>
+    <event name="sales_order_shipment_track_delete_after">
+        <observer instance="Extend\Integration\Observer\SalesOrderShipmentTrackDeleteAfter" name="extend_sales_order_shipment_track_delete_after" />
+    </event>
     <event name="controller_action_catalog_product_save_entity_after">
         <observer instance="Extend\Integration\Observer\CatalogProductSaveEntityAfter" name="extend_controller_action_catalog_product_save_entity_after"/>
     </event>
