@@ -16,5 +16,13 @@
                 <value id="extend-apis" type="host">https://*.extend.com/</value>
             </values>
         </policy>
+        <policy id="image-src">
+            <values>
+                <value id="extend-platformsandbox-images" type="host">https://shipping-offers-static-images-bucket-platformsandbox.s3.amazonaws.com/*</value>
+                <value id="extend-stage-images" type="host">https://shipping-offers-static-images-bucket-stage.s3.amazonaws.com/*</value>
+                <value id="extend-prod-images" type="host">https://shipping-offers-static-images-bucket-prod.s3.amazonaws.com/*</value>
+                <value id="extend-dev-images" type="host">https://shipping-offers-static-images-bucket-dev.s3.amazonaws.com/*</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist> 
