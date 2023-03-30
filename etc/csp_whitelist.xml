@@ -16,7 +16,7 @@
                 <value id="extend-apis" type="host">https://*.extend.com/</value>
             </values>
         </policy>
-        <policy id="image-src">
+        <policy id="img-src">
             <values>
                 <value id="extend-platformsandbox-images" type="host">https://shipping-offers-static-images-bucket-platformsandbox.s3.amazonaws.com/*</value>
                 <value id="extend-stage-images" type="host">https://shipping-offers-static-images-bucket-stage.s3.amazonaws.com/*</value>
