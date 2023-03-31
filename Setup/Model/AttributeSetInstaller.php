@@ -78,4 +78,22 @@ class AttributeSetInstaller
             );
         }
     }
+
+    public function deleteAttributeSet()
+    {
+        try {
+            $existingExtendAttributeSet = $this->attributeSetFactory->create();
+            $this->attributeSetResource->load($existingExtendAttributeSet, Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME, 'attribute_set_name');
+            if ($existingExtendAttributeSet->getAttributeSetId()) {
+                $this->attributeSetRepository->delete($existingExtendAttributeSet);
+            }
+        } catch (Exception $exception) {
+            throw new SetupException(
+                new Phrase(
+                    'here was an error deleting the Extend Attribute Set: %1',
+                    [$exception->getMessage()]
+                )
+            );
+        }
+    }
 }
