@@ -27,6 +27,7 @@ use Magento\Framework\Exception\StateException;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Dir\Reader;
 use Magento\Framework\Phrase;
+use Magento\Framework\Registry;
 use Magento\Framework\Setup\Exception as SetupException;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -43,6 +44,7 @@ class ProductInstaller
     private ProductResource $productResource;
     private Reader $reader;
     private StoreManagerInterface $storeManager;
+    private Registry $registry;
 
     public function __construct(
         DirectoryList $directoryList,
@@ -55,7 +57,8 @@ class ProductInstaller
         ProductRepositoryInterface $productRepository,
         ProductResource $productResource,
         Reader $reader,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Registry $registry
     ){
         $this->directoryList = $directoryList;
         $this->entryFactory = $entryFactory;
@@ -68,6 +71,7 @@ class ProductInstaller
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
         $this->reader = $reader;
+        $this->registry = $registry;
     }
 
     public function createProduct($attributeSet)
@@ -85,7 +89,12 @@ class ProductInstaller
     public function deleteProduct()
     {
         try {
-            if ($productToBeDeleted = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU)) {
+            $existingProduct = $this->productFactory->create();
+            $productId = $this->productResource->getIdBySku(Extend::WARRANTY_PRODUCT_SKU);
+            $this->productResource->load($existingProduct, $productId);
+            if ($existingProduct->getId()) {
+                $productToBeDeleted = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+                $this->registry->register('isSecureArea', true);
                 $this->productRepository->delete($productToBeDeleted);
                 $this->deleteImageFromPubMedia();
             }
@@ -106,7 +115,9 @@ class ProductInstaller
         try {
             // If the Extend protection product already exists, don't recreate it.
             $existingProduct = $this->productFactory->create();
-            if ($this->productResource->load($existingProduct, Extend::WARRANTY_PRODUCT_SKU, 'sku') && $existingProduct->getId()) {
+            $productId = $this->productResource->getIdBySku(Extend::WARRANTY_PRODUCT_SKU);
+            $this->productResource->load($existingProduct, $productId);
+            if ($existingProduct->getId()) {
                 return false;
             }
 

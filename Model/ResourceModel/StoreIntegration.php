@@ -8,13 +8,14 @@ namespace Extend\Integration\Model\ResourceModel;
 
 class StoreIntegration extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
+    public const EXTEND_STORE_INTEGRATION_TABLE = 'extend_store_integration';
 
     /**
      * @return void
      */
     protected function _construct()
     {
-        $this->_init('extend_store_integration', 'extend_store_integration_id');
+        $this->_init(self::EXTEND_STORE_INTEGRATION_TABLE, self::EXTEND_STORE_INTEGRATION_TABLE . '_id');
     }
 
 }
