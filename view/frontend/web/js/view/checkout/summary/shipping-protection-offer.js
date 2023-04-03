@@ -8,7 +8,7 @@ define(
       'uiComponent',
       'ko',
       'Magento_Checkout/js/model/quote',
-      'Extend',
+      'extendSdk',
       'ExtendMagento',
   ],
   function (Component, ko, magentoQuote, Extend, ExtendMagento) {
