@@ -21,10 +21,6 @@
         <plugin sortOrder="1" name="extendIntegrationQuoteRepository"
                 type="Extend\Integration\Plugin\Model\QuoteRepositoryPlugin"/>
     </type>
-    <type name="Magento\Backend\Controller\Adminhtml\System\Store\Save">
-        <plugin sortOrder="1" name="extendIntegrationSave"
-                type="Extend\Integration\Plugin\Controller\Adminhtml\System\Store\SavePlugin"/>
-    </type>
     <type name="Magento\Integration\Controller\Adminhtml\Integration\Save">
         <plugin sortOrder="1" name="extendIntegrationSave"
                 type="Extend\Integration\Plugin\Controller\Adminhtml\Integration\SavePlugin"/>
