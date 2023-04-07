@@ -46,4 +46,5 @@
     <type name="Magento\Catalog\Model\ProductRepository">
         <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin"/>
     </type>
+    <preference for="Magento\Framework\HTTP\ZendClient" type="Extend\Integration\Preference\Framework\Http\ZendClientPreference"/>
 </config>
