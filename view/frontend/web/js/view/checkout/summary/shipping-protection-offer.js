@@ -7,11 +7,12 @@ define(
   [
       'uiComponent',
       'ko',
+      'Magento_Customer/js/customer-data',
       'Magento_Checkout/js/model/quote',
       'extendSdk',
       'ExtendMagento',
   ],
-  function (Component, ko, magentoQuote, Extend, ExtendMagento) {
+  function (Component, ko, customerData, magentoQuote, Extend, ExtendMagento) {
       "use strict";
       return Component.extend({
         defaults: {
@@ -22,9 +23,9 @@ define(
             return false
         },
         renderSP: function() {
-            const items = ExtendMagento.formatCartItemsForSp(magentoQuote.getItems())
+            const items = ExtendMagento.formatCartItemsForSp(customerData.get('cart')().items)
             const totals = magentoQuote.getTotals()
-
+            
             Extend.shippingProtection.render(
                 {
                     selector: '#extend-shipping-protection', 
@@ -50,7 +51,7 @@ define(
                               if (err) {
                                 return;
                               }
-                            }               
+                            }
                         })
                     },
                     onUpdate: function(quote){
@@ -75,6 +76,13 @@ define(
             Extend.config({
                 storeId: window.ExtendConfig.storeId, 
                 environment: window.ExtendConfig.environment,
+            })
+
+            // Update SP on cart changes
+            customerData.get('cart').subscribe(function(cart) {
+                const items = ExtendMagento.formatCartItemsForSp(cart.items)
+            
+                Extend.shippingProtection.update({ items })
             })
         }
     });
