@@ -45,7 +45,6 @@
             <column name="store_uuid"/>
             <column name="extend_store_uuid"/>
             <column name="client_id"/>
-            <column name="client_secret"/>
         </constraint>
     </table>
 </schema>
