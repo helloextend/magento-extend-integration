@@ -235,10 +235,12 @@ class ProductInstaller
     
             foreach ($options as $arrayOption) {
                 $option = $this->catalogOptionFactory->create();
+
                 $option->setProductId($product->getId())
                     ->setStoreId($product->getStoreId())
                     ->setProductSku($product->getSku())
                     ->addData($arrayOption);
+                
                 $this->optionRepository->save($option);
             }
         } catch (Exception $exception) {
