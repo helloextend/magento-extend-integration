@@ -9,10 +9,11 @@ define(
       'ko',
       'Magento_Customer/js/customer-data',
       'Magento_Checkout/js/model/quote',
+      'Magento_Checkout/js/action/get-totals',
       'extendSdk',
       'ExtendMagento',
   ],
-  function (Component, ko, customerData, magentoQuote, Extend, ExtendMagento) {
+  function (Component, ko, customerData, magentoQuote, getTotalsAction, Extend, ExtendMagento) {
       "use strict";
       return Component.extend({
         defaults: {
@@ -39,6 +40,12 @@ define(
                             if (err) {
                               return;
                             }
+
+                            // getTotalsAction updates the `total_segments` returned in totals(). If this is not run then if you 
+                            // make another action that triggers one of these functions the totals() output will be stale which can
+                            // lead to undesirable effects such as SP not staying checked if you uncheck and recheck it
+                            getTotalsAction([])
+
                             // Reload is not necessary at the offers current location. SP Totals will show on the next checkout step.
                             // If the offer is moved anywhere the SP price is showing (Order Summary), a reload is necessary
                             // window.location.reload();
@@ -51,6 +58,11 @@ define(
                               if (err) {
                                 return;
                               }
+
+                              // getTotalsAction updates the `total_segments` returned in totals(). If this is not run then if you 
+                              // make another action that triggers one of these functions the totals() output will be stale which can
+                              // lead to undesirable effects such as SP not staying checked if you uncheck and recheck it
+                              getTotalsAction([])
                             }
                         })
                     },
@@ -62,6 +74,12 @@ define(
                               if (err) {
                                 return;
                               }
+
+                              // getTotalsAction updates the `total_segments` returned in totals(). If this is not run then if you 
+                              // make another action that triggers one of these functions the totals() output will be stale which can
+                              // lead to undesirable effects such as SP not staying checked if you uncheck and recheck it
+                              getTotalsAction([])
+
                               // Reload is not necessary at the offers current location. SP Totals will show on the next checkout step.
                               // If the offer is moved anywhere the SP price is showing (Order Summary), a reload is necessary
                               // window.location.reload();
