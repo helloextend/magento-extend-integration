@@ -17,6 +17,7 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
     const EXTEND_CONFIG_ENVIRONMENT = [
         // This is for custom mapping of Integration environments to Extend environments
         'dev' => 'development',
+        'prod' => 'production',
     ];
 
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
