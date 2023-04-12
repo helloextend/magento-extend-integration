@@ -5,22 +5,17 @@
 
 define(
     [
-        'ko',
         'jquery',
         'Magento_Checkout/js/view/summary/abstract-total',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/totals'
     ],
-    function (ko,$,Component,quote,totals) {
+    function ($,Component,quote,totals) {
         "use strict";
         return Component.extend({
             totals: quote.getTotals(),
-            shouldRenderSPTotalLineItem : function () {
-                if (this.getValue() == 0) {
-                    return false;
-                } else {
-                    return true;
-                }
+            isDisplayed : function () {
+                return this.getValue() !== 0;
             },
             getShippingProtectionTotal : function () {
                 var price = this.getValue();
