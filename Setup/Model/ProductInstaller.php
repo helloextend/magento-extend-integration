@@ -106,6 +106,7 @@ class ProductInstaller
             $productId = $this->productResource->getIdBySku(Extend::WARRANTY_PRODUCT_SKU);
             $this->productResource->load($existingProduct, $productId);
             if ($existingProduct->getId()) {
+                $this->removeOptionsForProtectionPlanProduct($existingProduct);
                 $productToBeDeleted = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
                 $this->registry->register('isSecureArea', true);
                 $this->productRepository->delete($productToBeDeleted);
@@ -162,6 +163,19 @@ class ProductInstaller
                     [$exception->getMessage()]
                 )
             );
+        }
+    }
+
+    private function removeOptionsForProtectionPlanProduct()
+    {
+        try {
+            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+            $options = $product->getOptions();
+            foreach ($options as $option) {
+                $this->optionRepository->delete($option);
+            }
+        } catch (Exception $exception) {
+            throw new Exception('There was an error removing the Extend Protection Plan Product Options' . $exception);
         }
     }
 
