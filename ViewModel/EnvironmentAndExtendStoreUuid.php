@@ -14,6 +14,12 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
+    const EXTEND_CONFIG_ENVIRONMENT = [
+        // This is for custom mapping of Integration environments to Extend environments
+        'dev' => 'development',
+        'prod' => 'production',
+    ];
+
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
     private StoreManagerInterface $storeManager;
     private ScopeConfigInterface $scopeConfig;
@@ -24,7 +30,7 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
         ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
-    ){
+    ) {
         $this->storeIntegrationRepository = $storeIntegrationRepository;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
@@ -34,7 +40,11 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
     public function getActiveEnvironment()
     {
         $activeEnvironmentUrl = $this->activeEnvironmentURLBuilder->getIntegrationURL();
-        return $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($activeEnvironmentUrl);
+        $integrationEnv = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($activeEnvironmentUrl);
+        if (isset(self::EXTEND_CONFIG_ENVIRONMENT[$integrationEnv])) {
+            return self::EXTEND_CONFIG_ENVIRONMENT[$integrationEnv];
+        }
+        return $integrationEnv;
     }
 
     public function getExtendStoreUuid(): ?string
