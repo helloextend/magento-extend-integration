@@ -153,7 +153,7 @@ class ProductInstaller
                     'manage_stock' => 0,
                     'use_config_notify_stock_qty' => 0
                 ]);
-            
+
             $this->productRepository->save($product);
             return $product;
         } catch (Exception $exception) {
