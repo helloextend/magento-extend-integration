@@ -165,6 +165,13 @@ class ProductInstaller
         }
     }
 
+    /**
+     * Adds customizable options to the protection plan product
+     *
+     * @param Product $product
+     * @return void
+     * @throws SetupException
+     */
     private function addOptionsToProtectionPlanProduct(Product $product)
     {
         try {
