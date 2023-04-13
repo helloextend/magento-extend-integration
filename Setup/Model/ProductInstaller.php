@@ -155,6 +155,7 @@ class ProductInstaller
                 ]);
 
             $this->productRepository->save($product);
+
             return $product;
         } catch (Exception $exception) {
             throw new SetupException(
