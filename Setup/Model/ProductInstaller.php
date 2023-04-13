@@ -106,7 +106,6 @@ class ProductInstaller
             $productId = $this->productResource->getIdBySku(Extend::WARRANTY_PRODUCT_SKU);
             $this->productResource->load($existingProduct, $productId);
             if ($existingProduct->getId()) {
-                $this->removeOptionsForProtectionPlanProduct($existingProduct);
                 $productToBeDeleted = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
                 $this->registry->register('isSecureArea', true);
                 $this->productRepository->delete($productToBeDeleted);
@@ -166,80 +165,50 @@ class ProductInstaller
         }
     }
 
-    private function removeOptionsForProtectionPlanProduct()
-    {
-        try {
-            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
-            $options = $product->getOptions();
-            foreach ($options as $option) {
-                $this->optionRepository->delete($option);
-            }
-        } catch (Exception $exception) {
-            throw new Exception('There was an error removing the Extend Protection Plan Product Options' . $exception);
-        }
-    }
-
     private function addOptionsToProtectionPlanProduct(Product $product)
     {
         try {
+            $default_values = [
+                'type' => 'field',
+                'price_type' => 'fixed',
+                'price' => '0.00',
+                'sort_order' => 0,
+                'is_require' => 1,
+            ];
+            
             $options = [
                 [
-                    'sort_order' => 0,
                     'title'      => 'Associated Product',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
-                    'is_require' => 1,
                 ],
                 [
-                    'sort_order' => 0,
                     'title'      => 'Plan Type',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
-                    'is_require' => 1,
                 ],
                 [
-                    'sort_order' => 0,
                     'title'      => 'Plan ID',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
-                    'is_require' => 1,
                 ],
                 [
-                    'sort_order' => 0,
                     'title'      => 'Term',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
-                    'is_require' => 1,
                 ],
                 [
-                    'sort_order' => 0,
                     'title'      => 'List Price',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
                     'is_require' => 0,
                 ],
                 [
-                    'sort_order' => 0,
                     'title'      => 'Order Offer Plan Id',
-                    'type'       => 'field',
-                    'price_type' => 'fixed',
-                    'price'      => '0.00',
                     'is_require' => 0,
                 ],
             ];
     
             foreach ($options as $arrayOption) {
-                $option = $this->catalogOptionFactory->create();
+                // if value exists in first and second array, the value from the first array will be used
+                $optionData = array_merge($arrayOption, $default_values);
 
+                $option = $this->catalogOptionFactory->create();
+                
                 $option->setProductId($product->getId())
                     ->setStoreId($product->getStoreId())
                     ->setProductSku($product->getSku())
-                    ->addData($arrayOption);
+                    ->addData($optionData);
                 
                 $this->optionRepository->save($option);
             }
