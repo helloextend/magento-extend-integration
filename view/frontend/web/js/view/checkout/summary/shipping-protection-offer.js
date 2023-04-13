@@ -46,11 +46,11 @@ define(
                                 // make another action that triggers one of these functions the totals() output will be stale which can
                                 // lead to undesirable effects such as SP not staying checked if you uncheck and recheck it
                                 getTotalsAction([])
-                                
+
                                 // Reload is not necessary at the offers current location. SP Totals will show on the next checkout step.
                                 // If the offer is moved anywhere the SP price is showing (Order Summary), a reload is necessary
                                 // window.location.reload();
-                              }               
+                              }
                             })
                         },
                         onDisable: function(){
@@ -80,11 +80,11 @@ define(
                                   // make another action that triggers one of these functions the totals() output will be stale which can
                                   // lead to undesirable effects such as SP not staying checked if you uncheck and recheck it
                                   getTotalsAction([])
-                                  
+
                                   // Reload is not necessary at the offers current location. SP Totals will show on the next checkout step.
                                   // If the offer is moved anywhere the SP price is showing (Order Summary), a reload is necessary
                                   // window.location.reload();
-                                }               
+                                }
                             })
                         }
                     }
