@@ -9,6 +9,7 @@ namespace Extend\Integration\Setup\Model;
 use Exception;
 use Extend\Integration\Service\Extend;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Api\ProductCustomOptionRepositoryInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Gallery\EntryFactory;
 use Magento\Catalog\Model\Product\Gallery\GalleryManagement;
@@ -16,6 +17,8 @@ use Magento\Catalog\Model\Product\Type;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductFactory;
+use Magento\Catalog\Model\Product\Option;
+use Magento\Catalog\Model\Product\OptionFactory;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
 use Magento\Eav\Api\Data\AttributeSetInterface;
 use Magento\Framework\Api\ImageContentFactory;
@@ -41,6 +44,9 @@ class ProductInstaller
     private Product $product;
     private ProductFactory $productFactory;
     private ProductRepositoryInterface $productRepository;
+    private Option $catalogOption;
+    private OptionFactory $catalogOptionFactory;
+    private ProductCustomOptionRepositoryInterface $optionRepository;
     private ProductResource $productResource;
     private Reader $reader;
     private StoreManagerInterface $storeManager;
@@ -54,6 +60,9 @@ class ProductInstaller
         ImageContentFactory $imageContentFactory,
         Product $product,
         ProductFactory $productFactory,
+        ProductCustomOptionRepositoryInterface $optionRepository,
+        Option $catalogOption,
+        OptionFactory $catalogOptionFactory,
         ProductRepositoryInterface $productRepository,
         ProductResource $productResource,
         Reader $reader,
@@ -67,6 +76,9 @@ class ProductInstaller
         $this->imageContentFactory = $imageContentFactory;
         $this->product = $product;
         $this->productFactory = $productFactory;
+        $this->catalogOption = $catalogOption;
+        $this->catalogOptionFactory = $catalogOptionFactory;
+        $this->optionRepository = $optionRepository;
         $this->productResource = $productResource;
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
@@ -80,6 +92,7 @@ class ProductInstaller
             if ($product = $this->createProtectionPlanProduct($attributeSet)) {
                 $this->addImageToPubMedia();
                 $this->processMediaGalleryEntry($this->getMediaImagePath(), $product->getSku());
+                $this->addOptionsToProtectionPlanProduct($product);
             }
         } catch (Exception $exception) {
             throw new Exception('There was an error creating the Extend Protection Plan Product' . $exception);
@@ -151,6 +164,70 @@ class ProductInstaller
                 )
             );
         }
+    }
+
+    /**
+     * Adds customizable options to the protection plan product
+     *
+     * @param Product $product
+     * @return void
+     * @throws SetupException
+     */
+    private function addOptionsToProtectionPlanProduct(Product $product)
+    {
+        try {
+            $default_values = [
+                'type' => 'field',
+                'price_type' => 'fixed',
+                'price' => '0.00',
+                'sort_order' => 0,
+                'is_require' => 1,
+            ];
+            
+            $options = [
+                [
+                    'title'      => 'Associated Product',
+                ],
+                [
+                    'title'      => 'Plan Type',
+                ],
+                [
+                    'title'      => 'Plan ID',
+                ],
+                [
+                    'title'      => 'Term',
+                ],
+                [
+                    'title'      => 'List Price',
+                    'is_require' => 0,
+                ],
+                [
+                    'title'      => 'Order Offer Plan Id',
+                    'is_require' => 0,
+                ],
+            ];
+    
+            foreach ($options as $arrayOption) {
+                // if value exists in first and second array, the value from the first array will be used
+                $optionData = array_merge($arrayOption, $default_values);
+
+                $option = $this->catalogOptionFactory->create();
+                
+                $option->setProductId($product->getId())
+                    ->setStoreId($product->getStoreId())
+                    ->setProductSku($product->getSku())
+                    ->addData($optionData);
+                
+                $this->optionRepository->save($option);
+            }
+        } catch (Exception $exception) {
+            throw new SetupException(
+                new Phrase('There was a problem adding the Extend Protection Product options: ',
+                    [$exception->getMessage()]
+                )
+            );
+        }
+
     }
 
     /**
