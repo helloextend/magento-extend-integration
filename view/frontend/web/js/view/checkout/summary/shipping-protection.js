@@ -23,8 +23,13 @@ define(
             },
             getValue: function() {
                 var price = 0;
-                if (this.totals() && totals.getSegment('shipping_protection')) {
-                    price = totals.getSegment('shipping_protection').value;
+                try {
+                    if (this.totals() && totals.getSegment('shipping_protection')) {
+                        price = totals.getSegment('shipping_protection').value;
+                    }
+                } catch (error) {
+                    // Swallow error to avoid impacting customer checkout experience
+                    console.error(error)
                 }
                 return price;
             }
