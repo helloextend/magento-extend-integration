@@ -208,7 +208,7 @@ class ProductInstaller
             ];
     
             foreach ($options as $arrayOption) {
-                // if value exists in first and second array, the value from the second array will be used
+                // If the input arrays have the same string keys, then the later value for that key will overwrite the previous one.
                 $optionData = array_merge($default_values, $arrayOption);
 
                 $option = $this->catalogOptionFactory->create();
