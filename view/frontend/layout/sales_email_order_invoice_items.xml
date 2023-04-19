@@ -9,7 +9,7 @@
       label="Email Invoice Items List" design_abstraction="custom">
     <body>
         <referenceBlock name="invoice_totals">
-            <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection" as="shipping_protection"/>
+            <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection"/>
         </referenceBlock>
     </body>
 </page>
