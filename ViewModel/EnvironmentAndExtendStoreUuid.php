@@ -39,19 +39,11 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
 
     public function getActiveEnvironment()
     {
-        $activeEnvironmentUrl = $this->activeEnvironmentURLBuilder->getIntegrationURL();
-        $integrationEnv = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($activeEnvironmentUrl);
-        if (isset(self::EXTEND_CONFIG_ENVIRONMENT[$integrationEnv])) {
-            return self::EXTEND_CONFIG_ENVIRONMENT[$integrationEnv];
-        }
-        return $integrationEnv;
+        return 'platformsandbox';
     }
 
     public function getExtendStoreUuid(): ?string
     {
-        $storeId = $this->storeManager->getStore()->getId();
-        $integrationId = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
-        $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId($storeId, $integrationId);
-        return $storeIntegration->getExtendStoreUuid();
+        return '12345678-1234-1234-1234-123456789012';
     }
 }
