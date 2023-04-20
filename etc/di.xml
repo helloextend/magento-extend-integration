@@ -47,4 +47,7 @@
         <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin"/>
     </type>
     <preference for="Magento\Framework\HTTP\ZendClient" type="Extend\Integration\Preference\Framework\Http\ZendClientPreference"/>
+    <type name="Magento\Sales\Model\Order">
+        <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\OrderPlugin"/>
+    </type>
 </config>

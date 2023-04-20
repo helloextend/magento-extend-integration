@@ -5,8 +5,11 @@
   -->
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" label="Email Invoice Items List" design_abstraction="custom">
-    <referenceBlock name="invoice_totals">
-        <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection" as="shipping_protection"/>
-    </referenceBlock>
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      label="Email Invoice Items List" design_abstraction="custom">
+    <body>
+        <referenceBlock name="invoice_totals">
+            <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection"/>
+        </referenceBlock>
+    </body>
 </page>

@@ -8,6 +8,8 @@ namespace Extend\Integration\Block\Sales\Totals;
 
 use Magento\Sales\Model\Order;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
+use Magento\Sales\Api\Data\InvoiceExtensionFactory;
+use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Store\Model\Store;
 
 class ShippingProtection extends \Magento\Framework\View\Element\Template
@@ -27,6 +29,8 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
      * @var OrderExtensionFactory
      */
     private OrderExtensionFactory $orderExtensionFactory;
+    private InvoiceExtensionFactory $invoiceExtensionFactory;
+    private CreditmemoExtensionFactory $creditmemoExtensionFactory;
 
     /**
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -35,10 +39,14 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         OrderExtensionFactory $orderExtensionFactory,
+        InvoiceExtensionFactory $invoiceExtensionFactory,
+        CreditmemoExtensionFactory $creditmemoExtensionFactory,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->orderExtensionFactory = $orderExtensionFactory;
+        $this->invoiceExtensionFactory = $invoiceExtensionFactory;
+        $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
     }
 
     /**
@@ -86,11 +94,25 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
      *
      * @return float
      */
-    public function getShippingProtection()
+    public function getShippingProtection($parent)
     {
-        $extensionAttributes = $this->_order->getExtensionAttributes();
-        if ($extensionAttributes === null) {
-            $extensionAttributes = $this->orderExtensionFactory->create();
+        $parentType = $parent->getType();
+
+        if ($parentType === \Magento\Sales\Block\Order\Totals::class) {
+            $extensionAttributes = $parent->getOrder()->getExtensionAttributes();
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->orderExtensionFactory->create();
+            }
+        } elseif ($parentType === \Magento\Sales\Block\Order\Invoice\Totals::class) {
+            $extensionAttributes = $parent->getInvoice()->getExtensionAttributes();
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->invoiceExtensionFactory->create();
+            }
+        } elseif ($parentType === \Magento\Sales\Block\Order\Creditmemo\Totals::class) {
+            $extensionAttributes = $parent->getCreditmemo()->getExtensionAttributes();
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->creditmemoExtensionFactory->create();
+            }
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
@@ -109,15 +131,16 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     public function initTotals()
     {
         $parent = $this->getParentBlock();
+        $type = getType($parent->getParentBlock());
         $this->_order = $parent->getOrder();
         $this->_source = $parent->getSource();
 
-        if ($this->getShippingProtection() > 0) {
+        if ($this->getShippingProtection($parent) > 0) {
             $total = new \Magento\Framework\DataObject(
                 [
                     'code' => 'shipping_protection',
                     'strong' => false,
-                    'value' => $this->getShippingProtection(),
+                    'value' => $this->getShippingProtection($parent),
                     'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
                 ]
             );

@@ -7,7 +7,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="invoice_totals">
-            <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection" as="shipping_protection"/>
+            <block class="Extend\Integration\Block\Sales\Totals\ShippingProtection" name="shipping_protection_invoice"/>
         </referenceBlock>
     </body>
 </page>
