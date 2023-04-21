@@ -99,10 +99,15 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
     public function getByStoreIdAndIntegrationId(int $storeId, int $integrationId): StoreIntegrationInterface
     {
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
-        return $storeIntegrationCollection
+        $storeIntegration = $storeIntegrationCollection
             ->addFieldToFilter('store_id', ['eq' => $storeId])
             ->addFieldToFilter('integration_id', ['eq' => $integrationId])
             ->getFirstItem();
+        if ($storeIntegration->getId()) {
+            return $storeIntegration;
+        } else {
+            throw new NoSuchEntityException(__('Integration not found'));
+        }
     }
 
     /**
