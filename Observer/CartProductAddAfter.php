@@ -32,7 +32,7 @@ class CartProductAddAfter implements ObserverInterface
      * @param Item $item
      * @return void
      */
-    private function setPPPrice(\Magento\Quote\Model\ResourceModel\Quote\Item $item) {
+    private function setPPPrice(\Magento\Quote\Model\Quote\Item  $item) {
         $price = $item->getProduct()->getData('extend_plan_price');
         $item->setCustomPrice($price);
         $item->setOriginalCustomPrice($price);
