@@ -13,6 +13,8 @@ use Magento\Framework\App\RequestInterface;
 class CartProductAddAfter implements ObserverInterface
 {
     /**
+     * This method is called after any product is added to the cart.
+     * 
      * @param Observer $observer
      * @return void
      */
@@ -25,6 +27,8 @@ class CartProductAddAfter implements ObserverInterface
     }
 
     /**
+     * This method is used to set the price of the product protection product.
+     * 
      * @param Item $item
      * @return void
      */
