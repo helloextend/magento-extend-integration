@@ -205,6 +205,10 @@ class ProductInstaller
                     'title'      => 'Order Offer Plan Id',
                     'is_require' => 0,
                 ],
+                [
+                    'title'      => 'Lead Token',
+                    'is_require' => 0,
+                ],
             ];
     
             foreach ($options as $arrayOption) {

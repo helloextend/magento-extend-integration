@@ -73,4 +73,10 @@
             <resource ref="anonymous" />
         </resources>
     </route>
+    <route url="/V1/extend/integration/pp/add" method="POST">
+        <service class="Extend\Integration\Api\ProductProtectionInterface" method="add"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
 </routes>
