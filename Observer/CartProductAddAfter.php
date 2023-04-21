@@ -12,19 +12,26 @@ use Magento\Framework\App\RequestInterface;
  
 class CartProductAddAfter implements ObserverInterface
 {
-  public function execute(\Magento\Framework\Event\Observer $observer) {
-      $item = $observer->getEvent()->getData('quote_item');         
-      $item = ( $item->getParentItem() ? $item->getParentItem() : $item );
-      if($item->getProduct()->getSku() == Extend::WARRANTY_PRODUCT_SKU) {
-          $this->setPPPrice($item);
-      }
-  }
+    /**
+     * @param Observer $observer
+     * @return void
+     */
+    public function execute(\Magento\Framework\Event\Observer $observer) {
+        $item = $observer->getEvent()->getData('quote_item');         
+        $item = ( $item->getParentItem() ? $item->getParentItem() : $item );
+        if($item->getProduct()->getSku() == Extend::WARRANTY_PRODUCT_SKU) {
+            $this->setPPPrice($item);
+        }
+    }
 
-  private function setPPPrice($item) {
-    $price = $item->getProduct()->getData('extend_plan_price');
-    $item->setCustomPrice($price);
-    $item->setOriginalCustomPrice($price);
-    $item->getProduct()->setIsSuperMode(true);
-  }
-
+    /**
+     * @param Item $item
+     * @return void
+     */
+    private function setPPPrice(\Magento\Quote\Model\ResourceModel\Quote\Item $item) {
+        $price = $item->getProduct()->getData('extend_plan_price');
+        $item->setCustomPrice($price);
+        $item->setOriginalCustomPrice($price);
+        $item->getProduct()->setIsSuperMode(true);
+    }
 }
