@@ -6,7 +6,8 @@
 
 namespace Extend\Integration\Api;
 
-interface ProductProtectionInterface {
+interface ProductProtectionInterface 
+{
     /**
      * Add product protection to cart
      *
