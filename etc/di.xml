@@ -41,8 +41,6 @@
     <type name="Magento\Sales\Model\Order\CreditmemoRepository">
         <plugin sortOrder="1" name="extendIntegrationCreditmemoRepository"
                 type="Extend\Integration\Plugin\Model\Order\CreditmemoRepositoryPlugin"/>
-        <plugin sortOrder="1" name="extendIntegrationCreditmemoRepository"
-                type="Extend\Integration\Plugin\Model\Order\CreditmemoRepositoryPlugin"/>
     </type>
     <type name="Magento\Catalog\Model\ProductRepository">
         <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin"/>
