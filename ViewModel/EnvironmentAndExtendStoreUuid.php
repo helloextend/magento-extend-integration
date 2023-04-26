@@ -11,6 +11,7 @@ use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
@@ -24,17 +25,20 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
     private StoreManagerInterface $storeManager;
     private ScopeConfigInterface $scopeConfig;
     private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
+    private LoggerInterface $logger;
 
     public function __construct(
         StoreIntegrationRepositoryInterface $storeIntegrationRepository,
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
-        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
+        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
+        LoggerInterface $logger
     ) {
         $this->storeIntegrationRepository = $storeIntegrationRepository;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
+        $this->logger = $logger;
     }
 
     public function getActiveEnvironment()
@@ -49,9 +53,16 @@ class EnvironmentAndExtendStoreUuid implements \Magento\Framework\View\Element\B
 
     public function getExtendStoreUuid(): ?string
     {
-        $storeId = $this->storeManager->getStore()->getId();
-        $integrationId = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
-        $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId($storeId, $integrationId);
-        return $storeIntegration->getExtendStoreUuid();
+        try {
+            $storeId = $this->storeManager->getStore()->getId();
+            $integrationId = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
+            $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId($storeId, $integrationId);
+            return $storeIntegration->getExtendStoreUuid();
+        } catch (\Exception $exception) {
+            $this->logger->error('The follow error was reported while trying to populate window.ExtendConfig: ' . $exception->getMessage());
+            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+
+            return '';
+        }
     }
 }
