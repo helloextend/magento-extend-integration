@@ -81,12 +81,19 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      *
      * @param int $storeId
      * @return StoreIntegrationInterface
+     * @throw NoSuchEntityException
      */
     public function getByStoreIdAndActiveEnvironment(int $storeId): StoreIntegrationInterface
     {
         $integrationId = (int)$this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
 
-        return $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
+        $integration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
+
+        if ($integration->getId()) {
+            return $integration;
+        } else {
+            throw new NoSuchEntityException('Integration Not Found');
+        }
     }
 
     /**
@@ -99,15 +106,10 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
     public function getByStoreIdAndIntegrationId(int $storeId, int $integrationId): StoreIntegrationInterface
     {
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
-        $storeIntegration = $storeIntegrationCollection
+        return $storeIntegrationCollection
             ->addFieldToFilter('store_id', ['eq' => $storeId])
             ->addFieldToFilter('integration_id', ['eq' => $integrationId])
             ->getFirstItem();
-        if ($storeIntegration->getId()) {
-            return $storeIntegration;
-        } else {
-            throw new NoSuchEntityException(__('Integration not found'));
-        }
     }
 
     /**
