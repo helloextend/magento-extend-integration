@@ -1,0 +1,21 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+?>
+<div class="product-protection-offer" id="product_protection_offer"></div>
+
+<script type="text/x-magento-init">
+    {
+        "#product_protection_offer": {
+            "productProtectionOffer": {
+                "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
+                "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
+                "productCategory": "<?= $block->getProduct()->getCategory(); ?>"
+            }
+        }
+    }
+</script>
