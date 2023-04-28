@@ -12,6 +12,7 @@
     {
         "#product_protection_offer": {
             "productProtectionOffer": {
+                "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                 "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
                 "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
                 "productCategory": "<?= $block->getProduct()->getCategory(); ?>"

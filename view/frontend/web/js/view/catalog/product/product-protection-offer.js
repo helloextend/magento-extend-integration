@@ -15,6 +15,7 @@ define(
         var options = {};
 
         return function(config, element) {
+            Extend.config({ storeId: config.extendStoreUuid });
             Extend.buttons.render('#product_protection_offer', {
                 referenceId: config.selectedProductSku,
                 price: config.selectedProductPrice,
