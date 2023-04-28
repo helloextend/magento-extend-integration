@@ -92,7 +92,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
         if ($integration->getId()) {
             return $integration;
         } else {
-            throw new NoSuchEntityException('Integration Not Found');
+            throw new NoSuchEntityException(__('Integration Not Found'));
         }
     }
 
