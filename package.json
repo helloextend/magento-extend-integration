@@ -1,0 +1,21 @@
+{
+  "name": "magento-extend-integration",
+  "version": "1.0.0",
+  "repository": "git@github.com:helloextend/magento-extend-integration.git",
+  "author": "Miles McLeod <miles.mcleod@extend.com>",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "husky install"
+  },
+  "lint-staged": {
+    "*.{ts,js,php}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.19.4",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8"
+  }
+}
