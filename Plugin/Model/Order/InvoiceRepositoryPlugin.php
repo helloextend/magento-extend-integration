@@ -32,7 +32,6 @@ class InvoiceRepositoryPlugin
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         InvoiceExtensionFactory $invoiceExtension
     ) {
-
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->invoiceExtension = $invoiceExtension;
     }
@@ -45,8 +44,11 @@ class InvoiceRepositoryPlugin
      * @param $invoiceId
      * @return mixed
      */
-    public function afterGet(\Magento\Sales\Model\Order\InvoiceRepository $subject, $result, $invoiceId)
-    {
+    public function afterGet(
+        \Magento\Sales\Model\Order\InvoiceRepository $subject,
+        $result,
+        $invoiceId
+    ) {
         $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
             $invoiceId,
             ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
@@ -64,8 +66,11 @@ class InvoiceRepositoryPlugin
      * @param $invoice
      * @return mixed
      */
-    public function afterSave(\Magento\Sales\Model\Order\InvoiceRepository $subject, $result, $invoice)
-    {
+    public function afterSave(
+        \Magento\Sales\Model\Order\InvoiceRepository $subject,
+        $result,
+        $invoice
+    ) {
         $extensionAttributes = $invoice->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->invoiceExtensionFactory->create();

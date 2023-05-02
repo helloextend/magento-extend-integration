@@ -14,7 +14,6 @@ use Magento\Store\Model\Store;
 
 class ShippingProtection extends \Magento\Framework\View\Element\Template
 {
-
     /**
      * @var Order
      */
@@ -120,7 +119,7 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        return (float)$shippingProtection->getPrice();
+        return (float) $shippingProtection->getPrice();
     }
 
     /**
@@ -136,14 +135,12 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
         $this->_source = $parent->getSource();
 
         if ($this->getShippingProtection($parent) > 0) {
-            $total = new \Magento\Framework\DataObject(
-                [
-                    'code' => 'shipping_protection',
-                    'strong' => false,
-                    'value' => $this->getShippingProtection($parent),
-                    'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
-                ]
-            );
+            $total = new \Magento\Framework\DataObject([
+                'code' => 'shipping_protection',
+                'strong' => false,
+                'value' => $this->getShippingProtection($parent),
+                'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
+            ]);
 
             $parent->addTotal($total, 'shipping');
         }

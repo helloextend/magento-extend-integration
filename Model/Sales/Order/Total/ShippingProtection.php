@@ -10,7 +10,6 @@ use Magento\Sales\Model\Order;
 
 class ShippingProtection extends \Magento\Sales\Model\Order\Total\AbstractTotal
 {
-
     /**
      * Collect Shipping Protection value from the extension attributes and populate the shipping_protection total property on the order
      *
@@ -19,8 +18,12 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Total\AbstractTotal
      */
     public function collect(Order $order): ShippingProtection
     {
-
-        if ($shippingProtection = $order->getOrder()->getExtensionAttributes()->getShippingProtection()) {
+        if (
+            $shippingProtection = $order
+                ->getOrder()
+                ->getExtensionAttributes()
+                ->getShippingProtection()
+        ) {
             $shippingProtectionBasePrice = $shippingProtection->getBase();
             $shippingProtectionPrice = $shippingProtection->getPrice();
 
@@ -28,7 +31,9 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Total\AbstractTotal
             $order->setShippingProtection($shippingProtectionPrice);
 
             $order->setGrandTotal($order->getGrandTotal() + $order->getShippingProtection());
-            $order->setBaseGrandTotal($order->getBaseGrandTotal() + $order->getBaseShippingProtection());
+            $order->setBaseGrandTotal(
+                $order->getBaseGrandTotal() + $order->getBaseShippingProtection()
+            );
         }
 
         return $this;

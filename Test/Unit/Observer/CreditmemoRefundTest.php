@@ -21,9 +21,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
 
-class CreditmemoRefundTest extends TestCase 
+class CreditmemoRefundTest extends TestCase
 {
-
     /**
      * @var string
      */
@@ -74,7 +73,7 @@ class CreditmemoRefundTest extends TestCase
      */
     private $creditmemoMock;
 
-     /**
+    /**
      * @var Event|MockObject
      */
     private $event;
@@ -86,73 +85,86 @@ class CreditmemoRefundTest extends TestCase
 
     protected function setUp(): void
     {
-      $this->creditmemoId = 'test';
-      $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-      $this->orderObserverHandler = $this->getMockBuilder(OrderObserverHandler::class)
-          ->setMethods(['execute'])
-          ->disableOriginalConstructor()
-          ->getMock();
-      $this->integration = $this->getMockBuilder(
-        Integration::class
-      )->disableOriginalConstructor()
-          ->getMock();
-      $this->store = $this->getMockBuilder(Store::class)
-          ->setMethods(['getId'])
-          ->disableOriginalConstructor()
-          ->getMockForAbstractClass();
-      $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-          ->setMethods(['getStore'])
-          ->disableOriginalConstructor()
-          ->getMockForAbstractClass();
-      $this->storeManager->expects($this->any())->method('getStore')
-          ->willReturn($this->store);
-      $this->orderMock = $this->createMock(Order::class);
-      $this->creditmemoMock = $this->getMockBuilder(Creditmemo::class)
-          ->onlyMethods(['getOrder', 'getId'])
-          ->disableOriginalConstructor()
-          ->getMock();
-      $this->creditmemoMock->expects($this->any())->method('getOrder')->willReturn($this->orderMock);
-      $this->creditmemoMock->expects($this->any())->method('getId')->willReturn($this->creditmemoId);
-      $this->event = $this->getMockBuilder(Event::class)
-      ->addMethods(['getCreditmemo'])
-      ->disableOriginalConstructor()
-      ->getMock();
-      $this->event->expects($this->any())->method('getCreditmemo')->willReturn($this->creditmemoMock);
-      $this->observer = $this->createPartialMock(Observer::class, ['getEvent']);
-      $this->observer->expects($this->any())->method('getEvent')->willReturn($this->event);
-      $this->objectManager = new ObjectManager($this);
-      $this->import = $this->objectManager->getObject(
-        CreditmemoRefund::class,
-          [
-              'logger' => $this->logger,
-              'orderObserverHandler' => $this->orderObserverHandler,
-              'integration' => $this->integration,
-              'storeManager'=> $this->storeManager,
-          ]
-      );
+        $this->creditmemoId = 'test';
+        $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $this->orderObserverHandler = $this->getMockBuilder(OrderObserverHandler::class)
+            ->setMethods(['execute'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->integration = $this->getMockBuilder(Integration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->store = $this->getMockBuilder(Store::class)
+            ->setMethods(['getId'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
+            ->setMethods(['getStore'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $this->storeManager
+            ->expects($this->any())
+            ->method('getStore')
+            ->willReturn($this->store);
+        $this->orderMock = $this->createMock(Order::class);
+        $this->creditmemoMock = $this->getMockBuilder(Creditmemo::class)
+            ->onlyMethods(['getOrder', 'getId'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->creditmemoMock
+            ->expects($this->any())
+            ->method('getOrder')
+            ->willReturn($this->orderMock);
+        $this->creditmemoMock
+            ->expects($this->any())
+            ->method('getId')
+            ->willReturn($this->creditmemoId);
+        $this->event = $this->getMockBuilder(Event::class)
+            ->addMethods(['getCreditmemo'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->event
+            ->expects($this->any())
+            ->method('getCreditmemo')
+            ->willReturn($this->creditmemoMock);
+        $this->observer = $this->createPartialMock(Observer::class, ['getEvent']);
+        $this->observer
+            ->expects($this->any())
+            ->method('getEvent')
+            ->willReturn($this->event);
+        $this->objectManager = new ObjectManager($this);
+        $this->import = $this->objectManager->getObject(CreditmemoRefund::class, [
+            'logger' => $this->logger,
+            'orderObserverHandler' => $this->orderObserverHandler,
+            'integration' => $this->integration,
+            'storeManager' => $this->storeManager,
+        ]);
     }
 
-    public function testExecutesOrdersObserver() 
+    public function testExecutesOrdersObserver()
     {
-      $this->orderObserverHandler->expects($this->once())
-          ->method('execute')
-          ->with(
-              $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'], 'type' => 'middleware']),
-              $this->equalTo($this->orderMock),
-              $this->equalTo(['credit_memo_id' => $this->creditmemoId])
-          );
-      $this->import->execute($this->observer);
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->with(
+                $this->equalTo([
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'],
+                    'type' => 'middleware',
+                ]),
+                $this->equalTo($this->orderMock),
+                $this->equalTo(['credit_memo_id' => $this->creditmemoId])
+            );
+        $this->import->execute($this->observer);
     }
 
-    public function testLogsErrorsToLoggingService() 
+    public function testLogsErrorsToLoggingService()
     {
-      $this->orderObserverHandler->expects($this->once())
-          ->method('execute')
-          ->willThrowException(new Exception());
-      $this->logger->expects($this->once())
-          ->method('error');
-      $this->integration->expects($this->once())
-          ->method('logErrorToLoggingService');
-      $this->import->execute($this->observer);
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->willThrowException(new Exception());
+        $this->logger->expects($this->once())->method('error');
+        $this->integration->expects($this->once())->method('logErrorToLoggingService');
+        $this->import->execute($this->observer);
     }
 }

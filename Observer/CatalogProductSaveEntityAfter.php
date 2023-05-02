@@ -16,70 +16,79 @@ use Psr\Log\LoggerInterface;
 
 class CatalogProductSaveEntityAfter implements ObserverInterface
 {
-  /**
-   * @var LoggerInterface
-   */
-  private $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-  /**
-   * @var ProductObserverHandler
-   */
-  private $productObserverHandler;
+    /**
+     * @var ProductObserverHandler
+     */
+    private $productObserverHandler;
 
-  /**
-   * @var Integration
-   */
-  private $integration;
+    /**
+     * @var Integration
+     */
+    private $integration;
 
-  /**
-   * @var StoreManagerInterface
-   */
-  private $storeManager;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
-  public function __construct(
-    LoggerInterface $logger,
-    ProductObserverHandler $productObserverHandler,
-    Integration $integration,
-    StoreManagerInterface $storeManager
-  ) {
-    $this->logger = $logger;
-    $this->productObserverHandler = $productObserverHandler;
-    $this->integration = $integration;
-    $this->storeManager = $storeManager;
-  }
-
-  /**
-   * @param Observer $observer
-   * @return void
-   */
-  public function execute(Observer $observer)
-  {
-    $product = $observer->getEvent()->getProduct();
-    $endpoint = $this->resolveEndpoint($product);
-  
-    try {
-      $this->productObserverHandler->execute(
-        $endpoint,
-        $product,
-        []
-      );
-    } catch (\Exception $exception) {
-      // silently handle errors
-      $this->logger->error('Extend Product Observer Handler encountered the following error: ' . $exception->getMessage());
-      $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
-    }
-  }
-
-  /**
-   * @param ProductInterface $product
-   * @return array
-   */
-  private function resolveEndpoint(ProductInterface $product): array
-  {
-    if ($product->isObjectNew()) {
-      return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'], 'type' => 'middleware'];
+    public function __construct(
+        LoggerInterface $logger,
+        ProductObserverHandler $productObserverHandler,
+        Integration $integration,
+        StoreManagerInterface $storeManager
+    ) {
+        $this->logger = $logger;
+        $this->productObserverHandler = $productObserverHandler;
+        $this->integration = $integration;
+        $this->storeManager = $storeManager;
     }
 
-    return ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_update'], 'type' => 'middleware'];
-  }
+    /**
+     * @param Observer $observer
+     * @return void
+     */
+    public function execute(Observer $observer)
+    {
+        $product = $observer->getEvent()->getProduct();
+        $endpoint = $this->resolveEndpoint($product);
+
+        try {
+            $this->productObserverHandler->execute($endpoint, $product, []);
+        } catch (\Exception $exception) {
+            // silently handle errors
+            $this->logger->error(
+                'Extend Product Observer Handler encountered the following error: ' .
+                    $exception->getMessage()
+            );
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error'
+            );
+        }
+    }
+
+    /**
+     * @param ProductInterface $product
+     * @return array
+     */
+    private function resolveEndpoint(ProductInterface $product): array
+    {
+        if ($product->isObjectNew()) {
+            return [
+                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'],
+                'type' => 'middleware',
+            ];
+        }
+
+        return [
+            'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_update'],
+            'type' => 'middleware',
+        ];
+    }
 }

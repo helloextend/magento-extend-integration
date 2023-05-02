@@ -28,7 +28,7 @@ class AttributeSetInstaller
         AttributeSetRepositoryInterface $attributeSetRepository,
         AttributeSetResource $attributeSetResource,
         CategorySetupFactory $categorySetupFactory
-    ){
+    ) {
         $this->attributeSetFactory = $attributeSetFactory;
         $this->attributeSetRepository = $attributeSetRepository;
         $this->attributeSetResource = $attributeSetResource;
@@ -46,7 +46,14 @@ class AttributeSetInstaller
         try {
             // If the Extend products attribute set already exists, don't recreate it.
             $existingExtendAttributeSet = $this->attributeSetFactory->create();
-            if ($this->attributeSetResource->load($existingExtendAttributeSet, Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME, 'attribute_set_name') && $existingExtendAttributeSet->getAttributeSetId()) {
+            if (
+                $this->attributeSetResource->load(
+                    $existingExtendAttributeSet,
+                    Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME,
+                    'attribute_set_name'
+                ) &&
+                $existingExtendAttributeSet->getAttributeSetId()
+            ) {
                 return $existingExtendAttributeSet;
             }
 
@@ -62,19 +69,16 @@ class AttributeSetInstaller
                 'sort_order' => 200,
             ];
 
-            $extendProductAttributeSet
-                ->setData($data)
-                ->validate();
+            $extendProductAttributeSet->setData($data)->validate();
             $extendProductAttributeSet->save();
             $extendProductAttributeSet->initFromSkeleton($defaultAttributeSetId);
 
             return $this->attributeSetRepository->save($extendProductAttributeSet);
         } catch (Exception $exception) {
             throw new SetupException(
-                new Phrase(
-                    'Error when creating the Extend Attribute Set: %1',
-                    [$exception->getMessage()]
-                )
+                new Phrase('Error when creating the Extend Attribute Set: %1', [
+                    $exception->getMessage(),
+                ])
             );
         }
     }
@@ -83,16 +87,19 @@ class AttributeSetInstaller
     {
         try {
             $existingExtendAttributeSet = $this->attributeSetFactory->create();
-            $this->attributeSetResource->load($existingExtendAttributeSet, Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME, 'attribute_set_name');
+            $this->attributeSetResource->load(
+                $existingExtendAttributeSet,
+                Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME,
+                'attribute_set_name'
+            );
             if ($existingExtendAttributeSet->getAttributeSetId()) {
                 $this->attributeSetRepository->delete($existingExtendAttributeSet);
             }
         } catch (Exception $exception) {
             throw new SetupException(
-                new Phrase(
-                    'here was an error deleting the Extend Attribute Set: %1',
-                    [$exception->getMessage()]
-                )
+                new Phrase('here was an error deleting the Extend Attribute Set: %1', [
+                    $exception->getMessage(),
+                ])
             );
         }
     }

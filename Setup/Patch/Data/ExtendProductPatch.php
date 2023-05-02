@@ -28,8 +28,8 @@ use Magento\Integration\Model\IntegrationService;
 use Magento\Store\Api\StoreRepositoryInterface as StoreRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
-class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface {
-
+class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
+{
     private AttributeSetInstaller $attributeSetInstaller;
     private ConfigBasedIntegrationManager $configBasedIntegrationManager;
     private ProductInstaller $productInstaller;
@@ -45,19 +45,19 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     private WriterInterface $configWriter;
 
     public function __construct(
-        AttributeSetInstaller               $attributeSetInstaller,
-        ConfigBasedIntegrationManager       $configBasedIntegrationManager,
-        ProductInstaller                    $productInstaller,
+        AttributeSetInstaller $attributeSetInstaller,
+        ConfigBasedIntegrationManager $configBasedIntegrationManager,
+        ProductInstaller $productInstaller,
         StoreIntegrationRepositoryInterface $integrationStoresRepository,
-        StoreRepositoryInterface            $storeRepository,
-        State                               $state,
-        IntegrationService                  $integrationService,
-        Integration                         $extendIntegration,
-        MetadataBuilder                     $metadataBuilder,
-        Environment                         $environment,
-        OauthServiceInterface               $oauthService,
-        SchemaSetupInterface                $schemaSetup,
-        WriterInterface                     $configWriter
+        StoreRepositoryInterface $storeRepository,
+        State $state,
+        IntegrationService $integrationService,
+        Integration $extendIntegration,
+        MetadataBuilder $metadataBuilder,
+        Environment $environment,
+        OauthServiceInterface $oauthService,
+        SchemaSetupInterface $schemaSetup,
+        WriterInterface $configWriter
     ) {
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->configBasedIntegrationManager = $configBasedIntegrationManager;
@@ -77,14 +77,16 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     /**
      * @inheritDoc
      */
-    public static function getDependencies() {
+    public static function getDependencies()
+    {
         return [];
     }
 
     /**
      * @inheritDoc
      */
-    public function getAliases() {
+    public function getAliases()
+    {
         return [];
     }
 
@@ -95,13 +97,24 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     public function apply()
     {
         try {
-
-            if (!$this->integrationService->findByName('Extend Integration - Production')->getIntegrationId()) {
-                $this->configBasedIntegrationManager->processIntegrationConfig(['Extend Integration - Production']);
+            if (
+                !$this->integrationService
+                    ->findByName('Extend Integration - Production')
+                    ->getIntegrationId()
+            ) {
+                $this->configBasedIntegrationManager->processIntegrationConfig([
+                    'Extend Integration - Production',
+                ]);
             }
 
-            if (!$this->integrationService->findByName('Extend Integration - Demo')->getIntegrationId()) {
-                $this->configBasedIntegrationManager->processIntegrationConfig(['Extend Integration - Demo']);
+            if (
+                !$this->integrationService
+                    ->findByName('Extend Integration - Demo')
+                    ->getIntegrationId()
+            ) {
+                $this->configBasedIntegrationManager->processIntegrationConfig([
+                    'Extend Integration - Demo',
+                ]);
             }
 
             //ADD WARRANTY PRODUCT TO THE DB
@@ -109,9 +122,16 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 $attributeSet = $this->attributeSetInstaller->createAttributeSet();
                 $this->productInstaller->createProduct($attributeSet);
 
-                $defaultEnvironmentId = $this->integrationService->findByName('Extend Integration - Demo')->getIntegrationId();
+                $defaultEnvironmentId = $this->integrationService
+                    ->findByName('Extend Integration - Demo')
+                    ->getIntegrationId();
 
-                $this->configWriter->save($this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG, $defaultEnvironmentId, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+                $this->configWriter->save(
+                    $this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG,
+                    $defaultEnvironmentId,
+                    ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+                    0
+                );
             });
         } catch (Exception $exception) {
             throw new SetupException(
@@ -131,43 +151,84 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     {
         try {
             $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
-
                 $installer = $this->schemaSetup;
                 $installer->startSetup();
 
                 $this->productInstaller->deleteProduct();
                 $this->attributeSetInstaller->deleteAttributeSet();
 
-                if ($installer->tableExists(\Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE)) {
+                if (
+                    $installer->tableExists(
+                        \Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE
+                    )
+                ) {
                     // body autogenerated by the Metadata Builder but isn't used in this case.  No store ids or pre-existing body provided to the builder.
-                    [$headers, $body] = $this->metadataBuilder->execute([], ['path' => $this->extendIntegration::EXTEND_INTEGRATION_ENDPOINTS['app_uninstall']], []);
+                    [$headers, $body] = $this->metadataBuilder->execute(
+                        [],
+                        [
+                            'path' =>
+                                $this->extendIntegration::EXTEND_INTEGRATION_ENDPOINTS[
+                                    'app_uninstall'
+                                ],
+                        ],
+                        []
+                    );
 
                     $integrations = $this->environment->toOptionArray();
 
                     foreach ($integrations as $integrationData) {
-                        if (isset($integrationData["value"]))
-                            $integration = $this->integrationService->get($integrationData["value"]);
+                        if (isset($integrationData['value'])) {
+                            $integration = $this->integrationService->get(
+                                $integrationData['value']
+                            );
+                        }
                         $consumerId = $integration->getConsumerId();
-                        $oauthConsumerKey = $this->oauthService->loadConsumer($consumerId)->getKey();
+                        $oauthConsumerKey = $this->oauthService
+                            ->loadConsumer($consumerId)
+                            ->getKey();
                         $this->extendIntegration->execute(
-                            ['path' => $this->extendIntegration::EXTEND_INTEGRATION_ENDPOINTS['app_uninstall'] . '?oauth_consumer_key=' . $oauthConsumerKey, 'type' => 'middleware'],
+                            [
+                                'path' =>
+                                    $this->extendIntegration::EXTEND_INTEGRATION_ENDPOINTS[
+                                        'app_uninstall'
+                                    ] .
+                                    '?oauth_consumer_key=' .
+                                    $oauthConsumerKey,
+                                'type' => 'middleware',
+                            ],
                             [],
                             $headers
                         );
-                        $this->integrationService->delete($integrationData["value"]);
+                        $this->integrationService->delete($integrationData['value']);
                     }
                 }
 
-                if ($installer->tableExists(\Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE)) {
-                    $installer->getConnection()->dropTable(
-                        $installer->getTable(\Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE)
-                    );
+                if (
+                    $installer->tableExists(
+                        \Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE
+                    )
+                ) {
+                    $installer
+                        ->getConnection()
+                        ->dropTable(
+                            $installer->getTable(
+                                \Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE
+                            )
+                        );
                 }
 
-                if ($installer->tableExists(\Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE)) {
-                    $installer->getConnection()->dropTable(
-                        $installer->getTable(\Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE)
-                    );
+                if (
+                    $installer->tableExists(
+                        \Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE
+                    )
+                ) {
+                    $installer
+                        ->getConnection()
+                        ->dropTable(
+                            $installer->getTable(
+                                \Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE
+                            )
+                        );
                 }
 
                 $installer->endSetup();
@@ -181,7 +242,4 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
             );
         }
     }
-
-
-
 }

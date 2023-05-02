@@ -47,7 +47,9 @@ class MetadataBuilder
         $headers['Content-Type'] = 'application/json';
         $fullMagentoVersion = $this->productMetadata->getVersion();
         $trimmedMagentoVersion = strstr($fullMagentoVersion, '-', true);
-        $headers['X-Magento-Version'] = !$trimmedMagentoVersion ? $fullMagentoVersion : $trimmedMagentoVersion;
+        $headers['X-Magento-Version'] = !$trimmedMagentoVersion
+            ? $fullMagentoVersion
+            : $trimmedMagentoVersion;
 
         $body['webhook_id'] = $this->identityService->generateId();
         $body['webhook_created_at'] = time();
@@ -55,8 +57,7 @@ class MetadataBuilder
         $body['data'] = $data;
 
         foreach ($storeIds as $storeId) {
-            $body['magento_store_uuids'][] =
-                $this->storeIntegrationRepository
+            $body['magento_store_uuids'][] = $this->storeIntegrationRepository
                 ->getByStoreIdAndActiveEnvironment($storeId)
                 ->getStoreUuid();
         }

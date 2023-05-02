@@ -15,7 +15,6 @@ use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 
 class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\AbstractTotal
 {
-
     /**
      * @var SerializerInterface
      */
@@ -30,7 +29,6 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
      * @var ShippingProtectionTotalRepositoryInterface
      */
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
-
 
     /**
      * @param SerializerInterface $serializer
@@ -69,7 +67,10 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
 
         if ($shippingProtection && $shippingProtection->getPrice() > 0) {
             $total->addTotalAmount($this->getCode(), $shippingProtection->getPrice());
-            $total->addBaseTotalAmount($this->getCode(), $shippingProtection->getBase() ?: $shippingProtection->getPrice());
+            $total->addBaseTotalAmount(
+                $this->getCode(),
+                $shippingProtection->getBase() ?: $shippingProtection->getPrice()
+            );
         }
 
         return $this;
@@ -92,13 +93,14 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (!$shippingProtection || !$shippingProtection->getPrice())
+        if (!$shippingProtection || !$shippingProtection->getPrice()) {
             return [];
+        }
 
         return [
             'code' => $this->getCode(),
             'title' => $this->getLabel(),
-            'value' => $shippingProtection->getPrice()
+            'value' => $shippingProtection->getPrice(),
         ];
     }
 }

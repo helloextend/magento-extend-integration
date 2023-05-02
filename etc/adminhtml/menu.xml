@@ -1,13 +1,31 @@
-<?xml version="1.0"?>
-
+<?xml version="1.0" ?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
-
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-    <menu>
-        <add id="Extend_Integration::extend" title="Extend" translate="title" module="Extend_Integration" sortOrder="80" dependsOnModule="Extend_Integration" resource="Extend_Integration::integration"/>
-        <add id="Extend_Integration::configuration" title="Integration" translate="title" module="Extend_Integration" sortOrder="10" parent="Extend_Integration::extend" action="admin/integration" resource="Extend_Integration::integration"/>
-    </menu>
+<config
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd"
+>
+  <menu>
+    <add
+      id="Extend_Integration::extend"
+      title="Extend"
+      translate="title"
+      module="Extend_Integration"
+      sortOrder="80"
+      dependsOnModule="Extend_Integration"
+      resource="Extend_Integration::integration"
+    />
+    <add
+      id="Extend_Integration::configuration"
+      title="Integration"
+      translate="title"
+      module="Extend_Integration"
+      sortOrder="10"
+      parent="Extend_Integration::extend"
+      action="admin/integration"
+      resource="Extend_Integration::integration"
+    />
+  </menu>
 </config>

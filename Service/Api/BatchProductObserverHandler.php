@@ -13,7 +13,8 @@ use Magento\Catalog\Model\Product;
 use Psr\log\LoggerInterface;
 use Exception;
 
-class BatchProductObserverHandler extends BaseObserverHandler {
+class BatchProductObserverHandler extends BaseObserverHandler
+{
     private ProductRepositoryInterface $productRepository;
 
     public function __construct(
@@ -22,13 +23,8 @@ class BatchProductObserverHandler extends BaseObserverHandler {
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder,
         ProductRepositoryInterface $productRepository
-    ){
-        parent::__construct(
-            $logger,
-            $integration,
-            $storeManager,
-            $metadataBuilder
-        );
+    ) {
+        parent::__construct($logger, $integration, $storeManager, $metadataBuilder);
         $this->productRepository = $productRepository;
     }
 
@@ -43,7 +39,7 @@ class BatchProductObserverHandler extends BaseObserverHandler {
         try {
             [$headers, $body] = $this->metadataBuilder->execute([], $integrationEndpoint, []);
 
-            foreach($productIds as $productId) {
+            foreach ($productIds as $productId) {
                 /** @var Product $product */
                 $product = $this->productRepository->getById($productId);
                 $magentoStoreIds = $product->getStoreIds();
@@ -59,16 +55,19 @@ class BatchProductObserverHandler extends BaseObserverHandler {
                 $body['magento_store_uuids'] = $currentBody['magento_store_uuids'];
                 $body['data'] = $currentBody['data'];
 
-                $this->integration->execute(
-                    $integrationEndpoint,
-                    $body,
-                    $headers
-                );
+                $this->integration->execute($integrationEndpoint, $body, $headers);
             }
         } catch (Exception $exception) {
             // silently handle errors
-            $this->logger->error('Extend Batch Product Observer encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            $this->logger->error(
+                'Extend Batch Product Observer encountered the following error: ' .
+                    $exception->getMessage()
+            );
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error'
+            );
         }
     }
 }

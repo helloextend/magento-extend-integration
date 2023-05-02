@@ -11,9 +11,8 @@ use Extend\Integration\Api\ProductProtectionInterface;
 use Magento\Checkout\Model\Cart;
 use Magento\Catalog\Model\ProductFactory;
 
-class ProductProtection implements ProductProtectionInterface 
+class ProductProtection implements ProductProtectionInterface
 {
-
     /**
      * @var Cart
      */
@@ -27,10 +26,8 @@ class ProductProtection implements ProductProtectionInterface
     /**
      * @return void
      */
-    public function __construct(
-        Cart $cart,
-        ProductFactory $productFactory
-    ) {
+    public function __construct(Cart $cart, ProductFactory $productFactory)
+    {
         $this->cart = $cart;
         $this->productFactory = $productFactory;
     }
@@ -49,19 +46,29 @@ class ProductProtection implements ProductProtectionInterface
      * @param string $orderOfferPlanId = null
      * @return void
      */
-    public function add(int $quantity, string $productId, string $planId, int $price, int $term, string $coverageType, string $leadToken = null, float $listPrice = null, string $orderOfferPlanId = null): void {
+    public function add(
+        int $quantity,
+        string $productId,
+        string $planId,
+        int $price,
+        int $term,
+        string $coverageType,
+        string $leadToken = null,
+        float $listPrice = null,
+        string $orderOfferPlanId = null
+    ): void {
         $product = $this->productFactory->create();
         $product->load($product->getIdBySku(Extend::WARRANTY_PRODUCT_SKU));
 
-        $params = array();
-        $options = array();
+        $params = [];
+        $options = [];
         $params['qty'] = $quantity;
         $params['product'] = $product->getId();
-        $product->setData('extend_plan_price', ($price/100));
+        $product->setData('extend_plan_price', $price / 100);
 
         foreach ($product->getOptions() as $o) {
             $optionId = $o->getId();
-            switch($o->getTitle()) {
+            switch ($o->getTitle()) {
                 case 'Associated Product':
                     $options[$optionId] = $productId;
                     break;
@@ -76,7 +83,7 @@ class ProductProtection implements ProductProtectionInterface
                     break;
                 case 'List Price':
                     if (isset($listPrice)) {
-                      $options[$optionId] = $listPrice;
+                        $options[$optionId] = $listPrice;
                     }
                     break;
                 case 'Order Offer Plan Id':
@@ -91,7 +98,7 @@ class ProductProtection implements ProductProtectionInterface
                     break;
                 default:
                     break;
-              }
+            }
         }
         $params['options'] = $options;
         $this->cart->addProduct($product, $params);

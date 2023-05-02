@@ -6,9 +6,9 @@
 
 namespace Extend\Integration\Model;
 
-class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements \Extend\Integration\Api\Data\StoreIntegrationInterface
+class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
+    \Extend\Integration\Api\Data\StoreIntegrationInterface
 {
-
     /**
      * @return void
      */
@@ -111,7 +111,6 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     {
         return $this->getData(self::INTEGRATION_ID);
     }
-
 
     /**
      * @return string|null

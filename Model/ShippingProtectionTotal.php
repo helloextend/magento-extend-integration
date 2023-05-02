@@ -6,7 +6,8 @@
 
 namespace Extend\Integration\Model;
 
-class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel implements \Extend\Integration\Api\Data\ShippingProtectionTotalInterface
+class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel implements
+    \Extend\Integration\Api\Data\ShippingProtectionTotalInterface
 {
     /**
      * @return void

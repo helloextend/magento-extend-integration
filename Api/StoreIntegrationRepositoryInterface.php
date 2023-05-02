@@ -36,7 +36,10 @@ interface StoreIntegrationRepositoryInterface
      * @param int $integrationId
      * @return StoreIntegrationInterface
      */
-    public function getByStoreIdAndIntegrationId(int $storeId, int $integrationId): StoreIntegrationInterface;
+    public function getByStoreIdAndIntegrationId(
+        int $storeId,
+        int $integrationId
+    ): StoreIntegrationInterface;
 
     /**
      * Get store Extend UUID and store ID by Magento store UUID
@@ -107,5 +110,9 @@ interface StoreIntegrationRepositoryInterface
      * @param string $clientSecret
      * @return void
      */
-    public function attachClientIdAndSecretToIntegration(string $consumerKey, string $clientId, string $clientSecret): void;
+    public function attachClientIdAndSecretToIntegration(
+        string $consumerKey,
+        string $clientId,
+        string $clientSecret
+    ): void;
 }

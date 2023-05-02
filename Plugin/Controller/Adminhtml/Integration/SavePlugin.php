@@ -44,9 +44,9 @@ class SavePlugin
      */
     public function __construct(
         StoreIntegrationRepositoryInterface $integrationStoresRepository,
-        StoreIntegration                    $storeIntegrationResource,
-        StoreIntegration\CollectionFactory  $storeIntegrationCollection,
-        ManagerInterface                    $messageManager
+        StoreIntegration $storeIntegrationResource,
+        StoreIntegration\CollectionFactory $storeIntegrationCollection,
+        ManagerInterface $messageManager
     ) {
         $this->integrationStoresRepository = $integrationStoresRepository;
         $this->storeIntegrationResource = $storeIntegrationResource;
@@ -68,13 +68,18 @@ class SavePlugin
         $postData = $subject->getRequest()->getPostValue();
         if (isset($postData['integration_stores'])) {
             $integrationStores = $postData['integration_stores'];
-            $this->disableAllStoreAssociations($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID));
+            $this->disableAllStoreAssociations(
+                $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
+            );
             foreach ($integrationStores as $integrationStore) {
-                $this->integrationStoresRepository->saveStoreToIntegration($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID), $integrationStore);
+                $this->integrationStoresRepository->saveStoreToIntegration(
+                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                    $integrationStore
+                );
             }
             $this->messageManager->addSuccessMessage(
                 __('Your selected stores were saved to the Extend Integration.')
-                );
+            );
             $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
         } else {
             $proceed();
@@ -95,9 +100,14 @@ class SavePlugin
         $postData = $subject->getRequest()->getPostValue();
         if (isset($postData['integration_stores'])) {
             $integrationStores = $postData['integration_stores'];
-            $this->disableAllStoreAssociations($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID));
+            $this->disableAllStoreAssociations(
+                $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
+            );
             foreach ($integrationStores as $integrationStore) {
-                $this->integrationStoresRepository->saveStoreToIntegration($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID), $integrationStore);
+                $this->integrationStoresRepository->saveStoreToIntegration(
+                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                    $integrationStore
+                );
             }
         }
 
@@ -116,7 +126,10 @@ class SavePlugin
     {
         $storeIntegrationCollection = $this->storeIntegrationCollection->create();
         $storeIntegrations = $storeIntegrationCollection
-            ->addFieldToFilter(\Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID, $integrationId)
+            ->addFieldToFilter(
+                \Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID,
+                $integrationId
+            )
             ->load();
         foreach ($storeIntegrations->getItems() as $storeIntegration) {
             $storeIntegration->setDisabled(1);

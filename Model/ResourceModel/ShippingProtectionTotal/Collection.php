@@ -8,7 +8,6 @@ namespace Extend\Integration\Model\ResourceModel\ShippingProtectionTotal;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
-
     /**
      * @var string
      */
@@ -19,6 +18,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('Extend\Integration\Model\ShippingProtectionTotal', 'Extend\Integration\Model\ResourceModel\ShippingProtectionTotal');
+        $this->_init(
+            'Extend\Integration\Model\ShippingProtectionTotal',
+            'Extend\Integration\Model\ResourceModel\ShippingProtectionTotal'
+        );
     }
 }
