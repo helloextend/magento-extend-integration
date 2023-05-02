@@ -72,7 +72,7 @@ class Totals extends \Magento\Framework\View\Element\Template
         $shippingProtection = $source->getShippingProtection();
 
         if ($shippingProtection !== null) {
-            return (float) $shippingProtection;
+            return (float)$shippingProtection;
         } else {
             $extensionAttributes = $source->getExtensionAttributes();
             if ($extensionAttributes === null) {
@@ -109,11 +109,14 @@ class Totals extends \Magento\Framework\View\Element\Template
         }
 
         if ($this->getShippingProtection() > 0) {
-            $total = new \Magento\Framework\DataObject([
-                'code' => 'shipping_protection',
-                'value' => $this->getShippingProtection(),
-                'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
-            ]);
+
+            $total = new \Magento\Framework\DataObject(
+                [
+                    'code' => 'shipping_protection',
+                    'value' => $this->getShippingProtection(),
+                    'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
+                ]
+            );
 
             $this->getParentBlock()->addTotal($total, 'shipping');
         }

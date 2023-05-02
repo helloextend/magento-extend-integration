@@ -22,8 +22,7 @@ use Magento\Store\Api\StoreRepositoryInterface;
  * @api
  * @since 100.0.2
  */
-class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
-    \Magento\Backend\Block\Widget\Tab\TabInterface
+class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements \Magento\Backend\Block\Widget\Tab\TabInterface
 {
     /**#@+
      * Form elements names.
@@ -47,15 +46,15 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
     private TemplateFactory $templateFactory;
 
     public function __construct(
-        Context $context,
-        Registry $registry,
-        FormFactory $formFactory,
-        StoreRepositoryInterface $storeRepository,
-        StoreIntegrationRepositoryInterface $integrationStoresRepository,
-        Container $container,
-        Data $integrationHelper,
+        Context         $context,
+        Registry                     $registry,
+        FormFactory             $formFactory,
+        StoreRepositoryInterface                        $storeRepository,
+        StoreIntegrationRepositoryInterface             $integrationStoresRepository,
+        Container         $container,
+        Data                $integrationHelper,
         TemplateFactory $templateFactory,
-        array $data = []
+        array                                           $data = []
     ) {
         parent::__construct($context, $registry, $formFactory);
         $this->storeRepository = $storeRepository;
@@ -76,14 +75,10 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix(self::HTML_ID_PREFIX);
-        $integrationData = $this->_coreRegistry->registry(
-            Integration::REGISTRY_KEY_CURRENT_INTEGRATION
-        );
+        $integrationData = $this->_coreRegistry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION);
         $this->_addGeneralFieldset($form, $integrationData);
         if (isset($integrationData['integration_id'])) {
-            $integrationStores = $this->integrationStoresRepository->getListByIntegration(
-                $integrationData['integration_id']
-            );
+            $integrationStores = $this->integrationStoresRepository->getListByIntegration($integrationData['integration_id']);
             $integrationData['integration_stores'] = $integrationStores;
         }
         $form->addValues($integrationData);
@@ -118,14 +113,8 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
      */
     public function canShowTab()
     {
-        $integrationData = $this->_coreRegistry->registry(
-            Integration::REGISTRY_KEY_CURRENT_INTEGRATION
-        );
-        if (
-            isset($integrationData['integration_id']) &&
-            str_contains($integrationData['endpoint'], 'extend.com') &&
-            str_contains($integrationData['endpoint'], 'integ-mage')
-        ) {
+        $integrationData = $this->_coreRegistry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION);
+        if (isset($integrationData['integration_id']) && str_contains($integrationData['endpoint'], 'extend.com') && str_contains($integrationData['endpoint'], 'integ-mage')) {
             return true;
         }
     }
@@ -151,25 +140,31 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
     {
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('Stores')]);
 
-        $fieldset->addField(self::DATA_NAME, 'multiselect', [
-            'label' => __('Stores'),
-            'name' => self::DATA_NAME,
-            'required' => true,
-            'maxlength' => '255',
-            'values' => $this->getStores(),
-        ]);
-        if (
-            $this->integrationHelper->isConfigType(
+        $fieldset->addField(
+            self::DATA_NAME,
+            'multiselect',
+            [
+                'label' => __('Stores'),
+                'name' => self::DATA_NAME,
+                'required' => true,
+                'maxlength' => '255',
+                'values' => $this->getStores()
+            ]
+        );
+        if ($this->integrationHelper->isConfigType(
                 $this->registry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION)
-            )
-        ) {
-            $fieldset->addField('button', 'submit', [
-                'value' => __('Save Stores For Extend Integration'),
-                'class' => 'save-integration-stores',
-                'data_attribute' => [
-                    'mage-init' => ['button' => ['event' => 'save', 'target' => '#edit_form']],
-                ],
-            ]);
+            )) {
+            $fieldset->addField(
+                'button',
+                'submit',
+                [
+                    'value' => __('Save Stores For Extend Integration'),
+                    'class' => 'save-integration-stores',
+                    'data_attribute' => [
+                        'mage-init' => ['button' => ['event' => 'save', 'target' => '#edit_form']],
+                    ],
+                ]
+            );
         }
     }
 

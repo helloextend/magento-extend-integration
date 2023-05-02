@@ -26,11 +26,11 @@ class Integration
         'webhooks_products_update' => '/webhooks/products/update',
         'webhooks_products_delete' => '/webhooks/products/delete',
         'log_error' => '/module/logging',
-        'app_uninstall' => '/app/uninstall',
+        'app_uninstall' => '/app/uninstall'
     ];
 
     const EXTEND_SDK_ENDPOINTS = [
-        'shipping_offers_quotes' => '/shipping-offers/quotes',
+        'shipping_offers_quotes' => '/shipping-offers/quotes'
     ];
 
     private Curl $curl;
@@ -81,17 +81,11 @@ class Integration
 
             $response = $status . ' ' . $responseBody;
 
-            $this->logger->info(
-                'Curl request to ' . $fullUrl . ' provided the following response: ' . $response
-            );
+            $this->logger->info('Curl request to ' . $fullUrl . ' provided the following response: ' . $response);
 
             if ($status >= 400) {
-                $errorMessage =
-                    'Curl request to ' .
-                    $fullUrl .
-                    ' provided the following unsuccessful response: ' .
-                    $response;
-
+                $errorMessage = 'Curl request to ' . $fullUrl . ' provided the following unsuccessful response: ' . $response;
+                
                 $this->logErrorToLoggingService(
                     $errorMessage,
                     $this->storeManager->getStore()->getId(),
@@ -104,11 +98,7 @@ class Integration
             }
         } catch (\Exception $exception) {
             $this->logger->critical($exception->getMessage());
-            $this->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+            $this->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
     }
 
@@ -117,7 +107,7 @@ class Integration
         try {
             $headers = [
                 'Content-Type' => 'application/json',
-                'X-Extend-Access-Token' => $this->accessTokenBuilder->getAccessToken(),
+                'X-Extend-Access-Token' => $this->accessTokenBuilder->getAccessToken()
             ];
 
             $this->curl->setHeaders($headers);
@@ -126,14 +116,15 @@ class Integration
                 'message' => $message,
                 'store_id' => $storeId,
                 'timestamp' => time(),
-                'log_level' => $logLevel,
+                'log_level' => $logLevel
             ]);
 
-            $endpoint =
-                $this->activeEnvironmentURLBuilder->getIntegrationURL() .
-                self::EXTEND_INTEGRATION_ENDPOINTS['log_error'];
+            $endpoint = $this->activeEnvironmentURLBuilder->getIntegrationURL() . self::EXTEND_INTEGRATION_ENDPOINTS['log_error'];
 
-            $this->curl->post($endpoint, $body);
+            $this->curl->post(
+                $endpoint,
+                $body
+            );
         } catch (\Exception $exception) {
             $this->logger->error('Cannot log to logging service: ' . $exception->getMessage());
         }

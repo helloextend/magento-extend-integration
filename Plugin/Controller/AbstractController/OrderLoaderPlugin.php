@@ -20,17 +20,14 @@ class OrderLoaderPlugin
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         Registry $registry,
         ShippingProtectionFactory $shippingProtectionFactory
-    ) {
+    ){
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->registry = $registry;
     }
 
-    public function afterLoad(
-        \Magento\Sales\Controller\AbstractController\OrderLoader $subject,
-        $result,
-        $request
-    ) {
-        $orderId = (int) $request->getParam('order_id');
+    public function afterLoad(\Magento\Sales\Controller\AbstractController\OrderLoader $subject, $result, $request)
+    {
+        $orderId = (int)$request->getParam('order_id');
 
         if (!$orderId) {
             return $result;

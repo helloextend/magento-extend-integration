@@ -59,13 +59,15 @@ class ProductRepositoryPlugin
 
     /**
      * This plugin injects Extend specific extension attributes when retrieving a single product
-     *
+     * 
      * @param ProductRepositoryInterface $subject
      * @param ProductInterface $result
      * @return ProductInterface
      */
-    public function afterGet(ProductRepositoryInterface $subject, ProductInterface $result)
-    {
+    public function afterGet(
+        ProductRepositoryInterface $subject,
+        ProductInterface $result
+    ) {
         try {
             $this->addProductExtensions($subject, $result);
         } catch (Exception $e) {
@@ -78,7 +80,7 @@ class ProductRepositoryPlugin
 
     /**
      * This plugin injects Extend specific extension attributes when retrieving a list of products
-     *
+     * 
      * @param ProductRepositoryInterface $subject
      * @param ProductSearchResultsInterface $result
      * @return ProductSearchResultsInterface
@@ -105,7 +107,7 @@ class ProductRepositoryPlugin
 
     /**
      * Adds Extend specific extension attributes to a product
-     *
+     * 
      * @param ProductRepositoryInterface $productRepository
      * @param ProductInterface $product
      * @return void
@@ -137,18 +139,18 @@ class ProductRepositoryPlugin
         $productExtension->setExtendParentSku($parentProductSku);
 
         $manufacturerOptionId = $product->getManufacturer();
-        if (
-            $manufacturerOptionId &&
-            ($optionText = $this->getAttributeOptionText('manufacturer', $manufacturerOptionId))
-        ) {
+        if ($manufacturerOptionId && $optionText = $this->getAttributeOptionText('manufacturer', $manufacturerOptionId)) {
             $productExtension->setExtendManufacturer($optionText);
         }
 
         $categoryIds = $product->getCategoryIds();
         if (count($categoryIds)) {
-            $categoryNames = array_map(function ($categoryId) {
-                return $this->categoryRepository->get($categoryId)->getName();
-            }, $categoryIds);
+            $categoryNames = array_map(
+                function ($categoryId) {
+                    return $this->categoryRepository->get($categoryId)->getName();
+                },
+                $categoryIds
+            );
             $productExtension->setExtendCategories($categoryNames);
         }
 
@@ -162,8 +164,10 @@ class ProductRepositoryPlugin
      * @param string $optionId
      * @return mixed
      */
-    private function getAttributeOptionText(string $code, string $optionId)
-    {
+    private function getAttributeOptionText(
+        string $code,
+        string $optionId
+    ) {
         $attributeConfig = $this->eavConfig->getAttribute('catalog_product', $code);
         if ($attributeConfig) {
             $optionText = $attributeConfig->getSource()->getOptionText($optionId);

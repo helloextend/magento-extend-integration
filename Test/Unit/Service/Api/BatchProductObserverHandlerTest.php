@@ -18,8 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
 
-class BatchProductObserverHandlerTest extends TestCase
-{
+class BatchProductObserverHandlerTest extends TestCase {
     /**
      * @var LoggerInterface
      */
@@ -80,7 +79,7 @@ class BatchProductObserverHandlerTest extends TestCase
         $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
         $this->integrationEndpoint = [
             'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
-            'type' => 'middleware',
+            'type' => 'middleware'
         ];
         $this->integration = $this->getMockBuilder(Integration::class)
             ->onlyMethods(['execute', 'logErrorToLoggingService'])
@@ -109,15 +108,15 @@ class BatchProductObserverHandlerTest extends TestCase
                 'webhook_created_at' => time(),
                 'topic' => 'products/delete',
                 'magento_store_uuids' => ['acff4bd1-889c-431f-908e-24fea292337b'],
-                'data' => [],
-            ],
+                'data' => []
+            ]
         ];
-
+        
         $this->productRepository = $this->getMockBuilder(ProductRepositoryInterface::class)
             ->onlyMethods(['getById'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-
+        
         $this->objectManager = new ObjectManager($this);
         $this->batchProductObserverHandler = $this->objectManager->getObject(
             BatchProductObserverHandler::class,
@@ -126,21 +125,20 @@ class BatchProductObserverHandlerTest extends TestCase
                 'integration' => $this->integration,
                 'storeManager' => $this->storeManager,
                 'metadataBuilder' => $this->metadataBuilder,
-                'productRepository' => $this->productRepository,
+                'productRepository' => $this->productRepository
             ]
         );
     }
 
-    public function testExecutesIntegrationWithExpectedPayload()
-    {
+    public function testExecutesIntegrationWithExpectedPayload() {
         $this->metadataBuilder
             ->expects($this->any())
             ->method('execute')
             ->willReturn($this->metadataMock);
 
         $numberOfProducts = count($this->productIdsMock);
-
-        for ($i = 0; $i < $numberOfProducts; $i++) {
+        
+        for($i = 0; $i < $numberOfProducts; $i++) {
             $productMock = $this->getMockBuilder(Product::class)
                 ->onlyMethods(['getStoreIds'])
                 ->disableOriginalConstructor()
@@ -156,23 +154,25 @@ class BatchProductObserverHandlerTest extends TestCase
                 ->willReturn($productMock);
         }
 
-        $this->integration->expects($this->exactly($numberOfProducts))->method('execute');
+        $this->integration
+            ->expects($this->exactly($numberOfProducts))
+            ->method('execute');
 
-        $this->batchProductObserverHandler->execute(
-            $this->integrationEndpoint,
-            $this->productIdsMock,
-            []
-        );
+        $this->batchProductObserverHandler->execute($this->integrationEndpoint, $this->productIdsMock, []);
     }
 
-    public function testLogsErrorsToLoggingService()
-    {
+
+    public function testLogsErrorsToLoggingService() {
         $this->metadataBuilder
             ->expects($this->any())
             ->method('execute')
             ->willThrowException(new Exception());
-        $this->logger->expects($this->once())->method('error');
-        $this->integration->expects($this->once())->method('logErrorToLoggingService');
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->integration
+            ->expects($this->once())
+            ->method('logErrorToLoggingService');
         $this->store
             ->expects($this->once())
             ->method('getId')
@@ -181,10 +181,6 @@ class BatchProductObserverHandlerTest extends TestCase
             ->expects($this->once())
             ->method('getStore')
             ->willReturn($this->store);
-        $this->batchProductObserverHandler->execute(
-            $this->integrationEndpoint,
-            $this->productIdsMock,
-            []
-        );
+        $this->batchProductObserverHandler->execute($this->integrationEndpoint, $this->productIdsMock, []);
     }
 }

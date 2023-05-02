@@ -22,135 +22,126 @@ use Exception;
 
 class InvoiceSaveAfterTest extends TestCase
 {
-    /**
-     * @var string
-     */
-    private string $invoiceId;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+  /**
+   * @var string
+   */
+  private string $invoiceId;
 
-    /**
-     * @var InvoiceSaveAfter
-     */
-    private $import;
+  /**
+   * @var LoggerInterface
+   */
+  private $logger;
 
-    /**
-     * @var StoreManagerInterface|MockObject
-     */
-    private $storeManager;
+  /**
+   * @var InvoiceSaveAfter
+   */
+  private $import;
 
-    /**
-     * @var Store|MockObject
-     */
-    private $store;
+  /**
+   * @var StoreManagerInterface|MockObject
+   */
+  private $storeManager;
 
-    /**
-     * @var OrderObserverHandler|MockObject
-     */
-    private $orderObserverHandler;
+  /**
+   * @var Store|MockObject
+   */
+  private $store;
 
-    /**
-     * @var Integration|MockObject
-     */
-    private $integration;
+  /**
+   * @var OrderObserverHandler|MockObject
+   */
+  private $orderObserverHandler;
 
-    /**
-     * @var Order|MockObject
-     */
-    private $orderMock;
+  /**
+   * @var Integration|MockObject
+   */
+  private $integration;
 
-    /**
-     * @var Observer|MockObject
-     */
-    private $observer;
+  /**
+   * @var Order|MockObject
+   */
+  private $orderMock;
 
-    /**
-     * @var Invoice|MockObject
-     */
-    private $invoice;
+  /**
+   * @var Observer|MockObject
+   */
+  private $observer;
 
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
+  /**
+   * @var Invoice|MockObject
+   */
+  private $invoice;
 
-    protected function setUp(): void
-    {
-        $this->invoiceId = 'test';
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-        $this->orderObserverHandler = $this->getMockBuilder(OrderObserverHandler::class)
-            ->setMethods(['execute'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->store = $this->getMockBuilder(Store::class)
-            ->setMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->setMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager
-            ->expects($this->any())
-            ->method('getStore')
-            ->willReturn($this->store);
-        $this->orderMock = $this->createMock(Order::class);
-        $this->invoice = $this->getMockBuilder(Invoice::class)
-            ->setMethods(['getOrder', 'getId'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->invoice
-            ->expects($this->any())
-            ->method('getOrder')
-            ->willReturn($this->orderMock);
-        $this->invoice
-            ->expects($this->any())
-            ->method('getId')
-            ->willReturn($this->invoiceId);
-        $this->observer = $this->createPartialMock(Observer::class, ['getInvoice']);
-        $this->observer
-            ->expects($this->any())
-            ->method('getInvoice')
-            ->willReturn($this->invoice);
-        $this->objectManager = new ObjectManager($this);
-        $this->import = $this->objectManager->getObject(InvoiceSaveAfter::class, [
-            'logger' => $this->logger,
-            'orderObserverHandler' => $this->orderObserverHandler,
-            'integration' => $this->integration,
-            'storeManager' => $this->storeManager,
-        ]);
-    }
+  /**
+   * @var ObjectManager
+   */
+  protected $objectManager;
 
-    public function testExecutesOrdersObserver()
-    {
-        $this->orderObserverHandler
-            ->expects($this->once())
-            ->method('execute')
-            ->with(
-                $this->equalTo([
-                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
-                    'type' => 'middleware',
-                ]),
-                $this->equalTo($this->orderMock),
-                $this->equalTo(['invoice_id' => $this->invoiceId])
-            );
-        $this->import->execute($this->observer);
-    }
+  protected function setUp(): void
+  {
+    $this->invoiceId = 'test';
+    $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+    $this->orderObserverHandler = $this->getMockBuilder(OrderObserverHandler::class)
+      ->setMethods(['execute'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->integration = $this->getMockBuilder(
+      Integration::class
+    )->disableOriginalConstructor()
+      ->getMock();
+    $this->store = $this->getMockBuilder(Store::class)
+      ->setMethods(['getId'])
+      ->disableOriginalConstructor()
+      ->getMockForAbstractClass();
+    $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
+      ->setMethods(['getStore'])
+      ->disableOriginalConstructor()
+      ->getMockForAbstractClass();
+    $this->storeManager->expects($this->any())->method('getStore')
+      ->willReturn($this->store);
+    $this->orderMock = $this->createMock(Order::class);
+    $this->invoice = $this->getMockBuilder(Invoice::class)
+      ->setMethods(['getOrder', 'getId'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->invoice->expects($this->any())->method('getOrder')->willReturn($this->orderMock);
+    $this->invoice->expects($this->any())->method('getId')->willReturn($this->invoiceId);
+    $this->observer = $this->createPartialMock(Observer::class, ['getInvoice']);
+    $this->observer->expects($this->any())->method('getInvoice')->willReturn($this->invoice);
+    $this->objectManager = new ObjectManager($this);
+    $this->import = $this->objectManager->getObject(
+      InvoiceSaveAfter::class,
+      [
+        'logger' => $this->logger,
+        'orderObserverHandler' => $this->orderObserverHandler,
+        'integration' => $this->integration,
+        'storeManager' => $this->storeManager,
+      ]
+    );
+  }
 
-    public function testLogsErrorsToLoggingService()
-    {
-        $this->orderObserverHandler
-            ->expects($this->once())
-            ->method('execute')
-            ->willThrowException(new Exception());
-        $this->logger->expects($this->once())->method('error');
-        $this->integration->expects($this->once())->method('logErrorToLoggingService');
-        $this->import->execute($this->observer);
-    }
+  public function testExecutesOrdersObserver()
+  {
+    $this->orderObserverHandler->expects($this->once())
+      ->method('execute')
+      ->with(
+        $this->equalTo(['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'], 'type' => 'middleware']),
+        $this->equalTo($this->orderMock),
+        $this->equalTo(['invoice_id' => $this->invoiceId])
+      );
+    $this->import->execute($this->observer);
+  }
+
+  public function testLogsErrorsToLoggingService()
+  {
+    $this->orderObserverHandler->expects($this->once())
+      ->method('execute')
+      ->willThrowException(new Exception());
+    $this->logger->expects($this->once())
+      ->method('error');
+    $this->integration->expects($this->once())
+      ->method('logErrorToLoggingService');
+    $this->import->execute($this->observer);
+  }
 }

@@ -25,12 +25,13 @@ class CreditmemoRefund implements ObserverInterface
         OrderObserverHandler $orderObserverHandler,
         Integration $integration,
         StoreManagerInterface $storeManager
-    ) {
+    ){
         $this->logger = $logger;
         $this->orderObserverHandler = $orderObserverHandler;
         $this->integration = $integration;
         $this->storeManager = $storeManager;
     }
+
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
@@ -40,24 +41,15 @@ class CreditmemoRefund implements ObserverInterface
     {
         try {
             $this->orderObserverHandler->execute(
-                [
-                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'],
-                    'type' => 'middleware',
-                ],
+                ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'], 'type' => 'middleware'],
                 $observer->getCreditmemo()->getOrder(),
                 ['credit_memo_id' => $observer->getCreditmemo()->getId()]
             );
         } catch (\Exception $exception) {
             // silently handle errors
-            $this->logger->error(
-                'Extend Order Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+            $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
+            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
     }
+
 }

@@ -16,79 +16,76 @@ use Psr\Log\LoggerInterface;
 
 class CatalogProductImportBunchDeleteAfter implements ObserverInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+  /**
+   * @var LoggerInterface
+   */
+  private $logger;
 
-    /**
-     * @var BatchProductObserverHandler
-     */
-    private $batchProductObserverHandler;
+  /**
+   * @var BatchProductObserverHandler
+   */
+  private $batchProductObserverHandler;
 
-    /**
-     * @var Integration
-     */
-    private $integration;
+  /**
+   * @var Integration
+   */
+  private $integration;
 
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
+  /**
+   * @var StoreManagerInterface
+   */
+  private $storeManager;
 
-    public function __construct(
-        LoggerInterface $logger,
-        BatchProductObserverHandler $batchProductObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
-    ) {
-        $this->logger = $logger;
-        $this->batchProductObserverHandler = $batchProductObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
-    }
+  public function __construct(
+    LoggerInterface $logger,
+    BatchProductObserverHandler $batchProductObserverHandler,
+    Integration $integration,
+    StoreManagerInterface $storeManager
+  ) {
+    $this->logger = $logger;
+    $this->batchProductObserverHandler = $batchProductObserverHandler;
+    $this->integration = $integration;
+    $this->storeManager = $storeManager;
+  }
 
-    /**
-     * @param Observer $observer
-     * @return void
-     */
-    public function execute(Observer $observer)
-    {
-        try {
-            $bunch = $observer->getEvent()->getBunch();
+  /**
+   * @param Observer $observer
+   * @return void
+   */
+  public function execute(Observer $observer)
+  {
+    try {
+      $bunch = $observer->getEvent()->getBunch();
 
-            /** @var Product $adapter */
-            $adapter = $observer->getEvent()->getAdapter();
+      /** @var Product $adapter */
+      $adapter = $observer->getEvent()->getAdapter();
 
-            $productIds = [];
+      $productIds = [];
 
-            foreach ($bunch as $rowNum => $rowData) {
-                $productData = $adapter->getNewSku($rowData[Product::COL_SKU]);
+      foreach ($bunch as $rowNum => $rowData) {
+        $productData = $adapter->getNewSku($rowData[Product::COL_SKU]);
 
-                if (isset($productData['entity_id'])) {
-                    $productId = $productData['entity_id'];
+        if (isset($productData['entity_id'])) {
+          $productId = $productData['entity_id'];
 
-                    array_push($productIds, $productId);
-                }
-            }
-
-            $endpoint = [
-                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
-                'type' => 'middleware',
-            ];
-
-            $this->batchProductObserverHandler->execute($endpoint, $productIds, []);
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error(
-                'Extend Batch Product Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+          array_push($productIds, $productId);
         }
+      }
+
+      $endpoint = [
+        'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
+        'type' => 'middleware'
+      ];
+
+      $this->batchProductObserverHandler->execute(
+        $endpoint,
+        $productIds,
+        []
+      );
+    } catch (\Exception $exception) {
+      // silently handle errors
+      $this->logger->error('Extend Batch Product Observer Handler encountered the following error: ' . $exception->getMessage());
+      $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
     }
+  }
 }

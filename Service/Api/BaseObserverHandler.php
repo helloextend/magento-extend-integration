@@ -10,8 +10,7 @@ use Extend\Integration\Service\Api\Integration;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\log\LoggerInterface;
 
-abstract class BaseObserverHandler
-{
+abstract class BaseObserverHandler {
     protected LoggerInterface $logger;
     protected Integration $integration;
     protected StoreManagerInterface $storeManager;
@@ -22,10 +21,11 @@ abstract class BaseObserverHandler
         Integration $integration,
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder
-    ) {
+    ){
         $this->logger = $logger;
         $this->integration = $integration;
         $this->storeManager = $storeManager;
         $this->metadataBuilder = $metadataBuilder;
     }
+
 }

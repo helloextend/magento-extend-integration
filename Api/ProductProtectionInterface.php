@@ -6,7 +6,7 @@
 
 namespace Extend\Integration\Api;
 
-interface ProductProtectionInterface
+interface ProductProtectionInterface 
 {
     /**
      * Add product protection to cart
@@ -22,15 +22,5 @@ interface ProductProtectionInterface
      * @param string $orderOfferPlanId = null
      * @return void
      */
-    public function add(
-        int $quantity,
-        string $productId,
-        string $planId,
-        int $price,
-        int $term,
-        string $coverageType,
-        string $leadToken = null,
-        float $listPrice = null,
-        string $orderOfferPlanId = null
-    ): void;
+    public function add(int $quantity, string $productId, string $planId, int $price, int $term, string $coverageType, string $leadToken = null, float $listPrice = null, string $orderOfferPlanId = null): void;
 }

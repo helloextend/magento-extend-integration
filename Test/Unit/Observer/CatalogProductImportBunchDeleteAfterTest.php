@@ -76,6 +76,7 @@ class CatalogProductImportBunchDeleteAfterTest extends TestCase
      */
     private $event;
 
+
     /**
      * @var ObjectManager
      */
@@ -84,103 +85,91 @@ class CatalogProductImportBunchDeleteAfterTest extends TestCase
     protected function setUp(): void
     {
         $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-        $this->batchProductObserverHandler = $this->getMockBuilder(
-            BatchProductObserverHandler::class
-        )
-            ->onlyMethods(['execute'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->batchProductObserverHandler = $this->getMockBuilder(BatchProductObserverHandler::class)
+          ->onlyMethods(['execute'])
+          ->disableOriginalConstructor()
+          ->getMock();
+        $this->integration = $this->getMockBuilder(
+          Integration::class
+        )->disableOriginalConstructor()
+          ->getMock();
         $this->store = $this->getMockBuilder(Store::class)
-            ->onlyMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+          ->onlyMethods(['getId'])
+          ->disableOriginalConstructor()
+          ->getMockForAbstractClass();
         $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->onlyMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager
-            ->expects($this->any())
-            ->method('getStore')
-            ->willReturn($this->store);
+          ->onlyMethods(['getStore'])
+          ->disableOriginalConstructor()
+          ->getMockForAbstractClass();
+        $this->storeManager->expects($this->any())->method('getStore')
+          ->willReturn($this->store);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getBunch', 'getAdapter'])
-            ->disableOriginalConstructor()
-            ->getMock();
+          ->addMethods(['getBunch', 'getAdapter'])
+          ->disableOriginalConstructor()
+          ->getMock();
         $this->bunchDataArrayMock = [
-            1 => [
-                'sku' => 'sku1',
-            ],
-            2 => [
-                'sku' => 'sku2',
-            ],
+          1 => [
+            'sku' => 'sku1'
+          ],
+          2 => [
+            'sku' => 'sku2'
+          ]
         ];
-        $this->productDataArrayMocks = [['entity_id' => 1], ['entity_id' => 2]];
+        $this->productDataArrayMocks = [
+          ['entity_id' => 1],
+          ['entity_id' => 2]
+        ];
         $this->adapterMock = $this->getMockBuilder(Product::class)
-            ->onlyMethods(['getNewSku'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->adapterMock
-            ->expects($this->at(0))
-            ->method('getNewSku')
-            ->with('sku1')
-            ->willReturn($this->productDataArrayMocks[0]);
-        $this->adapterMock
-            ->expects($this->at(1))
-            ->method('getNewSku')
-            ->with('sku2')
-            ->willReturn($this->productDataArrayMocks[1]);
-        $this->event
-            ->expects($this->any())
-            ->method('getBunch')
-            ->willReturn($this->bunchDataArrayMock);
-        $this->event
-            ->expects($this->any())
-            ->method('getAdapter')
-            ->willReturn($this->adapterMock);
+          ->onlyMethods(['getNewSku'])
+          ->disableOriginalConstructor()
+          ->getMockForAbstractClass();
+        $this->adapterMock->expects($this->at(0))
+          ->method('getNewSku')
+          ->with('sku1')
+          ->willReturn($this->productDataArrayMocks[0]);
+        $this->adapterMock->expects($this->at(1))
+          ->method('getNewSku')
+          ->with('sku2')
+          ->willReturn($this->productDataArrayMocks[1]);
+        $this->event->expects($this->any())->method('getBunch')->willReturn($this->bunchDataArrayMock);
+        $this->event->expects($this->any())->method('getAdapter')->willReturn($this->adapterMock);
         $this->observer = $this->createPartialMock(Observer::class, ['getEvent']);
-        $this->observer
-            ->expects($this->any())
-            ->method('getEvent')
-            ->willReturn($this->event);
+        $this->observer->expects($this->any())->method('getEvent')->willReturn($this->event);
         $this->objectManager = new ObjectManager($this);
         $this->import = $this->objectManager->getObject(
-            CatalogProductImportBunchDeleteAfter::class,
-            [
-                'logger' => $this->logger,
-                'batchProductObserverHandler' => $this->batchProductObserverHandler,
-                'integration' => $this->integration,
-                'storeManager' => $this->storeManager,
-            ]
+          CatalogProductImportBunchDeleteAfter::class,
+          [
+            'logger' => $this->logger,
+            'batchProductObserverHandler' => $this->batchProductObserverHandler,
+            'integration' => $this->integration,
+            'storeManager' => $this->storeManager,
+          ]
         );
     }
 
-    public function testExecutesProductsBatchObserverHandler()
-    {
-        $this->batchProductObserverHandler
-            ->expects($this->once())
+    public function testExecutesProductsBatchObserverHandler() {
+        $this->batchProductObserverHandler->expects($this->once())
             ->method('execute')
             ->with(
-                $this->equalTo([
-                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
-                    'type' => 'middleware',
-                ]),
-                $this->equalTo([1, 2]),
-                []
+              $this->equalTo([
+                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
+                'type' => 'middleware'
+              ]),
+              $this->equalTo([1, 2]),
+              []
             );
         $this->import->execute($this->observer);
     }
 
-    public function testLogsErrorsToLoggingService()
-    {
-        $this->batchProductObserverHandler
-            ->expects($this->once())
+
+    public function testLogsErrorsToLoggingService() {
+        $this->batchProductObserverHandler->expects($this->once())
             ->method('execute')
             ->willThrowException(new Exception());
-        $this->logger->expects($this->once())->method('error');
-        $this->integration->expects($this->once())->method('logErrorToLoggingService');
+        $this->logger->expects($this->once())
+            ->method('error');
+        $this->integration->expects($this->once())
+            ->method('logErrorToLoggingService');
         $this->import->execute($this->observer);
     }
 }

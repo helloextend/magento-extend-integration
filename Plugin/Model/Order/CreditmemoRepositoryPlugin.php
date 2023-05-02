@@ -29,7 +29,7 @@ class CreditmemoRepositoryPlugin
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory,
         ShippingProtectionFactory $shippingProtectionFactory
-    ) {
+    ){
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
@@ -43,11 +43,8 @@ class CreditmemoRepositoryPlugin
      * @param $creditMemoId
      * @return mixed
      */
-    public function afterGet(
-        \Magento\Sales\Model\Order\CreditmemoRepository $subject,
-        $result,
-        $creditMemoId
-    ) {
+    public function afterGet(\Magento\Sales\Model\Order\CreditmemoRepository $subject, $result, $creditMemoId)
+    {
         $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
             $creditMemoId,
             ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
@@ -65,11 +62,8 @@ class CreditmemoRepositoryPlugin
      * @param $creditMemo
      * @return mixed
      */
-    public function afterSave(
-        \Magento\Sales\Model\Order\CreditmemoRepository $subject,
-        $result,
-        $creditMemo
-    ) {
+    public function afterSave(\Magento\Sales\Model\Order\CreditmemoRepository $subject, $result, $creditMemo)
+    {
         $extensionAttributes = $creditMemo->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->creditmemoExtensionFactory->create();

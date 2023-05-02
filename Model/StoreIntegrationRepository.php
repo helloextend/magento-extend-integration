@@ -22,8 +22,7 @@ use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Store\Model\StoreManager;
 
-class StoreIntegrationRepository implements
-    \Extend\Integration\Api\StoreIntegrationRepositoryInterface
+class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegrationRepositoryInterface
 {
     const LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID = 'warranty/authentication/store_id';
     const LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID = 'warranty/authentication/sandbox_store_id';
@@ -40,15 +39,15 @@ class StoreIntegrationRepository implements
     private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
 
     public function __construct(
-        StoreManager $storeManager,
-        IdentityService $identityService,
-        StoreIntegrationFactory $storeIntegrationFactory,
-        StoreIntegrationResource $storeIntegrationResource,
-        OauthServiceInterface $oauthService,
+        StoreManager                $storeManager,
+        IdentityService             $identityService,
+        StoreIntegrationFactory     $storeIntegrationFactory,
+        StoreIntegrationResource    $storeIntegrationResource,
+        OauthServiceInterface       $oauthService,
         IntegrationServiceInterface $integrationService,
-        CollectionFactory $storeIntegrationCollectionFactory,
-        ScopeConfigInterface $scopeConfig,
-        EncryptorInterface $encryptor,
+        CollectionFactory           $storeIntegrationCollectionFactory,
+        ScopeConfigInterface        $scopeConfig,
+        EncryptorInterface          $encryptor,
         ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
     ) {
         $this->storeManager = $storeManager;
@@ -86,9 +85,7 @@ class StoreIntegrationRepository implements
      */
     public function getByStoreIdAndActiveEnvironment(int $storeId): StoreIntegrationInterface
     {
-        $integrationId = (int) $this->scopeConfig->getValue(
-            Integration::INTEGRATION_ENVIRONMENT_CONFIG
-        );
+        $integrationId = (int)$this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
 
         $integration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
 
@@ -106,10 +103,8 @@ class StoreIntegrationRepository implements
      * @param int $integrationId
      * @return StoreIntegrationInterface
      */
-    public function getByStoreIdAndIntegrationId(
-        int $storeId,
-        int $integrationId
-    ): StoreIntegrationInterface {
+    public function getByStoreIdAndIntegrationId(int $storeId, int $integrationId): StoreIntegrationInterface
+    {
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
         return $storeIntegrationCollection
             ->addFieldToFilter('store_id', ['eq' => $storeId])
@@ -140,11 +135,7 @@ class StoreIntegrationRepository implements
     public function getByExtendUuid(string $extendStoreUuid): StoreIntegrationInterface
     {
         $storeIntegration = $this->storeIntegrationFactory->create();
-        $this->storeIntegrationResource->load(
-            $storeIntegration,
-            $extendStoreUuid,
-            'extend_store_uuid'
-        );
+        $this->storeIntegrationResource->load($storeIntegration, $extendStoreUuid, 'extend_store_uuid');
 
         return $storeIntegration;
     }
@@ -161,10 +152,7 @@ class StoreIntegrationRepository implements
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
 
         $storeIntegrationCollection
-            ->addFieldToFilter(
-                \Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID,
-                $integrationId
-            )
+            ->addFieldToFilter(\Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID, $integrationId)
             ->addFieldToSelect('store_id')
             ->load();
 
@@ -206,20 +194,10 @@ class StoreIntegrationRepository implements
             $this->storeIntegrationResource->save($storeIntegration);
         } else {
             $storeCode = $this->storeManager->getStore($storeId)->getCode();
-            $legacyExtendProductionStoreId = $this->scopeConfig->getValue(
-                self::LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID,
-                'store',
-                $storeCode
-            );
-            $legacyExtendSandboxStoreId = $this->scopeConfig->getValue(
-                self::LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID,
-                'store',
-                $storeCode
-            );
+            $legacyExtendProductionStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_PRODUCTION_STORE_ID, 'store', $storeCode);
+            $legacyExtendSandboxStoreId = $this->scopeConfig->getValue(self::LEGACY_EXTEND_MODULE_SANDBOX_STORE_ID, 'store', $storeCode);
             $integration = $this->integrationService->get($integrationId);
-            $environment = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL(
-                $integration->getEndpoint()
-            );
+            $environment = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
             $storeIntegration = $this->storeIntegrationFactory->create();
             if ($legacyExtendProductionStoreId && $environment == 'prod') {
                 $storeIntegration->setExtendStoreUuid($legacyExtendProductionStoreId);
@@ -243,6 +221,7 @@ class StoreIntegrationRepository implements
      */
     public function generateUuidForStore(StoreIntegrationInterface $storeIntegration): void
     {
+
         if (!$storeIntegration->getStoreUuid()) {
             $uuid = $this->identityService->generateId();
             $storeIntegration->setStoreUuid($uuid);
@@ -278,24 +257,20 @@ class StoreIntegrationRepository implements
      * @param string $clientSecret
      * @return void
      */
-    public function attachClientIdAndSecretToIntegration(
-        string $consumerKey,
-        string $clientId,
-        string $clientSecret
-    ): void {
+    public function attachClientIdAndSecretToIntegration(string $consumerKey, string $clientId, string $clientSecret): void
+    {
         $consumer = $this->oauthService->loadConsumerByKey($consumerKey);
 
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
         $storeIntegrationCollection
-            ->addFieldToFilter(
-                \Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID,
-                $consumer->getId()
-            )
+            ->addFieldToFilter(\Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID, $consumer->getId())
             ->load();
 
         foreach ($storeIntegrationCollection as $integration) {
             $integration->setClientId($clientId);
-            $integration->setClientSecret($this->encryptor->encrypt($clientSecret));
+            $integration->setClientSecret(
+                $this->encryptor->encrypt($clientSecret)
+            );
             $this->storeIntegrationResource->save($integration);
         }
     }

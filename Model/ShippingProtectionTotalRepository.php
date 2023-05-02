@@ -17,9 +17,9 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
-class ShippingProtectionTotalRepository implements
-    \Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface
+class ShippingProtectionTotalRepository implements \Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface
 {
+
     /**
      * @var ShippingProtectionTotalFactory
      */
@@ -49,6 +49,7 @@ class ShippingProtectionTotalRepository implements
         ShippingProtectionTotalCollectionFactory $shippingProtectionTotalCollection,
         Session $checkoutSession
     ) {
+
         $this->shippingProtectionTotalFactory = $shippingProtectionTotalFactory;
         $this->shippingProtectionTotalResource = $shippingProtectionTotalResource;
         $this->shippingProtectionTotalCollection = $shippingProtectionTotalCollection;
@@ -84,10 +85,7 @@ class ShippingProtectionTotalRepository implements
     public function getById(int $shippingProtectionTotalId): ShippingProtectionTotal
     {
         $shippingProtectionTotal = $this->shippingProtectionTotalFactory->create();
-        $this->shippingProtectionTotalResource->load(
-            $shippingProtectionTotal,
-            $shippingProtectionTotalId
-        );
+        $this->shippingProtectionTotalResource->load($shippingProtectionTotal, $shippingProtectionTotalId);
 
         return $shippingProtectionTotal;
     }
@@ -105,17 +103,10 @@ class ShippingProtectionTotalRepository implements
      * @return ShippingProtectionTotal
      * @throws AlreadyExistsException
      */
-    public function save(
-        int $entityId,
-        int $entityTypeId,
-        string $spQuoteId,
-        float $price,
-        string $currency,
-        ?float $basePrice,
-        ?string $baseCurrency
-    ): ShippingProtectionTotal {
+    public function save(int $entityId, int $entityTypeId, string $spQuoteId, float $price, string $currency, ?float $basePrice, ?string $baseCurrency): ShippingProtectionTotal
+    {
         //need to make $entityId and $entityTypeId optional for SDK ajax call
-        if (!($shippingProtectionTotal = $this->get($entityId, $entityTypeId))) {
+        if (!$shippingProtectionTotal = $this->get($entityId, $entityTypeId)) {
             $shippingProtectionTotal = $this->shippingProtectionTotalFactory->create();
         }
 
@@ -145,23 +136,10 @@ class ShippingProtectionTotalRepository implements
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveBySdk(
-        string $spQuoteId,
-        float $price,
-        string $currency,
-        float $basePrice = null,
-        string $baseCurrency = null
-    ): void {
+    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void
+    {
         $entityId = $this->checkoutSession->getQuote()->getId();
-        $this->save(
-            $entityId,
-            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID,
-            $spQuoteId,
-            $price / 100,
-            $currency,
-            $basePrice / 100 ?: null,
-            $baseCurrency ?: null
-        );
+        $this->save($entityId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID, $spQuoteId, ($price / 100), $currency, ($basePrice / 100) ?: null, $baseCurrency ?: null);
     }
 
     /**
@@ -183,10 +161,7 @@ class ShippingProtectionTotalRepository implements
     public function delete(): void
     {
         $entityId = $this->checkoutSession->getQuote()->getId();
-        $shippingProtection = $this->get(
-            $entityId,
-            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
-        );
+        $shippingProtection = $this->get($entityId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID);
         $this->shippingProtectionTotalResource->delete($shippingProtection);
     }
 
@@ -199,27 +174,18 @@ class ShippingProtectionTotalRepository implements
      * @param ExtensibleDataInterface $result
      * @return void
      */
-    public function getAndSaturateExtensionAttributes(
-        int $entityId,
-        int $entityTypeId,
-        ExtensibleDataInterface $result
-    ): void {
+    public function getAndSaturateExtensionAttributes(int $entityId, int $entityTypeId, ExtensibleDataInterface $result): void
+    {
         $shippingProtectionTotal = $this->get($entityId, $entityTypeId);
 
-        if (
-            !$shippingProtectionTotal->getData() ||
-            sizeof($shippingProtectionTotal->getData()) === 0
-        ) {
+        if (!$shippingProtectionTotal->getData() || sizeof($shippingProtectionTotal->getData()) === 0)
             return;
-        }
 
         $extensionAttributes = $result->getExtensionAttributes();
         $shippingProtection = $this->shippingProtectionFactory->create();
 
         $shippingProtection->setBase($shippingProtectionTotal->getShippingProtectionBasePrice());
-        $shippingProtection->setBaseCurrency(
-            $shippingProtectionTotal->getShippingProtectionBaseCurrency()
-        );
+        $shippingProtection->setBaseCurrency($shippingProtectionTotal->getShippingProtectionBaseCurrency());
         $shippingProtection->setPrice($shippingProtectionTotal->getShippingProtectionPrice());
         $shippingProtection->setCurrency($shippingProtectionTotal->getShippingProtectionCurrency());
         $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
@@ -265,16 +231,10 @@ class ShippingProtectionTotalRepository implements
                 $shippingProtection = $this->shippingProtectionFactory->create();
 
                 $shippingProtection->setBase($shippingProtectionExtensionAttribute->getBase());
-                $shippingProtection->setBaseCurrency(
-                    $shippingProtectionExtensionAttribute->getBaseCurrency()
-                );
+                $shippingProtection->setBaseCurrency($shippingProtectionExtensionAttribute->getBaseCurrency());
                 $shippingProtection->setPrice($shippingProtectionExtensionAttribute->getPrice());
-                $shippingProtection->setCurrency(
-                    $shippingProtectionExtensionAttribute->getCurrency()
-                );
-                $shippingProtection->setSpQuoteId(
-                    $shippingProtectionExtensionAttribute->getSpQuoteId()
-                );
+                $shippingProtection->setCurrency($shippingProtectionExtensionAttribute->getCurrency());
+                $shippingProtection->setSpQuoteId($shippingProtectionExtensionAttribute->getSpQuoteId());
 
                 $extensionAttributesForResaturation = $result->getExtensionAttributes();
                 $extensionAttributesForResaturation->setShippingProtection($shippingProtection);
@@ -297,22 +257,8 @@ class ShippingProtectionTotalRepository implements
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveByApi(
-        string $cartId,
-        string $spQuoteId,
-        float $price,
-        string $currency,
-        float $basePrice = null,
-        string $baseCurrency = null
-    ): void {
-        $this->save(
-            $cartId,
-            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID,
-            $spQuoteId,
-            $price / 100,
-            $currency,
-            $basePrice / 100 ?: null,
-            $baseCurrency ?: null
-        );
+    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void
+    {
+        $this->save($cartId, ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID, $spQuoteId, ($price / 100), $currency, ($basePrice / 100) ?: null, $baseCurrency ?: null);
     }
 }

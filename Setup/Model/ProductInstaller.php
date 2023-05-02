@@ -68,7 +68,7 @@ class ProductInstaller
         Reader $reader,
         StoreManagerInterface $storeManager,
         Registry $registry
-    ) {
+    ){
         $this->directoryList = $directoryList;
         $this->entryFactory = $entryFactory;
         $this->file = $file;
@@ -95,9 +95,7 @@ class ProductInstaller
                 $this->addOptionsToProtectionPlanProduct($product);
             }
         } catch (Exception $exception) {
-            throw new Exception(
-                'There was an error creating the Extend Protection Plan Product' . $exception
-            );
+            throw new Exception('There was an error creating the Extend Protection Plan Product' . $exception);
         }
     }
 
@@ -114,9 +112,7 @@ class ProductInstaller
                 $this->deleteImageFromPubMedia();
             }
         } catch (Exception $exception) {
-            throw new Exception(
-                'There was an error deleting the Extend Protection Plan Product' . $exception
-            );
+            throw new Exception('There was an error deleting the Extend Protection Plan Product' . $exception);
         }
     }
 
@@ -140,8 +136,7 @@ class ProductInstaller
 
             $product = $this->productFactory->create();
 
-            $product
-                ->setSku(Extend::WARRANTY_PRODUCT_SKU)
+            $product->setSku(Extend::WARRANTY_PRODUCT_SKU)
                 ->setName('Extend Protection Plan')
                 ->setWebsiteIds(array_keys($this->storeManager->getWebsites()))
                 ->setAttributeSetId($attributeSet->getAttributeSetId())
@@ -156,7 +151,7 @@ class ProductInstaller
                     'is_in_stock' => 1,
                     'qty' => 1,
                     'manage_stock' => 0,
-                    'use_config_notify_stock_qty' => 0,
+                    'use_config_notify_stock_qty' => 0
                 ]);
 
             $this->productRepository->save($product);
@@ -164,9 +159,9 @@ class ProductInstaller
             return $product;
         } catch (Exception $exception) {
             throw new SetupException(
-                new Phrase('There was a problem create the Extend Protection Product: ', [
-                    $exception->getMessage(),
-                ])
+                new Phrase('There was a problem create the Extend Protection Product: ',
+                    [$exception->getMessage()]
+                )
             );
         }
     }
@@ -188,55 +183,55 @@ class ProductInstaller
                 'sort_order' => 0,
                 'is_require' => 1,
             ];
-
+            
             $options = [
                 [
-                    'title' => 'Associated Product',
+                    'title'      => 'Associated Product',
                 ],
                 [
-                    'title' => 'Plan Type',
+                    'title'      => 'Plan Type',
                 ],
                 [
-                    'title' => 'Plan ID',
+                    'title'      => 'Plan ID',
                 ],
                 [
-                    'title' => 'Term',
+                    'title'      => 'Term',
                 ],
                 [
-                    'title' => 'List Price',
+                    'title'      => 'List Price',
                     'is_require' => 0,
                 ],
                 [
-                    'title' => 'Order Offer Plan Id',
+                    'title'      => 'Order Offer Plan Id',
                     'is_require' => 0,
                 ],
                 [
-                    'title' => 'Lead Token',
+                    'title'      => 'Lead Token',
                     'is_require' => 0,
                 ],
             ];
-
+    
             foreach ($options as $arrayOption) {
                 // If the input arrays have the same string keys, then the later value for that key will overwrite the previous one.
                 $optionData = array_merge($default_values, $arrayOption);
 
                 $option = $this->catalogOptionFactory->create();
-
-                $option
-                    ->setProductId($product->getId())
+                
+                $option->setProductId($product->getId())
                     ->setStoreId($product->getStoreId())
                     ->setProductSku($product->getSku())
                     ->addData($optionData);
-
+                
                 $this->optionRepository->save($option);
             }
         } catch (Exception $exception) {
             throw new SetupException(
-                new Phrase('There was a problem adding the Extend Protection Product options: ', [
-                    $exception->getMessage(),
-                ])
+                new Phrase('There was a problem adding the Extend Protection Product options: ',
+                    [$exception->getMessage()]
+                )
             );
         }
+
     }
 
     /**

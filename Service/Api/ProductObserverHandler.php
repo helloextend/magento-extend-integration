@@ -13,13 +13,19 @@ use Psr\log\LoggerInterface;
 
 class ProductObserverHandler extends BaseObserverHandler
 {
+
     public function __construct(
         LoggerInterface $logger,
         Integration $integration,
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder
     ) {
-        parent::__construct($logger, $integration, $storeManager, $metadataBuilder);
+        parent::__construct(
+            $logger,
+            $integration,
+            $storeManager,
+            $metadataBuilder
+        );
     }
 
     /**
@@ -34,29 +40,19 @@ class ProductObserverHandler extends BaseObserverHandler
             $productId = $product->getId();
             $productSku = $product->getSku();
             $magentoStoreIds = $product->getStoreIds();
-            $data = array_merge(
-                ['product_id' => $productId, 'product_sku' => $productSku],
-                $additionalFields
-            );
+            $data = array_merge(['product_id' => $productId, 'product_sku' => $productSku], $additionalFields);
 
-            [$headers, $body] = $this->metadataBuilder->execute(
-                $magentoStoreIds,
+            [$headers, $body] = $this->metadataBuilder->execute($magentoStoreIds, $integrationEndpoint, $data);
+
+            $this->integration->execute(
                 $integrationEndpoint,
-                $data
+                $body,
+                $headers
             );
-
-            $this->integration->execute($integrationEndpoint, $body, $headers);
         } catch (\Exception $exception) {
             // silently handle errors
-            $this->logger->error(
-                'Extend Product Observer encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+            $this->logger->error('Extend Product Observer encountered the following error: ' . $exception->getMessage());
+            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
     }
 }

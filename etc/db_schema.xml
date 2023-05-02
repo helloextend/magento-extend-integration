@@ -1,125 +1,50 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
-<schema
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd"
->
-  <table
-    name="extend_shipping_protection"
-    resource="default"
-    engine="innodb"
-    comment="Extend Shipping Protection Total Per Order"
-  >
-    <column
-      xsi:type="int"
-      name="extend_shipping_protection_id"
-      unsigned="true"
-      nullable="false"
-      identity="true"
-      comment="Extend Shipping Protection ID"
-    />
-    <column
-      xsi:type="int"
-      name="entity_id"
-      unsigned="true"
-      nullable="false"
-      identity="false"
-      comment="Entity ID"
-    />
-    <column xsi:type="varchar" name="sp_quote_id" comment="Shipping Protection Quote Id" />
-    <column
-      xsi:type="float"
-      name="shipping_protection_base_price"
-      comment="Shipping Protection Base Price"
-    />
-    <column
-      xsi:type="varchar"
-      name="shipping_protection_base_currency"
-      comment="Shipping Protection Base Currency"
-    />
-    <column xsi:type="float" name="shipping_protection_price" comment="Shipping Protection Price" />
-    <column
-      xsi:type="varchar"
-      name="shipping_protection_currency"
-      comment="Shipping Protection Currency"
-    />
-    <column xsi:type="int" name="entity_type_id" comment="Entity Type ID" />
-    <constraint xsi:type="primary" referenceId="PRIMARY">
-      <column name="extend_shipping_protection_id" />
-    </constraint>
-  </table>
-  <table
-    name="extend_store_integration"
-    resource="default"
-    engine="innodb"
-    comment="Relationship table between stores and integrations with additional Extend store-integration data"
-  >
-    <column
-      xsi:type="int"
-      name="extend_store_integration_id"
-      unsigned="true"
-      nullable="false"
-      identity="true"
-      comment="Extend Store Integration ID"
-    />
-    <column
-      xsi:type="smallint"
-      name="store_id"
-      unsigned="true"
-      nullable="false"
-      identity="false"
-      comment="Store ID"
-    />
-    <column
-      xsi:type="int"
-      name="integration_id"
-      unsigned="true"
-      nullable="false"
-      identity="false"
-      comment="integration_id"
-    />
-    <column xsi:type="varchar" name="store_uuid" comment="Internal generated store UUID" />
-    <column
-      xsi:type="varchar"
-      name="extend_store_uuid"
-      comment="Store UUID generated on Extend\'s side"
-    />
-    <column xsi:type="varchar" name="client_id" nullable="false" comment="Extend Client ID" />
-    <column xsi:type="text" name="client_secret" nullable="false" comment="Extend Client Secret" />
-    <column
-      xsi:type="tinyint"
-      name="disabled"
-      nullable="true"
-      comment="A store with a prior association, but is currently disabled (unselected in the integration)"
-    />
-    <constraint xsi:type="primary" referenceId="PRIMARY">
-      <column name="extend_store_integration_id" />
-    </constraint>
-    <constraint
-      xsi:type="foreign"
-      referenceId="EXTEND_STORE_INTEGRATION_STORE_ID_STORE_STORE_ID"
-      table="extend_store_integration"
-      column="store_id"
-      referenceTable="store"
-      referenceColumn="store_id"
-      onDelete="CASCADE"
-    />
-    <constraint
-      xsi:type="foreign"
-      referenceId="EXTEND_STORE_INTEGRATION_INTEGRATION_ID_INTEGRATION_INTEGRATION_ID"
-      table="extend_store_integration"
-      column="integration_id"
-      referenceTable="integration"
-      referenceColumn="integration_id"
-      onDelete="CASCADE"
-    />
-    <constraint xsi:type="unique" referenceId="EXTEND_STORE_INTEGRATION_STORE_ID_INTEGRATION_ID">
-      <column name="store_uuid" />
-      <column name="extend_store_uuid" />
-      <column name="client_id" />
-    </constraint>
-  </table>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="extend_shipping_protection" resource="default" engine="innodb" comment="Extend Shipping Protection Total Per Order">
+        <column xsi:type="int" name="extend_shipping_protection_id" unsigned="true" nullable="false" identity="true"
+                comment="Extend Shipping Protection ID"/>
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="false"
+                comment="Entity ID"/>
+        <column xsi:type="varchar" name="sp_quote_id" comment="Shipping Protection Quote Id"/>
+        <column xsi:type="float" name="shipping_protection_base_price" comment="Shipping Protection Base Price"/>
+        <column xsi:type="varchar" name="shipping_protection_base_currency" comment="Shipping Protection Base Currency"/>
+        <column xsi:type="float" name="shipping_protection_price" comment="Shipping Protection Price"/>
+        <column xsi:type="varchar" name="shipping_protection_currency" comment="Shipping Protection Currency"/>
+        <column xsi:type="int" name="entity_type_id" comment="Entity Type ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="extend_shipping_protection_id"/>
+        </constraint>
+    </table>
+    <table name="extend_store_integration" resource="default" engine="innodb" comment="Relationship table between stores and integrations with additional Extend store-integration data">
+        <column xsi:type="int" name="extend_store_integration_id" unsigned="true" nullable="false" identity="true"
+                comment="Extend Store Integration ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" identity="false"
+                comment="Store ID"/>
+        <column xsi:type="int" name="integration_id" unsigned="true" nullable="false" identity="false"
+                comment="integration_id"/>
+        <column xsi:type="varchar" name="store_uuid" comment="Internal generated store UUID"/>
+        <column xsi:type="varchar" name="extend_store_uuid" comment="Store UUID generated on Extend\'s side"/>
+        <column xsi:type="varchar" name="client_id" nullable="false" comment="Extend Client ID"/>
+        <column xsi:type="text" name="client_secret" nullable="false" comment="Extend Client Secret"/>
+        <column xsi:type="tinyint" name="disabled" nullable="true" comment="A store with a prior association, but is currently disabled (unselected in the integration)"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="extend_store_integration_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="EXTEND_STORE_INTEGRATION_STORE_ID_STORE_STORE_ID"
+                    table="extend_store_integration" column="store_id" referenceTable="store"
+                    referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="EXTEND_STORE_INTEGRATION_INTEGRATION_ID_INTEGRATION_INTEGRATION_ID"
+                    table="extend_store_integration" column="integration_id" referenceTable="integration"
+                    referenceColumn="integration_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="EXTEND_STORE_INTEGRATION_STORE_ID_INTEGRATION_ID">
+            <column name="store_uuid"/>
+            <column name="extend_store_uuid"/>
+            <column name="client_id"/>
+        </constraint>
+    </table>
 </schema>

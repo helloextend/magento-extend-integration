@@ -41,7 +41,7 @@ class SalesOrderSaveAfter implements ObserverInterface
         OrderObserverHandler $orderObserverHandler,
         Integration $integration,
         StoreManagerInterface $storeManager
-    ) {
+    ){
         $this->logger = $logger;
         $this->orderObserverHandler = $orderObserverHandler;
         $this->integration = $integration;
@@ -53,7 +53,7 @@ class SalesOrderSaveAfter implements ObserverInterface
      * @return void
      */
     public function execute(Observer $observer)
-    {
+    {   
         $order = $observer->getEvent()->getOrder();
 
         $orderCreatedAt = $order->getCreatedAt();
@@ -62,25 +62,14 @@ class SalesOrderSaveAfter implements ObserverInterface
         if ($orderCreatedAt !== $orderUpdatedAt) {
             try {
                 $this->orderObserverHandler->execute(
-                    [
-                        'path' =>
-                            Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'],
-                        'type' => 'middleware',
-                    ],
+                    ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'], 'type' => 'middleware'],
                     $order,
                     []
                 );
             } catch (\Exception $exception) {
                 // silently handle errors
-                $this->logger->error(
-                    'Extend Order Observer Handler encountered the following error: ' .
-                        $exception->getMessage()
-                );
-                $this->integration->logErrorToLoggingService(
-                    $exception->getMessage(),
-                    $this->storeManager->getStore()->getId(),
-                    'error'
-                );
+                $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
+                $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
             }
         }
     }

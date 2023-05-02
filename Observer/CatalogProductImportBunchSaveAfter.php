@@ -37,11 +37,12 @@ class CatalogProductImportBunchSaveAfter implements ObserverInterface
     private $storeManager;
 
     public function __construct(
-        LoggerInterface $logger,
+        LoggerInterface             $logger,
         BatchProductObserverHandler $batchProductObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
-    ) {
+        Integration                 $integration,
+        StoreManagerInterface       $storeManager
+    )
+    {
         $this->logger = $logger;
         $this->batchProductObserverHandler = $batchProductObserverHandler;
         $this->integration = $integration;
@@ -74,21 +75,18 @@ class CatalogProductImportBunchSaveAfter implements ObserverInterface
 
             $endpoint = [
                 'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'],
-                'type' => 'middleware',
+                'type' => 'middleware'
             ];
 
-            $this->batchProductObserverHandler->execute($endpoint, $productIds, []);
+            $this->batchProductObserverHandler->execute(
+                $endpoint,
+                $productIds,
+                []
+            );
         } catch (\Exception $exception) {
             // silently handle errors
-            $this->logger->error(
-                'Extend Batch Product Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+            $this->logger->error('Extend Batch Product Observer Handler encountered the following error: ' . $exception->getMessage());
+            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
     }
 }

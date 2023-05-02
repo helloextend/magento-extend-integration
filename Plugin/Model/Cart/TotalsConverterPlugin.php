@@ -22,17 +22,17 @@ class TotalsConverterPlugin
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
     }
 
-    public function afterProcess(\Magento\Quote\Model\Cart\TotalsConverter $subject, $result)
-    {
+    public function afterProcess(
+        \Magento\Quote\Model\Cart\TotalsConverter $subject,
+        $result
+    ) {
         if (isset($result['shipping_protection'])) {
             $quoteId = $this->checkoutSession->getQuote()->getId();
             if ($quoteId) {
-                $spQuoteId = $this->shippingProtectionTotalRepository
-                    ->get(
-                        $quoteId,
-                        \Extend\Integration\Api\Data\ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
-                    )
-                    ->getSpQuoteId();
+                $spQuoteId = $this->shippingProtectionTotalRepository->get(
+                    $quoteId,
+                    \Extend\Integration\Api\Data\ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+                )->getSpQuoteId();
             }
 
             $attributes = $result['shipping_protection']->getExtensionAttributes();

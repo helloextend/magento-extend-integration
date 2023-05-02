@@ -14,6 +14,7 @@ use Magento\Quote\Api\Data\CartExtensionFactory;
 
 class SaveOrderBeforeSalesModelQuote implements ObserverInterface
 {
+
     /**
      * @var Copy
      */
@@ -22,8 +23,9 @@ class SaveOrderBeforeSalesModelQuote implements ObserverInterface
     /**
      * @var OrderExtensionFactory
      */
-    private $orderExtensionFactory;
+    private  $orderExtensionFactory;
     private CartExtensionFactory $cartExtensionFactory;
+
 
     /**
      * @param Copy $objectCopyService
@@ -65,12 +67,7 @@ class SaveOrderBeforeSalesModelQuote implements ObserverInterface
             }
             $order->setExtensionAttributes($extensionAttributes);
 
-            $this->objectCopyService->copyFieldsetToTarget(
-                'extend_integration_sales_convert_quote',
-                'to_order',
-                $quote,
-                $order
-            );
+            $this->objectCopyService->copyFieldsetToTarget('extend_integration_sales_convert_quote', 'to_order', $quote, $order);
         }
 
         return $this;

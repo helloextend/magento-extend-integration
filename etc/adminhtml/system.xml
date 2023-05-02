@@ -1,51 +1,25 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
-<config
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd"
->
-  <system>
-    <tab id="extend" translate="label" sortOrder="200">
-      <label>Extend</label>
-    </tab>
-    <section
-      id="extend"
-      translate="label"
-      type="text"
-      sortOrder="40"
-      showInDefault="1"
-      showInWebsite="1"
-      showInStore="1"
-    >
-      <class>separator-top</class>
-      <label>Integration</label>
-      <tab>extend</tab>
-      <resource>Magento_Catalog::config_catalog</resource>
-      <group
-        id="integration"
-        translate="label"
-        type="text"
-        sortOrder="90"
-        showInDefault="1"
-        showInWebsite="1"
-        showInStore="1"
-      >
-        <label>Integration</label>
-        <field
-          id="environment"
-          translate="label comment"
-          type="select"
-          sortOrder="10"
-          showInDefault="1"
-          canRestore="1"
-        >
-          <label>Environment</label>
-          <source_model>Extend\Integration\Model\Config\Source\Environment</source_model>
-        </field>
-      </group>
-    </section>
-  </system>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="extend" translate="label" sortOrder="200">
+            <label>Extend</label>
+        </tab>
+        <section id="extend" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Integration</label>
+            <tab>extend</tab>
+            <resource>Magento_Catalog::config_catalog</resource>
+            <group id="integration" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Integration</label>
+                <field id="environment" translate="label comment" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Environment</label>
+                    <source_model>Extend\Integration\Model\Config\Source\Environment</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
 </config>

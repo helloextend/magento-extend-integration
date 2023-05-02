@@ -9,17 +9,23 @@ namespace Extend\Integration\Service\Api;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order\Shipment;
-use Psr\log\LoggerInterface;
+use \Psr\log\LoggerInterface;
 
 class ShipmentObserverHandler extends BaseObserverHandler
 {
+
     public function __construct(
         LoggerInterface $logger,
         Integration $integration,
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder
     ) {
-        parent::__construct($logger, $integration, $storeManager, $metadataBuilder);
+        parent::__construct(
+            $logger,
+            $integration,
+            $storeManager,
+            $metadataBuilder
+        );
     }
 
     /**
@@ -35,29 +41,19 @@ class ShipmentObserverHandler extends BaseObserverHandler
             $shipmentOrder = $shipment->getOrder();
             $orderId = $shipmentOrder->getId();
 
-            $data = array_merge(
-                ['shipment_id' => $shipmentId, 'order_id' => $orderId],
-                $additionalFields
-            );
+            $data = array_merge(['shipment_id' => $shipmentId, 'order_id' => $orderId], $additionalFields);
 
-            [$headers, $body] = $this->metadataBuilder->execute(
-                [$shipmentOrder->getStoreId()],
+            [$headers, $body] = $this->metadataBuilder->execute([$shipmentOrder->getStoreId()], $integrationEndpoint, $data);
+
+            $this->integration->execute(
                 $integrationEndpoint,
-                $data
+                $body,
+                $headers
             );
-
-            $this->integration->execute($integrationEndpoint, $body, $headers);
         } catch (\Exception $exception) {
             // silently handle errors
-            $this->logger->error(
-                'Extend Shipment Observer encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
+            $this->logger->error('Extend Shipment Observer encountered the following error: ' . $exception->getMessage());
+            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
         }
     }
 }

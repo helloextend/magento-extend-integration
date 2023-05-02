@@ -9,8 +9,7 @@ namespace Extend\Integration\Model;
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\Data\ShippingProtectionInterface;
 
-class ShippingProtection extends \Magento\Framework\Model\AbstractModel implements
-    ShippingProtectionInterface
+class ShippingProtection extends \Magento\Framework\Model\AbstractModel implements ShippingProtectionInterface
 {
     /**
      * Set base price
