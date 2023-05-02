@@ -10,17 +10,14 @@
     "postinstall": "husky install",
     "lint:js": "eslint --cache --cache-location ./node_modules/.eslintcache --ext=.ts,.js \"./**/*.js\"",
     "lint:php": "prettier \"**/*.php\"",
-    "lint:xml": "prettier \"**/*.xml\"",
-    "fix:js": "eslint --fix --cache --cache-location ./node_modules/.eslintcache --ext=.ts,.js \"**/*.js\"",
-    "fix:php": "prettier --write \"**/*.php\"",
-    "fix:xml": "prettier --write \"**/*.xml\""
+    "lint:xml": "prettier \"**/*.xml\""
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "eslint --fix"
+      "eslint"
     ],
     "*.{php,xml,html}": [
-      "prettier --write"
+      "prettier"
     ]
   },
   "devDependencies": {
