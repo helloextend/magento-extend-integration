@@ -3,7 +3,6 @@
   "description": "this npm package is used to manage linting dependencies only",
   "version": "1.0.0",
   "repository": "git@github.com:helloextend/magento-extend-integration.git",
-  "author": "Miles McLeod <miles.mcleod@extend.com>",
   "license": "MIT",
   "scripts": {
     "postinstall": "husky install"
