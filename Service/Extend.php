@@ -11,17 +11,17 @@ class Extend
     /**
      * warranty product sku
      */
-    public const WARRANTY_PRODUCT_SKU = 'extend-protection-plan';
+    public const WARRANTY_PRODUCT_SKU = "extend-protection-plan";
 
     /**
      * warranty product sku
      */
-    public const WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME = 'Extend Products';
+    public const WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME = "Extend Products";
 
     /**
      * This const allows for future scalability in markets with stricter privacy laws.
      */
     public const COLLECT_ALL_ORDERS = true;
 
-    public const SHIPPING_PROTECTION_LABEL = 'Shipping Protection';
+    public const SHIPPING_PROTECTION_LABEL = "Shipping Protection";
 }
