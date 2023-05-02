@@ -9,15 +9,15 @@
     "changelog": "auto-changelog",
     "postinstall": "husky install",
     "lint:js": "eslint --cache --cache-location ./node_modules/.eslintcache --ext=.ts,.js \"./**/*.js\"",
-    "lint:php": "prettier \"**/*.php\"",
-    "lint:xml": "prettier \"**/*.xml\""
+    "lint:php": "prettier --check \"**/*.php\"",
+    "lint:xml": "prettier --check \"**/*.xml\""
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "eslint"
+      "eslint --fix"
     ],
     "*.{php,xml,html}": [
-      "prettier"
+      "prettier --write"
     ]
   },
   "devDependencies": {
