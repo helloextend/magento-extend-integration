@@ -7,5 +7,11 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Extend_Integration::css/admin.css"/>
+
+
+
+
+
+        
     </head>
 </page>
