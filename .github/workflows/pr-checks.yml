@@ -20,9 +20,12 @@ jobs:
           node-version: 18.15.0
       - name: Install linting dependencies
         run: yarn
-      - name: lint:js
-        run: yarn lint:js
-      - name: lint:php
-        run: yarn lint:php
-      - name: lint:xml
-        run: yarn lint:xml
+      - name: Lint Javascript diff
+        if: always()
+        run: yarn lint:diff:js
+      - name: Lint PHP diff
+        if: always()
+        run: yarn lint:diff:php
+      - name: Lint XML diff
+        if: always()
+        run: yarn lint:diff:xml
