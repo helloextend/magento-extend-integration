@@ -2,6 +2,8 @@ module.exports = {
   env: {
     es2020: true,
     node: true,
+    browser: true,
+    amd: true,
   },
   extends: [
     'eslint:recommended',
@@ -45,6 +47,6 @@ module.exports = {
     'jsdoc/require-yields': 2,
     'prettier/prettier': ['error'],
     'no-undef': 'warn',
-    'no-unused-vars': 'warn',
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
   },
 }
