@@ -11,8 +11,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: './tsconfig.json',
+    sourceType: 'script',
   },
   plugins: ['filenames', 'jsdoc', 'prettier'],
   ignorePatterns: ['dist', 'node_modules'],
