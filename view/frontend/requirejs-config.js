@@ -1,13 +1,7 @@
 var config = {
   paths: {
-<<<<<<< HEAD
-      extendSdk: 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min',
-      ExtendMagento: 'https://sdk.helloextend.com/extend-sdk-client-magento-addon/v1/extend-sdk-client-magento-addon.min'
-  }
-=======
-    extendSdk: 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js',
+    extendSdk: 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min',
     ExtendMagento:
-      'https://sdk.helloextend.com/extend-sdk-client-magento-addon/v1/extend-sdk-client-magento-addon.min.js',
+      'https://sdk.helloextend.com/extend-sdk-client-magento-addon/v1/extend-sdk-client-magento-addon.min',
   },
->>>>>>> 48825c8 (format js file showing up as changed in remote diff)
 }
