@@ -27,10 +27,12 @@ if [ $? -eq 0 ]; then
   exit 0
 fi
 
-# Otherwise show a diff of the changes and exit with a status code of 1
+# Otherwise show a diff of the changes and exit with a status code of 1.
+# This runs prettier (altering the files), runs a git diff against origin/master,
+# and then restores the files to their original state.
 npx prettier --parser=$1 --write --loglevel silent $matched_files
 git --no-pager diff origin/master $matched_files
-git restore .
+git -C $(git rev-parse --show-toplevel) restore .
 
 echo -e "\n"
 echo -e "These ^ files will be auto-formatted upon commit... or you can:"
