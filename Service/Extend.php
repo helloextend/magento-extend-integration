@@ -24,4 +24,6 @@ class Extend
     public const COLLECT_ALL_ORDERS = true;
 
     public const SHIPPING_PROTECTION_LABEL = 'Shipping Protection';
+
+    public const ENABLE_PRODUCT_PROTECTION = 'extend/product_protection/enable';
 }
