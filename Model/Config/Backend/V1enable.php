@@ -11,6 +11,9 @@ use Magento\Framework\App\Config\Value;
 
 class V1enable extends Value
 {
+    /**
+     * @var WriterInterface
+     */
     private WriterInterface $writer;
 
     public function __construct(
@@ -21,11 +24,17 @@ class V1enable extends Value
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
         WriterInterface $writer
-    ){
-        parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection);
+    ) {
+        parent::__construct(
+            $context,
+            $registry,
+            $config,
+            $cacheTypeList,
+            $resource,
+            $resourceCollection
+        );
         $this->writer = $writer;
     }
-
 
     /**
      * This will disable Product Protection on the new module if it's enabled on the old module.
@@ -34,7 +43,7 @@ class V1enable extends Value
      */
     public function afterSave()
     {
-        $value = (int)$this->getValue();
+        $value = (int) $this->getValue();
         if ($value === 1) {
             $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION, 0);
         }
