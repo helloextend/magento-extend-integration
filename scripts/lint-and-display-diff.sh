@@ -29,7 +29,7 @@ fi
 
 # Otherwise show a diff of the changes and exit with a status code of 1
 npx prettier --parser=$1 --write --loglevel silent $matched_files
-git --no-pager diff
+git --no-pager diff origin/master $matched_files
 git restore .
 
 echo -e "\n"

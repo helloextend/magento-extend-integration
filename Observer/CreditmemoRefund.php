@@ -42,6 +42,11 @@ class CreditmemoRefund implements ObserverInterface
         try {
             $this->orderObserverHandler->execute(
                 ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'], 'type' => 'middleware'],
+
+
+
+
+                
                 $observer->getCreditmemo()->getOrder(),
                 ['credit_memo_id' => $observer->getCreditmemo()->getId()]
             );
