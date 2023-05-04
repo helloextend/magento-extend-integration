@@ -13,8 +13,8 @@
     "lint:all:xml": "prettier --check \"**/*.xml\"",
     "lint:all": "yarn lint:all:js && yarn lint:all:php && yarn lint:all:xml",
     "lint:diff:js": "eslint $(git diff --name-only --diff-filter=ACMRTUXB origin/master | grep -E \"(.js$)\")",
-    "lint:diff:php": "bash ./scripts/lint-php.sh php",
-    "lint:diff:xml": "bash ./scripts/lint-php.sh xml",
+    "lint:diff:php": "bash ./scripts/lint-and-display-diff.sh php",
+    "lint:diff:xml": "bash ./scripts/lint-and-display-diff.sh xml",
     "lint": "yarn lint:diff:js && yarn lint:diff:php && yarn lint:diff:xml"
   },
   "lint-staged": {
