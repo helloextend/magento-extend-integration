@@ -27,6 +27,11 @@ class V1enable extends Value
     }
 
 
+    /**
+     * This will disable Product Protection on the new module if it's enabled on the old module.
+     *
+     * @return V1enable
+     */
     public function afterSave()
     {
         $value = (int)$this->getValue();
