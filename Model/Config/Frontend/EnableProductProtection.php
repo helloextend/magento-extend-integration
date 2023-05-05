@@ -11,6 +11,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Magento\Store\Model\StoreManagerInterface;
 
 class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\Field
 {
@@ -23,17 +24,20 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
      * @var Manager
      */
     private \Magento\Framework\Module\Manager $manager;
+    private StoreManagerInterface $storeManager;
 
     public function __construct(
         Context $context,
         array $data = [],
         ?SecureHtmlRenderer $secureRenderer = null,
         ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Module\Manager $manager
+        \Magento\Framework\Module\Manager $manager,
+        StoreManagerInterface $storeManager
     ) {
         parent::__construct($context, $data, $secureRenderer);
         $this->scopeConfig = $scopeConfig;
         $this->manager = $manager;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -46,14 +50,14 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->scopeConfig->getValue('warranty/enableExtend/enable', 'stores') &&
+            $this->checkIfV1PPEnabledInAnyStores() &&
             $this->manager->isEnabled('Extend_Warranty')
         ) {
             $element->setDisabled(true);
             $element->setValue(0);
             $element->setComment(
                 __(
-                    'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is disabled.'
+                    'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is completely disabled on all stores.'
                 )
             );
         }
@@ -70,12 +74,31 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->scopeConfig->getValue('warranty/enableExtend/enable', 'stores') &&
+            $this->checkIfV1PPEnabledInAnyStores() &&
             $this->manager->isEnabled('Extend_Warranty')
         ) {
             $element->setIsDisableInheritance(true);
         }
 
         return parent::_renderInheritCheckbox($element);
+    }
+
+    /**
+     * @return bool
+     */
+    private function checkIfV1PPEnabledInAnyStores()
+    {
+        $values = [];
+        $stores = $this->storeManager->getStores();
+
+        foreach ($stores as $store) {
+            $values[] = $this->scopeConfig->getValue(
+                'warranty/enableExtend/enable',
+                'stores',
+                $store->getId()
+            );
+        }
+
+        return in_array(1, $values);
     }
 }
