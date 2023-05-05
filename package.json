@@ -24,7 +24,7 @@
     "*.{php,html}": [
       "prettier --write"
     ],
-    "*.{xml}": [
+    "*.xml": [
       "prettier --config .prettierrc.xml.json --write"
     ]
   },
