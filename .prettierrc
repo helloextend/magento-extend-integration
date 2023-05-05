@@ -3,7 +3,5 @@
   "semi": false,
   "singleQuote": true,
   "trailingComma": "all",
-  "arrowParens": "avoid",
-  "xmlWhitespaceSensitivity": "ignore",
-  "xmlSelfClosingSpace": true
+  "arrowParens": "avoid"
 }
