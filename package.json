@@ -10,19 +10,22 @@
     "postinstall": "husky install",
     "lint:all:js": "eslint --cache --cache-location ./node_modules/.eslintcache --ext=.ts,.js \"./**/*.js\"",
     "lint:all:php": "prettier --check \"**/*.php\"",
-    "lint:all:xml": "prettier --check \"**/*.xml\"",
+    "lint:all:xml": "prettier --config .prettierrc.xml.json --check \"**/*.xml\"",
     "lint:all": "yarn lint:all:js && yarn lint:all:php && yarn lint:all:xml",
     "lint:diff:js": "eslint $(git diff --name-only --diff-filter=ACMRTUXB origin/master | grep -E \"(.js$)\")",
-    "lint:diff:php": "git diff --diff-filter=ACMRTUXB --name-only origin/master | grep -E \"(.php$)\" | xargs npx prettier --parser=php --check",
-    "lint:diff:xml": "git diff --diff-filter=ACMRTUXB --name-only origin/master | grep -E \"(.xml$)\" | xargs npx prettier --parser=xml --check",
+    "lint:diff:php": "bash ./scripts/lint-and-display-diff.sh php",
+    "lint:diff:xml": "bash ./scripts/lint-and-display-diff.sh xml",
     "lint": "yarn lint:diff:js && yarn lint:diff:php && yarn lint:diff:xml"
   },
   "lint-staged": {
     "*.{ts,js}": [
       "eslint --fix"
     ],
-    "*.{php,xml,html}": [
+    "*.{php,html}": [
       "prettier --write"
+    ],
+    "*.xml": [
+      "prettier --config .prettierrc.xml.json --write"
     ]
   },
   "devDependencies": {
