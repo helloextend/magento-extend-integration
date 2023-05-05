@@ -75,6 +75,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         ) {
             $element->setIsDisableInheritance(true);
         }
+
         return parent::_renderInheritCheckbox($element);
     }
 }
