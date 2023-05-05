@@ -46,7 +46,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->scopeConfig->getValue('warranty/enableExtend/enable') &&
+            $this->scopeConfig->getValue('warranty/enableExtend/enable', 'stores') &&
             $this->manager->isEnabled('Extend_Warranty')
         ) {
             $element->setDisabled(true);
@@ -70,7 +70,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->scopeConfig->getValue('warranty/enableExtend/enable') &&
+            $this->scopeConfig->getValue('warranty/enableExtend/enable', 'stores') &&
             $this->manager->isEnabled('Extend_Warranty')
         ) {
             $element->setIsDisableInheritance(true);
