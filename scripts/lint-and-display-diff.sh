@@ -27,11 +27,7 @@ if ! git diff --quiet; then
 fi
 
 # Set the prettier command to a variable, based on file extension
-if [ "$1" == "xml" ]; then
-  prettier_command="yarn prettier --parser=$1 --config .prettierrc.xml.json"
-else
-  prettier_command="yarn prettier --parser=$1"
-fi
+prettier_command="yarn prettier --parser=$1"
 
 # Check the formatting of the files
 eval "$prettier_command --check $matched_files"
