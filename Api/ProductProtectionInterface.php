@@ -6,21 +6,36 @@
 
 namespace Extend\Integration\Api;
 
-interface ProductProtectionInterface 
+use Magento\Framework\Exception\NoSuchEntityException;
+
+interface ProductProtectionInterface
 {
     /**
-     * Add product protection to cart
+     * Upsert product protection in cart
      *
-     * @param int $quantity
-     * @param string $productId
-     * @param string $planId
-     * @param int $price
-     * @param int $term
-     * @param string $coverageType
-     * @param string $leadToken = null
-     * @param float $listPrice = null
-     * @param string $orderOfferPlanId = null
+     * @param int|null $quantity
+     * @param string|null $cartItemId
+     * @param string|null $productId
+     * @param string|null $planId
+     * @param int|null $price
+     * @param int|null $term
+     * @param string|null $coverageType
+     * @param string|null $leadToken
+     * @param string|null $listPrice
+     * @param string|null $orderOfferPlanId
      * @return void
+     * @throws NoSuchEntityException
      */
-    public function add(int $quantity, string $productId, string $planId, int $price, int $term, string $coverageType, string $leadToken = null, float $listPrice = null, string $orderOfferPlanId = null): void;
+    public function upsert(
+        int $quantity = null,
+        string $cartItemId = null,
+        string $productId = null,
+        string $planId = null,
+        int $price = null,
+        int $term = null,
+        string $coverageType = null,
+        string $leadToken = null,
+        string $listPrice = null,
+        string $orderOfferPlanId = null
+    ): void;
 }
