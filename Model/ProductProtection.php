@@ -107,81 +107,79 @@ class ProductProtection implements ProductProtectionInterface
         string $orderOfferPlanId = null
     ): void {
         try {
-            // If quantity is 0, delete the item from the cart
-            if ($quantity === 0 && isset($cartItemId)) {
-                $quote = $this->checkoutSession->getQuote();
-                $quote->removeItem($cartItemId);
-                $this->quoteRepository->save($quote);
-                return;
-            }
-
-            // if there is not an existing cart item, and we are missing required parameters, throw an exception
-            if (
-                !isset($cartItemId) &&
-                (!isset($quantity) ||
-                    !isset($productId) ||
-                    !isset($planId) ||
-                    !isset($price) ||
-                    !isset($term) ||
-                    !isset($coverageType))
-            ) {
-                throw new Exception(
-                    'Missing required parameters to add product protection to cart.'
-                );
-            }
+            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+            $quote = $this->checkoutSession->getQuote();
+            $quoteId = $quote->getId();
 
             if ($price === 0) {
                 throw new Exception('Cannot add/update product protection with a price of 0');
             }
 
-            $item = $this->itemFactory->create();
+            // if quantity is 0, remove the item from the quote
+            if ($quantity === 0 && isset($cartItemId)) {
+                $quote->removeItem($cartItemId);
+                $this->quoteRepository->save($quote);
+                return;
+            }
+
             if (isset($cartItemId)) {
                 $item = $this->checkoutSession->getQuote()->getItemById($cartItemId);
             }
 
-            if ($item) {
-                $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+            // if we are adding pp, or we didn't find an existing item, create a new one
+            if (!isset($item) || $item === false) {
+                // ensure that we have the required properties to create the protection plan
+                if (
+                    !isset($quantity) ||
+                    !isset($productId) ||
+                    !isset($planId) ||
+                    !isset($price) ||
+                    !isset($term) ||
+                    !isset($coverageType)
+                ) {
+                    throw new Exception(
+                        'Missing required parameters to add product protection to cart.'
+                    );
+                }
+                $item = $this->itemFactory->create();
+            }
+
+            // if quote has not been saved yet, save it so that we have an id
+            if (!isset($quoteId)) {
+                $this->quoteRepository->save($quote);
                 $quote = $this->checkoutSession->getQuote();
                 $quoteId = $quote->getId();
-
-                // if quote has not been saved yet, save it so that we have an id
-                if (!isset($quoteId)) {
-                    $this->quoteRepository->save($quote);
-                    $quote = $this->checkoutSession->getQuote();
-                    $quoteId = $quote->getId();
-                }
-                $item->setQuoteId($quoteId);
-                $item->setProduct($product);
-
-                if (isset($quantity)) {
-                    $item->setQty($quantity);
-                }
-
-                if (isset($price)) {
-                    $item
-                        ->setCustomPrice($price / 100)
-                        ->setOriginalCustomPrice($price / 100)
-                        ->getProduct()
-                        ->setIsSuperMode(true);
-                }
-
-                $options = $this->createOptions($product, $item, [
-                    'Plan Type' => $coverageType,
-                    'Term' => $term,
-                    'List Price' => $listPrice,
-                    'Order Offer Plan Id' => $orderOfferPlanId,
-                    'Lead Token' => $leadToken,
-                    'Associated Product' => $productId,
-                    'Plan ID' => $planId,
-                ]);
-                $item->setOptions($options);
-                $quote->addItem($item);
-
-                $this->quoteRepository->save($quote);
-                $quote->collectTotals();
-            } else {
-                throw new Exception('Could not find item');
             }
+
+            $item->setQuoteId($quoteId);
+            $item->setProduct($product);
+
+            if (isset($quantity)) {
+                $item->setQty($quantity);
+            }
+
+            if (isset($price)) {
+                $item
+                    ->setCustomPrice($price / 100)
+                    ->setOriginalCustomPrice($price / 100)
+                    ->getProduct()
+                    ->setIsSuperMode(true);
+            }
+
+            $options = $this->createOptions($product, $item, [
+                'Plan Type' => $coverageType,
+                'Term' => $term,
+                'List Price' => $listPrice,
+                'Order Offer Plan Id' => $orderOfferPlanId,
+                'Lead Token' => $leadToken,
+                'Associated Product' => $productId,
+                'Plan ID' => $planId,
+            ]);
+            $item->setOptions($options);
+            $quote->addItem($item);
+
+            $this->quoteRepository->save($quote);
+            $quote->collectTotals();
         } catch (Exception $exception) {
             $this->logger->error(
                 'Extend Product Protection Upsert Encountered the Following Exception ' .
