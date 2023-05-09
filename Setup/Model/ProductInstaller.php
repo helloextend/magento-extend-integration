@@ -164,7 +164,7 @@ class ProductInstaller
                 ->setStockData([
                     'use_config_manage_stock' => 0,
                     'is_in_stock' => 1,
-                    'qty' => 100,
+                    'qty' => 1,
                     'manage_stock' => 0,
                     'use_config_notify_stock_qty' => 0,
                 ]);
@@ -261,7 +261,7 @@ class ProductInstaller
             $sourceItem = $this->sourceItemFactory->create();
             $sourceItem->setSourceCode('default');
             $sourceItem->setSku(Extend::WARRANTY_PRODUCT_SKU);
-            $sourceItem->setQuantity(100);
+            $sourceItem->setQuantity(1);
             $sourceItem->setStatus(1);
             $this->sourceItemsSave->execute([$sourceItem]);
         } catch (Exception $exception) {
