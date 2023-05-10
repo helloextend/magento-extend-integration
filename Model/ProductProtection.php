@@ -11,6 +11,8 @@ use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Api\ProductProtectionInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Phrase;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Magento\Quote\Model\Quote\Item\OptionFactory;
@@ -93,6 +95,7 @@ class ProductProtection implements ProductProtectionInterface
      * @param string|null $orderOfferPlanId
      * @return void
      * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function upsert(
         int $quantity = null,
@@ -112,7 +115,9 @@ class ProductProtection implements ProductProtectionInterface
             $quoteId = $quote->getId();
 
             if ($price === 0) {
-                throw new Exception('Cannot add/update product protection with a price of 0');
+                throw new LocalizedException(
+                    new Phrase('Cannot add/update product protection with a price of 0')
+                );
             }
 
             // if quantity is 0, remove the item from the quote
@@ -137,8 +142,8 @@ class ProductProtection implements ProductProtectionInterface
                     !isset($term) ||
                     !isset($coverageType)
                 ) {
-                    throw new Exception(
-                        'Missing required parameters to add product protection to cart.'
+                    throw new LocalizedException(
+                        new Phrase('Missing required parameters to add product protection to cart.')
                     );
                 }
                 $item = $this->itemFactory->create();
@@ -180,7 +185,7 @@ class ProductProtection implements ProductProtectionInterface
 
             $this->quoteRepository->save($quote);
             $quote->collectTotals();
-        } catch (Exception $exception) {
+        } catch (Exception | LocalizedException $exception) {
             $this->logger->error(
                 'Extend Product Protection Upsert Encountered the Following Exception ' .
                     $exception->getMessage()
@@ -190,6 +195,8 @@ class ProductProtection implements ProductProtectionInterface
                 $this->storeManager->getStore()->getId(),
                 'error'
             );
+            // this is handled by magento error handler
+            throw $exception;
         }
     }
 

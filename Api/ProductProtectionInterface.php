@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Api;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 interface ProductProtectionInterface
@@ -25,6 +26,7 @@ interface ProductProtectionInterface
      * @param string|null $orderOfferPlanId
      * @return void
      * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function upsert(
         int $quantity = null,
