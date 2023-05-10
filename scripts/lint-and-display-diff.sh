@@ -12,7 +12,7 @@ fi
 files=$(git diff --diff-filter=ACMRTUXB --name-only origin/master)
 
 # Filter the list of files to include only files with file extension $1
-matched_files=$(echo "$files" | grep -E "(.$1$)")
+matched_files=$(echo "$files" | grep -E "(.$1$)" | tr '\n' ' ')
 
 # If there are no files with extension $1, exit with a status code of 0
 if [ -z "$matched_files" ]; then
@@ -42,8 +42,8 @@ fi
 # This runs prettier (altering the files), runs a git diff against origin/master,
 # and then restores the files to their original state.
 eval "$prettier_command --write --loglevel silent $matched_files"
-git --no-pager diff origin/master $matched_files
-git -C $(git rev-parse --show-toplevel) restore .
+eval "git --no-pager diff origin/master $matched_files"
+git -C "$(git rev-parse --show-toplevel)" restore .
 
 echo -e "\n"
 echo -e "These ^ files will be auto-formatted upon commit... or you can:"
