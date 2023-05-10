@@ -3,49 +3,59 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define([
-    'jquery',
-    'extendSdk',
-    'ExtendMagento',
-], function ($, Extend, ExtendMagento) {
-        'use strict';
+define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+  'use strict'
 
-        return function(config, element) {
+  function getActiveProductConfig() {
+    const swatches = $('div.swatch-attribute', '.product-info-main')
+    let selectedSku = null
+    let selectedPrice = null
 
-            var swatches = $('div.swatch-attribute', this.mainWrap);
-            var selectedSku = null;
+    if (swatches.length > 0) {
+      const swatchesElem = $('[data-role=swatch-options]', '.product-info-main')
+      const swatchRenderer = swatchesElem.data('mageSwatchRenderer')
 
-            if (swatches.length > 0 ) {
-                var swatchesElem = this.options.isInProductView ?
-                    $('[data-role=swatch-options]', this.mainWrap) :
-                    $('[data-role^=swatch-option-]', this.mainWrap);
-                var swatchRenderer = swatchesElem.data('mageSwatchRenderer');
-
-                if (swatchRenderer) {
-                    var selectedProducts = swatchRenderer._CalcProducts();
-                    var selectedId = _.isArray(selectedProducts) && selectedProducts.length === 1 ? selectedProducts[0] : null;
-                    if (selectedId && selectedId !== '') {
-                        selectedSku = swatchRenderer.options.jsonConfig.skus[selectedId];
-                    }
-                }
-            } else if (this.options.isInProductView) {
-                var selectedId = $('input[name=selected_configurable_option]', this.mainWrap).val();
-                if (selectedId && selectedId !== '') {
-                    var spConfig = this.addToCartForm.data('mageConfigurable').options.spConfig;
-                    selectedSku = spConfig && spConfig.skus ? spConfig.skus[selectedId] : null;
-                }
-            }
-
-            return selectedSku ? selectedSku : this.options.productSku;
-
-            Extend.config({ storeId: config.extendStoreUuid });
-            Extend.buttons.render('#product_protection_offer', {
-                referenceId: config.selectedProductSku,
-                price: config.selectedProductPrice,
-                category: config.productCategory
-            });
-
-        };
-
+      if (swatchRenderer) {
+        const selectedProducts = swatchRenderer._CalcProducts()
+        const selectedId =
+          _.isArray(selectedProducts) && selectedProducts.length === 1 ? selectedProducts[0] : null
+        if (selectedId && selectedId !== '') {
+          selectedPrice =
+            swatchRenderer.options.jsonConfig.optionPrices[selectedId].finalPrice.amount
+          selectedSku = swatchRenderer.options.jsonConfig.skus[selectedId]
+        }
+      }
+    } else if (this.options.isInProductView) {
+      const spConfig = $('#product_addtocart_form').data('mageConfigurable').options.spConfig
+      const selectedId = $('input[name=selected_configurable_option]', '.product-info-main').val()
+      if (selectedId && selectedId !== '') {
+        selectedSku = spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
+      }
     }
-)
+    return { selectedSku, selectedPrice }
+  }
+
+  return function (config, element) {
+    Extend.config({ storeId: config.extendStoreUuid, environment: config.activeEnvironment })
+    Extend.buttons.render('#product_protection_offer', {
+      referenceId: config.selectedProductSku,
+      price: config.selectedProductPrice * 100,
+      category: config.productCategory,
+    })
+
+    $('div.product-options-wrapper', '.product-info-main').on('change', function () {
+      const selectedProduct = getActiveProductConfig()
+      const buttonInstance = Extend.buttons.instance('#product_protection_offer')
+      const activeProductData = {
+        referenceId: selectedProduct.selectedSku,
+        price: selectedProduct.selectedPrice * 100,
+        category: config.productCategory,
+      }
+      if (buttonInstance) {
+        buttonInstance.setActiveProduct(activeProductData)
+      } else {
+        Extend.buttons.render('#product_protection_offer', activeProductData)
+      }
+    })
+  }
+})

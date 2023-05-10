@@ -5,6 +5,13 @@
  */
 
 /** @var $block \Magento\Catalog\Block\Product\View */
+
+$categoryName = '';
+
+if ($category = $block->getProduct()->getCategory()) {
+    $categoryName = $category->getName();
+}
+
 ?>
 <div class="product-protection-offer" id="product_protection_offer"></div>
 
@@ -13,9 +20,10 @@
         "#product_protection_offer": {
             "productProtectionOffer": {
                 "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
+                "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
                 "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
                 "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
-                "productCategory": "<?= $block->getProduct()->getCategory(); ?>"
+                "productCategory": "<?= $categoryName; ?>"
             }
         }
     }
