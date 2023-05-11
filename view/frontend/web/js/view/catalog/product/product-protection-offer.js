@@ -36,12 +36,14 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
   }
 
   return function (config, element) {
-    Extend.config({ storeId: config.extendStoreUuid, environment: config.activeEnvironment })
-    Extend.buttons.render('#product_protection_offer', {
-      referenceId: config.selectedProductSku,
-      price: config.selectedProductPrice * 100,
-      category: config.productCategory,
-    })
+    Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+    for (let key in config) {
+      Extend.buttons.render('#product_protection_offer_' + config[key].selectedProductSku, {
+        referenceId: config[key].selectedProductSku,
+        price: config[key].selectedProductPrice * 100,
+        category: config[key].productCategory,
+      })
+    }
 
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()

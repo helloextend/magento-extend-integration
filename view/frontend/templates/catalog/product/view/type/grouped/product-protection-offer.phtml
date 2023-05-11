@@ -4,7 +4,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-/** @var $block \Magento\Catalog\Block\Product\View|Magento\GroupedProduct\Block\Product\View\Type\Grouped */
+/** @var $block Magento\GroupedProduct\Block\Product\View\Type\Grouped */
 
 $categoryName = '';
 
@@ -13,21 +13,25 @@ if ($category = $block->getProduct()->getCategory()) {
 }
 
 ?>
-<?php foreach ($block->getAssociatedProducts() as $product): ?>
-    <div class="product-protection-offer" id="product_protection_offer_<?= $product->getSku(); ?>"></div>
-<?php endforeach; ?>
+<div id="product_protection_offers">
+    <?php foreach ($block->getAssociatedProducts() as $product): ?>
+        <div class="product-protection-offer" id="product_protection_offer_<?= $product->getSku(); ?>"></div>
+    <?php endforeach; ?>
+</div>
 <script type="text/x-magento-init">
     {
-        "#product_protection_offer": {
-            "productProtectionOffer": {
-                "<?= $block->getProduct()->getSku(); ?>": {
+        "#product_protection_offers": {
+            "productProtectionOffer": [
+            <?php foreach ($block->getAssociatedProducts() as $key => $product): ?>
+                {
                     "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                     "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                    "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
-                    "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
+                    "selectedProductSku": "<?= $product->getSku(); ?>",
+                    "selectedProductPrice": "<?= $product->getPrice(); ?>",
                     "productCategory": "<?= $categoryName; ?>"
-                }
-            }
+                }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
+            <?php endforeach; ?>
+            ]
         }
     }
 </script>
