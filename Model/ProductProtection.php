@@ -13,7 +13,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
-use Magento\Quote\Model\QuoteRepository;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Magento\Quote\Model\Quote\Item\OptionFactory;
 use Magento\Quote\Model\Quote\Item;
@@ -37,9 +37,9 @@ class ProductProtection implements ProductProtectionInterface
      */
     private LoggerInterface $logger;
     /**
-     * @var QuoteRepository
+     * @var CartRepositoryInterface
      */
-    private QuoteRepository $quoteRepository;
+    private CartRepositoryInterface $quoteRepository;
     /**
      * @var Session
      */
@@ -61,7 +61,7 @@ class ProductProtection implements ProductProtectionInterface
      * @return void
      */
     public function __construct(
-        QuoteRepository $quoteRepository,
+        CartRepositoryInterface $quoteRepository,
         ProductRepositoryInterface $productRepository,
         ItemFactory $itemFactory,
         OptionFactory $itemOptionFactory,
@@ -123,7 +123,7 @@ class ProductProtection implements ProductProtectionInterface
             // if quantity is 0, remove the item from the quote
             if ($quantity === 0 && isset($cartItemId)) {
                 $quote->removeItem($cartItemId);
-                $this->quoteRepository->save($quote);
+                $this->quoteRepository->save($quote->collectTotals());
                 return;
             }
 
@@ -182,9 +182,7 @@ class ProductProtection implements ProductProtectionInterface
             ]);
             $item->setOptions($options);
             $quote->addItem($item);
-
-            $this->quoteRepository->save($quote);
-            $quote->collectTotals();
+            $this->quoteRepository->save($quote->collectTotals());
         } catch (Exception | LocalizedException $exception) {
             $this->logger->error(
                 'Extend Product Protection Upsert Encountered the Following Exception ' .
@@ -233,7 +231,7 @@ class ProductProtection implements ProductProtectionInterface
         $option = $this->itemOptionFactory->create();
         $option->setProduct($product);
         $option->setCode('option_ids');
-        $option->setValue(implode(',', $optionIds));
+        $option->setValue(join(',', $optionIds));
         $options[] = $option;
         return $options;
     }
