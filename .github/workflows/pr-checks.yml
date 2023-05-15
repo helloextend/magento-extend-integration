@@ -1,0 +1,34 @@
+name: PR
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+concurrency:
+  group: ${{ github.ref }} && ${{ github.workflow }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.5.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Fetch all branches
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+      - name: Use node
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18.15.0
+      - name: Install linting dependencies
+        run: yarn
+      - name: Lint Javascript diff
+        if: always()
+        run: yarn lint:diff:js
+      - name: Lint PHP diff
+        if: always()
+        run: yarn lint:diff:php
+      - name: Lint XML diff
+        if: always()
+        run: yarn lint:diff:xml
