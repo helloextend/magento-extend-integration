@@ -16,7 +16,6 @@ use Magento\Framework\Phrase;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote\ItemFactory;
 use Magento\Quote\Model\Quote\Item\OptionFactory;
-use Magento\Quote\Model\Quote\Item;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -119,6 +118,8 @@ class ProductProtection implements ProductProtectionInterface
                     new Phrase('Cannot add/update product protection with a price of 0')
                 );
             }
+
+            $quote->setData('_xtd_is_extend_quote_save', true);
 
             // if quantity is 0, remove the item from the quote
             if ($quantity === 0 && isset($cartItemId)) {
