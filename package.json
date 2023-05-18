@@ -51,7 +51,8 @@
         "options": {
           "printWidth": 1000,
           "xmlWhitespaceSensitivity": "ignore",
-          "xmlSelfClosingSpace": true
+          "xmlSelfClosingSpace": true,
+          "tabWidth": 4
         }
       }
     ]
