@@ -16,7 +16,7 @@ if ($category = $block->getProduct()->getCategory()) {
 <table id="product_protection_offers">
     <?php foreach ($block->getAssociatedProducts() as $product): ?>
         <tr>
-            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= $product->getSku(); ?>" colspan="3"></td>
+            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= $product->getSku(); ?>" colspan="3" style="border-top: 0 !important"></td>
         </tr>
     <?php endforeach; ?>
 </table>
@@ -41,7 +41,7 @@ if ($category = $block->getProduct()->getCategory()) {
     document.querySelectorAll('#super-product-table tbody tr .price-box').forEach((el, i) => {
         let id = el.getAttribute('data-price-box');
         if (document.querySelector('.' + id)) {
-            el.closest('tr').after(document.querySelector('.'+id));
+            el.closest('tr').after(document.querySelector('.'+id).closest('tr'));
         }
     });
 </script>
