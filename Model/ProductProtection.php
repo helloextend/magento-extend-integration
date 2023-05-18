@@ -121,15 +121,26 @@ class ProductProtection implements ProductProtectionInterface
 
             $quote->setData('_xtd_is_extend_quote_save', true);
 
+            if (isset($cartItemId)) {
+                $item = $this->checkoutSession->getQuote()->getItemById($cartItemId);
+                if ($item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU) {
+                    throw new LocalizedException(
+                        new Phrase('Cannot update non product-protection item')
+                    );
+                }
+            }
+
+            if ($quantity === 0 && !isset($cartItemId)) {
+                throw new LocalizedException(
+                    new Phrase('Cannot remove product protection without cart item id')
+                );
+            }
+
             // if quantity is 0, remove the item from the quote
             if ($quantity === 0 && isset($cartItemId)) {
                 $quote->removeItem($cartItemId);
                 $this->quoteRepository->save($quote->collectTotals());
                 return;
-            }
-
-            if (isset($cartItemId)) {
-                $item = $this->checkoutSession->getQuote()->getItemById($cartItemId);
             }
 
             // if we are adding pp, or we didn't find an existing item, create a new one
