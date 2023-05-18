@@ -4,7 +4,7 @@
   ~ See Extend-COPYING.txt for license details.
   -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Extend\Integration\Api\Data\ShippingProtectionInterface" type="Extend\Integration\Model\ShippingProtection"/>
+    <preference for="Extend\Integration\Api\Data\ShippingProtectionInterface" type="Extend\Integration\Model\ShippingProtection" />
     <preference for="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" type="Extend\Integration\Model\ShippingProtectionTotalRepository" />
     <preference for="Extend\Integration\Api\ProductProtectionInterface" type="Extend\Integration\Model\ProductProtection" />
     <preference for="Extend\Integration\Api\StoreIntegrationRepositoryInterface" type="Extend\Integration\Model\StoreIntegrationRepository" />
