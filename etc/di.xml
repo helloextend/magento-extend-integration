@@ -1,52 +1,44 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" type="Extend\Integration\Model\ShippingProtectionTotalRepository"/>
-    <preference for="Extend\Integration\Api\ProductProtectionInterface" type="Extend\Integration\Model\ProductProtection"/>
-    <preference for="Extend\Integration\Api\StoreIntegrationRepositoryInterface" type="Extend\Integration\Model\StoreIntegrationRepository"/>
+    <preference for="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" type="Extend\Integration\Model\ShippingProtectionTotalRepository" />
+    <preference for="Extend\Integration\Api\ProductProtectionInterface" type="Extend\Integration\Model\ProductProtection" />
+    <preference for="Extend\Integration\Api\StoreIntegrationRepositoryInterface" type="Extend\Integration\Model\StoreIntegrationRepository" />
     <type name="Magento\Sales\Model\OrderRepository">
-        <plugin sortOrder="1" name="extendIntegrationOrderRepository"
-                type="Extend\Integration\Plugin\Model\OrderRepositoryPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationOrderRepository" type="Extend\Integration\Plugin\Model\OrderRepositoryPlugin" />
     </type>
     <type name="Magento\Sales\Model\Order\InvoiceRepository">
-        <plugin sortOrder="1" name="extendIntegrationInvoiceRepository"
-                type="Extend\Integration\Plugin\Model\Order\InvoiceRepositoryPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationInvoiceRepository" type="Extend\Integration\Plugin\Model\Order\InvoiceRepositoryPlugin" />
     </type>
     <type name="Magento\Sales\Model\Convert\Order">
-        <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\Convert\OrderPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\Convert\OrderPlugin" />
     </type>
     <type name="Magento\Quote\Model\QuoteRepository">
-        <plugin sortOrder="1" name="extendIntegrationQuoteRepository"
-                type="Extend\Integration\Plugin\Model\QuoteRepositoryPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationQuoteRepository" type="Extend\Integration\Plugin\Model\QuoteRepositoryPlugin" />
     </type>
     <type name="Magento\Integration\Controller\Adminhtml\Integration\Save">
-        <plugin sortOrder="1" name="extendIntegrationSave"
-                type="Extend\Integration\Plugin\Controller\Adminhtml\Integration\SavePlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationSave" type="Extend\Integration\Plugin\Controller\Adminhtml\Integration\SavePlugin" />
     </type>
     <type name="Magento\Quote\Model\Cart\TotalsConverter">
-        <plugin sortOrder="1" name="extendIntegrationTotalsConverter"
-                type="Extend\Integration\Plugin\Model\Cart\TotalsConverterPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationTotalsConverter" type="Extend\Integration\Plugin\Model\Cart\TotalsConverterPlugin" />
     </type>
     <type name="Magento\Sales\Controller\AbstractController\OrderLoader">
-        <plugin sortOrder="1" name="extendIntegrationOrderLoader"
-                type="Extend\Integration\Plugin\Controller\AbstractController\OrderLoaderPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationOrderLoader" type="Extend\Integration\Plugin\Controller\AbstractController\OrderLoaderPlugin" />
     </type>
     <type name="Magento\Sales\Controller\Adminhtml\Order\Invoice\Save">
-        <plugin sortOrder="1" name="extendIntegrationSave"
-                type="Extend\Integration\Plugin\Controller\Adminhtml\Order\Invoice\SavePlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationSave" type="Extend\Integration\Plugin\Controller\Adminhtml\Order\Invoice\SavePlugin" />
     </type>
     <type name="Magento\Sales\Model\Order\CreditmemoRepository">
-        <plugin sortOrder="1" name="extendIntegrationCreditmemoRepository"
-                type="Extend\Integration\Plugin\Model\Order\CreditmemoRepositoryPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationCreditmemoRepository" type="Extend\Integration\Plugin\Model\Order\CreditmemoRepositoryPlugin" />
     </type>
     <type name="Magento\Catalog\Model\ProductRepository">
-        <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin"/>
+        <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin" />
     </type>
-    <preference for="Magento\Framework\HTTP\ZendClient" type="Extend\Integration\Preference\Framework\Http\ZendClientPreference"/>
+    <preference for="Magento\Framework\HTTP\ZendClient" type="Extend\Integration\Preference\Framework\Http\ZendClientPreference" />
     <type name="Magento\Sales\Model\Order">
-        <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\OrderPlugin"/>
+        <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\OrderPlugin" />
     </type>
 </config>
