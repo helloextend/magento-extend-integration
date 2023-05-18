@@ -6,76 +6,76 @@
  */
 -->
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-  <route url="/V1/extend/integration/store/:code" method="GET">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByStoreCodeAndActiveEnvironment" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/store/id/:store_id" method="GET">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByStoreIdAndActiveEnvironment" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/store/uuid/:store_uuid" method="GET">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByUuid" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/store/extend_uuid/:extend_store_uuid" method="GET">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByExtendUuid" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/store/:store_uuid/extend_uuid" method="POST">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="addExtendUuidToStore" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/stores/consumer_key/:consumer_key" method="GET">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getListByConsumerKey" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/client" method="POST">
-    <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="attachClientIdAndSecretToIntegration" />
-    <resources>
-      <resource ref="Extend_Integration::manage" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/sp-totals" method="POST">
-    <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveBySdk" />
-    <resources>
-      <resource ref="anonymous" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/sp-totals" method="PUT">
-    <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveBySdk" />
-    <resources>
-      <resource ref="anonymous" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/sp-totals" method="DELETE">
-    <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="delete" />
-    <resources>
-      <resource ref="anonymous" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/api/sp-totals" method="POST">
-    <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveByApi" />
-    <resources>
-      <resource ref="anonymous" />
-    </resources>
-  </route>
-  <route url="/V1/extend/integration/pp/upsert" method="POST">
-    <service class="Extend\Integration\Api\ProductProtectionInterface" method="upsert" />
-    <resources>
-      <resource ref="anonymous" />
-    </resources>
-  </route>
+    <route url="/V1/extend/integration/store/:code" method="GET">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByStoreCodeAndActiveEnvironment" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/store/id/:store_id" method="GET">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByStoreIdAndActiveEnvironment" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/store/uuid/:store_uuid" method="GET">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByUuid" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/store/extend_uuid/:extend_store_uuid" method="GET">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getByExtendUuid" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/store/:store_uuid/extend_uuid" method="POST">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="addExtendUuidToStore" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/stores/consumer_key/:consumer_key" method="GET">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="getListByConsumerKey" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/client" method="POST">
+        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="attachClientIdAndSecretToIntegration" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/sp-totals" method="POST">
+        <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveBySdk" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/sp-totals" method="PUT">
+        <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveBySdk" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/sp-totals" method="DELETE">
+        <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="delete" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/api/sp-totals" method="POST">
+        <service class="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" method="saveByApi" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/pp/upsert" method="POST">
+        <service class="Extend\Integration\Api\ProductProtectionInterface" method="upsert" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
 </routes>
