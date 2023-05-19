@@ -13,13 +13,13 @@ if ($category = $block->getProduct()->getCategory()) {
 }
 
 ?>
-<div class="product-protection-offer" id="product_protection_offer"></div>
+<div class="product-protection-offer" id="product_protection_offer_<?= $block->getProduct()->getSku(); ?>"></div>
 
 <script type="text/x-magento-init">
     {
-        "#product_protection_offer": {
+        "#product_protection_offer_<?= $block->getProduct()->getSku(); ?>": {
             "productProtectionOffer": [
-                0: {
+                {
                     "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                     "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
                     "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
