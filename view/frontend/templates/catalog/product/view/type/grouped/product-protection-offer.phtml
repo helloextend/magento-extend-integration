@@ -1,0 +1,47 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+
+/** @var $block Magento\GroupedProduct\Block\Product\View\Type\Grouped */
+
+$categoryName = '';
+
+if ($category = $block->getProduct()->getCategory()) {
+    $categoryName = $category->getName();
+}
+
+?>
+<table id="product_protection_offers">
+    <?php foreach ($block->getAssociatedProducts() as $product): ?>
+        <tr>
+            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= $product->getSku(); ?>" colspan="3" style="border-top: 0 !important"></td>
+        </tr>
+    <?php endforeach; ?>
+</table>
+<script type="text/x-magento-init">
+    {
+        "#product_protection_offers": {
+            "productProtectionOffer": [
+                <?php foreach ($block->getAssociatedProducts() as $key => $product): ?>
+                    {
+                        "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
+                        "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
+                        "selectedProductSku": "<?= $product->getSku(); ?>",
+                        "selectedProductPrice": "<?= $product->getPrice(); ?>",
+                        "productCategory": "<?= $categoryName; ?>"
+                    }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
+                <?php endforeach; ?>
+            ]
+        }
+    }
+</script>
+<script>
+    document.querySelectorAll('#super-product-table tbody tr .price-box').forEach((el, i) => {
+        let id = el.getAttribute('data-price-box');
+        if (document.querySelector('.' + id)) {
+            el.closest('tr').after(document.querySelector('.'+id).closest('tr'));
+        }
+    });
+</script>

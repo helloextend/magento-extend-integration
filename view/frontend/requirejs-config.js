@@ -4,4 +4,9 @@ var config = {
     ExtendMagento:
       'https://sdk.helloextend.com/extend-sdk-client-magento-addon/v1/extend-sdk-client-magento-addon.min',
   },
+  map: {
+    '*': {
+      productProtectionOffer: 'Extend_Integration/js/view/catalog/product/product-protection-offer',
+    },
+  },
 }
