@@ -1,13 +1,16 @@
 <?php
+$viewModel = $block->getData('viewModel');
+
+$extendStoreUuid = $viewModel->getExtendStoreUuid();
+$activeEnvironment = $viewModel->getActiveEnvironment();
+
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $block->getProduct();
 
 $productId = $product->getId();
-
 $productPrice = $product->getPrice();
 
 $categoryName = '';
-
 if ($category = $product->getCategory()) {
     $categoryName = $category->getName();
 }
@@ -21,12 +24,8 @@ if ($category = $product->getCategory()) {
         "#product_protection_modal_offer": {
             "productProtectionModalOffer": [
                 {
-                    "extendStoreUuid": "<?= $block
-                        ->getData('viewModel')
-                        ->getExtendStoreUuid() ?>",
-                    "activeEnvironment": "<?= $block
-                        ->getData('viewModel')
-                        ->getActiveEnvironment() ?>",
+                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                    "activeEnvironment": "<?= $activeEnvironment ?>",
                     "productId": "<?= $productId ?>",
                     "productPrice": "<?= $productPrice ?>",
                     "productCategory": "<?= $categoryName ?>"
@@ -34,4 +33,7 @@ if ($category = $product->getCategory()) {
             ]
         }
     }
+</script>
+<script>
+    console.log('Loaded template script');
 </script>
