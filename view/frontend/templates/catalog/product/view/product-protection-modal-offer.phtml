@@ -2,6 +2,16 @@
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $block->getProduct();
 
+$productId = $product->getId();
+
+$productPrice = $product->getPrice();
+
+$categoryName = '';
+
+if ($category = $product->getCategory()) {
+    $categoryName = $category->getName();
+}
+
 ?>
 
 <div class="product_protection_modal_offer" id="product_protection_modal_offer"></div>
@@ -17,9 +27,9 @@ $product = $block->getProduct();
                     "activeEnvironment": "<?= $block
                         ->getData('viewModel')
                         ->getActiveEnvironment() ?>",
-                    "productId": "<?= $product->getSku() ?>",
-                    "productPrice": "<?= $product->getPrice() ?>",
-                    "productCategory": "<?= $product->getCategory()->getName() ?>"
+                    "productId": "<?= $productId ?>",
+                    "productPrice": "<?= $productPrice ?>",
+                    "productCategory": "<?= $categoryName ?>"
                 }
             ]
         }
