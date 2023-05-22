@@ -1,21 +1,27 @@
 <?php
 /** @var \Magento\Quote\Model\Quote\Item $_item */
 $item = $block->getItem();
+
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $item->getProduct();
 
 /** @var \Magento\Quote\Model\Quote $quote */
-$quote = $_item->getQuote();
+$quote = $item->getQuote();
 
 $productType = $product->getTypeId();
+
+$categoryName = '';
+
+if ($category = $product->getCategory()) {
+    $categoryName = $category->getName();
+}
 ?>
 <div>
-    <span>Product Protection</span>        
-    <div class="product-protection-offer" id="product_protection_offer_<?= product->getSku() ?>"></div>
+    <div class="product-protection-offer" id="product_protection_offer_<?= $product->getSku() ?>"></div>
 </div>
 <script type="text/x-magento-init">
     {
-        "#product_protection_offer_<?= $block->getProduct()->getSku() ?>": {
+        "#product_protection_offer_<?= $product->getSku() ?>": {
             "simpleProductProtectionOffer": [
                {
                         "extendStoreUuid": "<?= $block
@@ -26,21 +32,9 @@ $productType = $product->getTypeId();
                             ->getActiveEnvironment() ?>",
                         "selectedProductSku": "<?= $product->getSku() ?>",
                         "selectedProductPrice": "<?= $product->getPrice() ?>",
-                        "productCategory": "<?= $product->getCategory()->getName() ?>"
+                        "productCategory": "<?= $categoryName ?>"
                     }
             ]
         }
     }
-</script>
-<script>
-    document
-        .querySelectorAll('#super-product-table tbody tr .price-box')
-        .forEach((el, i) => {
-            let id = el.getAttribute('data-price-box');
-            if (document.querySelector('.' + id)) {
-                el
-                    .closest('tr')
-                    .after(document.querySelector('.' + id).closest('tr'));
-            }
-        });
 </script>

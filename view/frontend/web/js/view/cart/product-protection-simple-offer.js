@@ -8,9 +8,12 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
   return function (config, element) {
     const activeProductData = {
-      referenceId: selectedProduct.selectedSku,
-      price: selectedProduct.selectedPrice * 100,
-      category: config.productCategory,
+      referenceId: config[0].selectedProductSku,
+      price: config[0].selectedProductPrice * 100,
+      category: config[0].productCategory,
+      onAddToCart: function (opts) {
+        console.log('onAddToCart invoked', opts)
+      },
     }
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
     Extend.buttons.renderSimpleOffer(
