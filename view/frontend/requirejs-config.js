@@ -8,7 +8,7 @@ var config = {
     '*': {
       productProtectionOffer: 'Extend_Integration/js/view/catalog/product/product-protection-offer',
       simpleProductProtectionOffer:
-        'Extend_Integration/js/view/catalog/product/simple-product-protection-offer',
+        'Extend_Integration/js/view/cart/product-protection-simple-offer',
     },
   },
 }
