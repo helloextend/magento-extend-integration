@@ -6,6 +6,8 @@
 define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
 
+  console.log('Loaded offer modal script')
+
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
     Extend.modal.open({
