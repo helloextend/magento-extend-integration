@@ -1,0 +1,56 @@
+<?php
+// Get the cart
+$cart = $block->getLayout()->createBlock('Magento\Checkout\Block\Cart');
+
+// Get the items collection
+$itemsCollection = $cart->getQuote()->getItemsCollection();
+
+// Get all items
+$items = $cart->getQuote()->getAllItems();
+?>
+<div>
+    <span>Product Protection</span>        
+    <table id="product_protection_offers">
+        <?php foreach ($items as $item): ?>
+            <tr>
+                <td class="product-protection-offer product-id-<?= $item->getProductId() ?>" id="product_protection_offer_<?= $item->getSku() ?>" colspan="3" style="border-top: 0 !important"></td>
+            </tr>
+        <?php endforeach; ?>
+    </table>
+</div>
+<script type="text/x-magento-init">
+    {
+        "#product_protection_offers": {
+            "simpleProductProtectionOffer": [
+                <?php foreach ($items as $key => $item): ?>
+                    {
+                        "extendStoreUuid": "<?= $block
+                            ->getData('viewModel')
+                            ->getExtendStoreUuid() ?>",
+                        "activeEnvironment": "<?= $block
+                            ->getData('viewModel')
+                            ->getActiveEnvironment() ?>",
+                        "selectedProductSku": "<?= $item->getSku() ?>",
+                        "selectedProductPrice": "<?= $item->getPrice() ?>",
+                        "productCategory": "<?= $item
+                            ->getProduct()
+                            ->getCategory()
+                            ->getName() ?>"
+                    }<?= array_key_last($items) === $key ? '' : ',' ?>
+                <?php endforeach; ?>
+            ]
+        }
+    }
+</script>
+<script>
+    document
+        .querySelectorAll('#super-product-table tbody tr .price-box')
+        .forEach((el, i) => {
+            let id = el.getAttribute('data-price-box');
+            if (document.querySelector('.' + id)) {
+                el
+                    .closest('tr')
+                    .after(document.querySelector('.' + id).closest('tr'));
+            }
+        });
+</script>
