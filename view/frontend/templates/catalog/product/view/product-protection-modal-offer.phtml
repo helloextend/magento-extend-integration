@@ -1,0 +1,27 @@
+<?php
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProduct();
+
+?>
+
+<div class="product_protection_modal_offer" id="product_protection_modal_offer"></div>
+
+<script type="text/x-magento-init">
+    {
+        "#product_protection_modal_offer": {
+            "productProtectionModalOffer": [
+                {
+                    "extendStoreUuid": "<?= $block
+                        ->getData('viewModel')
+                        ->getExtendStoreUuid() ?>",
+                    "activeEnvironment": "<?= $block
+                        ->getData('viewModel')
+                        ->getActiveEnvironment() ?>",
+                    "productId": "<?= $product->getSku() ?>",
+                    "productPrice": "<?= $product->getPrice() ?>",
+                    "productCategory": "<?= $product->getCategory()->getName() ?>"
+                }
+            ]
+        }
+    }
+</script>
