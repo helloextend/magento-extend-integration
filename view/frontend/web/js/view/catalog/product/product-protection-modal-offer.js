@@ -3,18 +3,24 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
+define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
-
-  console.log('script loaded')
 
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
-    console.log('current product:' + config[0].productSku)
+
+    $('product_protection_modal_offer_' + config[0].productSku)
+      .closest('.actions-secondary')
+      .css({ 'background-color': 'red' })
+    //   .siblings('.actions-primary')
+    //   .find('button')
+    //   .html('<span>Modified</span>')
+
     // Extend.modal.open({
     //   referenceId: config[0].productId,
     //   price: config[0].productPrice * 100,
     //   category: config[0].productCategory,
+
     //   onClose: function (plan, product) {},
     // })
   }
