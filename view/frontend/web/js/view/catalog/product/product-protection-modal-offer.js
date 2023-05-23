@@ -13,7 +13,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       .closest('.product-item-inner')
       .find('.actions-primary')
       .find('button')
-      .css({ color: 'red', border: '2px solid red' })
+      .html('<span>Modified</span>')
 
     // Extend.modal.open({
     //   referenceId: config[0].productId,
