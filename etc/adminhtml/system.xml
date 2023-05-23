@@ -26,6 +26,7 @@
           <label>Enable Product Protection (V2)</label>
           <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
           <frontend_model>Extend\Integration\Model\Config\Frontend\EnableProductProtection</frontend_model>
+          <backend_model>Extend\Integration\Model\Config\Backend\V2enable</backend_model>
         </field>
       </group>
     </section>
