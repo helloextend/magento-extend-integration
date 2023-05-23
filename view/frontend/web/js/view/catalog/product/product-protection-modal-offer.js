@@ -3,7 +3,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
+define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
 
   console.log('script loaded')
