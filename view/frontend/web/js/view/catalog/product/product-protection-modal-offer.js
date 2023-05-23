@@ -9,7 +9,9 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
-    console.log(document.getElementById('product_protection_modal_offer_' + config[0]).className)
+    console.log(
+      document.getElementById('product_protection_modal_offer_' + config[0].productSku).className,
+    )
 
     // Extend.modal.open({
     //   referenceId: config[0].productId,
