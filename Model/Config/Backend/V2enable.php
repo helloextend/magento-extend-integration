@@ -45,7 +45,7 @@ class V2enable extends Value
     }
 
     /**
-     * This will disable Product Protection on the new module if it's enabled on the old module.
+     * This will create a new Product Protection product on the new module when V2 PP is enabled
      *
      * @return V2enable
      */
