@@ -9,9 +9,31 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
-    $('product_protection_modal_offer_' + config[0].productSku)
-      .closest('.actions-secondary')
-      .css({ 'background-color': 'red' })
+    const offerDiv = $('#product_protection_offer_' + config[0].productSku)
+    if (offerDiv) {
+      const secondaryActionsDiv = offerDiv.closest('.actions-secondary')
+      if (secondaryActionsDiv) {
+        const primaryActionsDivs = secondaryActionsDiv.siblings('.actions-primary')
+        if (primaryActionsDivs.length) {
+          const primaryActionsDiv = primaryActionsDivs[0]
+          const addToCartButton = primaryActionsDiv.find('button')
+          if (addToCartButton) {
+            addToCartButton.html('<span>Modified</span>')
+          } else {
+            console.log('addToCartButton not found')
+          }
+        } else {
+          console.log('primaryActionsDivs not found')
+        }
+      } else {
+        console.log('secondaryActionsDiv not found')
+      }
+    } else {
+      console.log('offerDiv not found')
+    }
+
+    // $('product_protection_modal_offer_' + config[0].productSku)
+    //   .closest('.actions-secondary')
     //   .siblings('.actions-primary')
     //   .find('button')
     //   .html('<span>Modified</span>')
