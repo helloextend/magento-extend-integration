@@ -42,4 +42,7 @@
     <type name="Magento\Sales\Model\Order">
         <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\OrderPlugin" />
     </type>
+    <type name="Magento\Quote\Model\ChangeQuoteControl">
+        <plugin sortOrder="1" name="extendIntegrationChangeQuoteControl" type="Extend\Integration\Plugin\Model\Quote\ChangeQuoteControlPlugin" />
+    </type>
 </config>

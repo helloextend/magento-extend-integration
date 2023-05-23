@@ -47,7 +47,9 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
-      const buttonInstance = Extend.buttons.instance('#product_protection_offer')
+      const buttonInstance = Extend.buttons.instance(
+        '#product_protection_offer_' + config[0].selectedProductSku,
+      )
       const activeProductData = {
         referenceId: selectedProduct.selectedSku,
         price: selectedProduct.selectedPrice * 100,
@@ -56,7 +58,10 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       if (buttonInstance) {
         buttonInstance.setActiveProduct(activeProductData)
       } else {
-        Extend.buttons.render('#product_protection_offer', activeProductData)
+        Extend.buttons.render(
+          '#product_protection_offer_' + config[0].selectedProductSku,
+          activeProductData,
+        )
       }
     })
   }

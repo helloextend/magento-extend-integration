@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright Extend (c) 2022. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.item.renderers.default.actions">
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Generic" ifconfig="extend/product_protection/enable" before="-" name="extend.cart.view.type.default.product-protection-offer" template="Extend_Integration::cart/item/renderer/actions/product-protection-simple-offer.phtml">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.simple.actions">
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Generic" ifconfig="extend/product_protection/enable" before="-" name="extend.cart.view.type.simple.product-protection-offer" template="Extend_Integration::cart/item/renderer/actions/product-protection-simple-offer.phtml">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.configurable.actions">
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Generic" ifconfig="extend/product_protection/enable" before="-" name="extend.cart.view.type.configurable.product-protection-offer" template="Extend_Integration::cart/item/renderer/actions/product-protection-simple-offer.phtml">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.grouped.actions">
+            <block class="Magento\Checkout\Block\Cart\Item\Renderer\Actions\Generic" ifconfig="extend/product_protection/enable" before="-" name="extend.cart.view.type.grouped.product-protection-offer" template="Extend_Integration::cart/item/renderer/actions/product-protection-simple-offer.phtml">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>
