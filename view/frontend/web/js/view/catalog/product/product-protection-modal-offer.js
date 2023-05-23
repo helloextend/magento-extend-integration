@@ -9,8 +9,8 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
   console.log('script loaded')
 
   return function (config, element) {
-    // Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
-    // console.log('current product:' + config[0].productSku)
+    Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+    console.log('current product:' + config[0].productSku)
     // Extend.modal.open({
     //   referenceId: config[0].productId,
     //   price: config[0].productPrice * 100,
