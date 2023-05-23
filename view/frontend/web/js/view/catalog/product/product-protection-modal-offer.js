@@ -10,16 +10,17 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
     $('product_protection_modal_offer_' + config[0].productSku)
-      .closest('.actions-primary')
-      .closest('.action.tocart.primary')
+      .closest('.product-item-inner')
+      .find('.actions-primary')
+      .find('button')
       .css({ color: 'red', border: '2px solid red' })
 
-    Extend.modal.open({
-      referenceId: config[0].productId,
-      price: config[0].productPrice * 100,
-      category: config[0].productCategory,
+    // Extend.modal.open({
+    //   referenceId: config[0].productId,
+    //   price: config[0].productPrice * 100,
+    //   category: config[0].productCategory,
 
-      onClose: function (plan, product) {},
-    })
+    //   onClose: function (plan, product) {},
+    // })
   }
 })
