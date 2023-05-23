@@ -6,10 +6,14 @@
 define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
 
-  console.log('Loaded offer modal script')
-
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+
+    $('product_protection_modal_offer_' + config[0].productSku)
+      .closest('.actions-primary')
+      .closest('.action.tocart.primary')
+      .css({ color: 'red', border: '2px solid red' })
+
     Extend.modal.open({
       referenceId: config[0].productId,
       price: config[0].productPrice * 100,
