@@ -6,17 +6,12 @@
 
 namespace Extend\Integration\Model\Config\Backend;
 
-use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\Value;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductInstaller;
 
 class V2enable extends Value
 {
-    /**
-     * @var WriterInterface
-     */
-    private WriterInterface $writer;
     private AttributeSetInstaller $attributeSetInstaller;
     private ProductInstaller $productInstaller;
 
@@ -27,7 +22,6 @@ class V2enable extends Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        WriterInterface $writer,
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
     ) {
@@ -39,7 +33,6 @@ class V2enable extends Value
             $resource,
             $resourceCollection
         );
-        $this->writer = $writer;
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->productInstaller = $productInstaller;
     }
