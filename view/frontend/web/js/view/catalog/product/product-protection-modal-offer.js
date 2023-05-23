@@ -10,7 +10,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
     $('product_protection_modal_offer_' + config[0].productSku)
-      .closest('.product-item-inner')
+      .parents('.product-item-actions')
       .find('.actions-primary')
       .find('button')
       .html('<span>Modified</span>')
