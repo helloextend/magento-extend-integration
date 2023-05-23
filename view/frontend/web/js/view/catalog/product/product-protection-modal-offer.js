@@ -11,9 +11,10 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
     $('product_protection_modal_offer_' + config[0].productSku)
       .closest('.actions-secondary')
-      .siblings('.actions-primary')
-      .find('button')
-      .html('<span>Modified</span>')
+      .css({ background: 'red' })
+    //   .siblings('.actions-primary')
+    //   .find('button')
+    //   .html('<span>Modified</span>')
 
     // Extend.modal.open({
     //   referenceId: config[0].productId,
