@@ -8,23 +8,22 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
-    Extend.setDebug(true)
 
     const productSku = config[0].productSku
 
-    const addToCartButtonForm = $('#product_protection_modal_offer_' + productSku)
-      .closest('.product.actions.product-item-actions')
-      .find('.actions-primary')
-      .find('form[data-role="tocart-form"]')
+    const addToCartForm = $('#product_protection_modal_offer_' + productSku)
+      ?.closest('.product.actions.product-item-actions')
+      ?.find('.actions-primary')
+      ?.find('form[data-role="tocart-form"]')
 
-    const addToCartButton = addToCartButtonForm.find('.action.tocart.primary')
+    if (addToCartForm) {
+      const addToCartButton = addToCartForm.find('.action.tocart.primary')
 
-    if (addToCartButton) {
-      addToCartButton.removeAttr('type').attr('type', 'button')
+      if (addToCartButton) {
+        addToCartButton.removeAttr('type').attr('type', 'button')
 
-      addToCartButton.click(function () {
-        Extend.modal
-          .open({
+        addToCartButton.click(function () {
+          Extend.modal.open({
             referenceId: productSku,
             price: config[0].productPrice * 100,
             category: config[0].productCategory,
@@ -33,15 +32,8 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
               addToCartButtonForm.submit()
             },
           })
-          .then(function () {
-            console.log('modal opened')
-          })
-          .catch(function (error) {
-            console.log('modal error', error)
-          })
-      })
-    } else {
-      console.log('addToCartButton not found')
+        })
+      }
     }
   }
 })
