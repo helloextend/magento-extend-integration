@@ -12,7 +12,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
     const productSku = config[0].productSku
 
-    const addToCartButtonForm = $('#product_protection_modal_offer_' + productSkuu)
+    const addToCartButtonForm = $('#product_protection_modal_offer_' + productSku)
       .closest('.product.actions.product-item-actions')
       .find('.actions-primary')
       .find('form[data-role="tocart-form"]')
