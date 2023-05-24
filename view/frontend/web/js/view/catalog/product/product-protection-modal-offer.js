@@ -3,18 +3,19 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
   'use strict'
 
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
-    const addToCartButton = $('#product_protection_modal_offer_' + config[0].productSku)
+    const addToCartButton = document
+      .getElementById('#product_protection_modal_offer_' + config[0].productSku)
       .closest('.product.actions.product-item-actions')
-      .find('.action.tocart.primary')
+      .querySelector('.action.tocart.primary')
 
     if (addToCartButton) {
-      addToCartButton.click(function () {
+      addToCartButton.addEventListener('click', function () {
         Extend.modal.open({
           referenceId: config[0].productId,
           price: config[0].productPrice * 100,
