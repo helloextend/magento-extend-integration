@@ -29,7 +29,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
             category: config[0].productCategory,
             onClose: function (plan, product) {
               console.log('onClose invoked', plan, product)
-              addToCartButtonForm.submit()
+              addToCartForm.submit()
             },
           })
         })
