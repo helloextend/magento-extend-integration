@@ -9,9 +9,16 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
-    const addToCartButton = $('#product_protection_modal_offer_' + config[0].productSku)
+    // const addToCartButton = $('#product_protection_modal_offer_' + config[0].productSku)
+    //   .closest('.product.actions.product-item-actions')
+    //   .find('.action.tocart.primary')
+
+    const addToCartButtonForm = $('#product_protection_modal_offer_' + config[0].productSku)
       .closest('.product.actions.product-item-actions')
-      .find('.action.tocart.primary')
+      .find('.actions-primary')
+      .find('form[data-role="tocart-form"]')
+
+    const addToCartButton = addToCartButtonForm.find('.action.tocart.primary')
 
     if (addToCartButton) {
       addToCartButton.click(function () {
