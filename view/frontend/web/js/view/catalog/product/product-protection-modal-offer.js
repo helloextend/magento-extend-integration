@@ -14,7 +14,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       .find('.action.tocart.primary')
 
     if (addToCartButton) {
-      addToCartButton.addEventListener('click', function () {
+      addToCartButton.click(function () {
         Extend.modal.open({
           referenceId: config[0].productId,
           price: config[0].productPrice * 100,
