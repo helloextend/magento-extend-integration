@@ -14,6 +14,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       .find('.action.tocart.primary')
 
     if (addToCartButton) {
+      console.log('button html: ' + addToCartButton.html())
       addToCartButton.click(function () {
         Extend.modal.open({
           referenceId: config[0].productId,
