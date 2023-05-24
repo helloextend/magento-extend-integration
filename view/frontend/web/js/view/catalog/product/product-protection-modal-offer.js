@@ -28,7 +28,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
             price: config[0].productPrice * 100,
             category: config[0].productCategory,
             onClose: function (plan, product) {
-              console.log('onClose invoked', plan, product)
+              console.log('onClose invoked', { plan }, { product })
               addToCartForm.submit()
             },
           })
