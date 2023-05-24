@@ -20,10 +20,10 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       const addToCartButton = addToCartForm.find('.action.tocart.primary')
 
       if (addToCartButton) {
-        // this button is of type submit so clicking it automatically submits the form, the form now gets submitted on modal close
-        addToCartButton.removeAttr('type').attr('type', 'button')
+        addToCartButton.click(function (event) {
+          // this button is of type submit so clicking it automatically submits the form, the form now gets submitted on modal close
+          event.preventDefault()
 
-        addToCartButton.click(function () {
           Extend.modal.open({
             referenceId: productSku,
             price: config[0].productPrice * 100,
