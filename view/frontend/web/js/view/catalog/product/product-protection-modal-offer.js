@@ -20,6 +20,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       const addToCartButton = addToCartForm.find('.action.tocart.primary')
 
       if (addToCartButton) {
+        // this button is of type submit so clicking it automatically submits the form, the form now gets submitted on modal close
         addToCartButton.removeAttr('type').attr('type', 'button')
 
         addToCartButton.click(function () {
@@ -28,6 +29,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
             price: config[0].productPrice * 100,
             category: config[0].productCategory,
             onClose: function (plan, product) {
+              // TODO: [PAR-4187] Add add to cart functionality
               console.log('onClose invoked', { plan }, { product })
               addToCartForm.submit()
             },
