@@ -9,12 +9,11 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
   return function (config, element) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
-    const addToCartButton = $('#product_protection_offer_' + config[0].productSku)
+    const addToCartButton = $('#product_protection_modal_offer_' + config[0].productSku)
       .closest('.product.actions.product-item-actions')
       .find('.action.tocart.primary')
 
     if (addToCartButton) {
-      console.log('addToCartButton type: ' + typeof addToCartButton)
       addToCartButton.click(function () {
         Extend.modal.open({
           referenceId: config[0].productId,
