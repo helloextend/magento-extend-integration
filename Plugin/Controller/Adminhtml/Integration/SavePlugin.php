@@ -93,14 +93,14 @@ class SavePlugin
     {
         $postData = $subject->getRequest()->getPostValue();
         if (isset($postData['integration_stores'])) {
-            $integrationStores = (array) $postData['integration_stores'];
+            $integrationStoresIds = (array) $postData['integration_stores'];
             $this->disableAllStoreAssociations(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
             );
-            foreach ($integrationStores as $integrationStore) {
+            foreach ($integrationStoresIds as $integrationStoreId) {
                 $this->integrationStoresRepository->saveStoreToIntegration(
                     $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStore
+                    $integrationStoreId
                 );
                 $this->sendIntegrationToExtend(
                     $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
@@ -174,7 +174,7 @@ class SavePlugin
     private function sendIntegrationToExtend($integrationId, $storeId)
     {
         $integrationStore = $this->integrationStoresRepository->getByStoreIdAndIntegrationId(
-            $toreId,
+            $storeId,
             $integrationId
         );
         $integration = $this->integrationService->get($integrationId);
@@ -205,6 +205,6 @@ class SavePlugin
             ),
         ]);
 
-        $this->integration->execute($integrationEndpoint, $body, $headers);
+        $this->integration->execute($endpoint, $body, $headers);
     }
 }
