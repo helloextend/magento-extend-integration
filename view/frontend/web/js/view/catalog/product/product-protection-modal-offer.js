@@ -39,7 +39,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         if (primaryActionsDiv) {
           const addToCartButton = actionsDiv.find('button')
           if (addToCartButton) {
-            addToCartButton.html('<span>Modified</span>')
+            console.log('addToCartButton found!')
           } else {
             console.log('addToCartButton not found')
           }
