@@ -92,7 +92,10 @@ class SavePlugin
     public function aroundExecute(Save $subject, callable $proceed)
     {
         $postData = $subject->getRequest()->getPostValue();
-        if (isset($postData['integration_stores'])) {
+        $integration = $this->integrationService->get(
+            $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
+        );
+        if (isset($postData['integration_stores']) && (int) $integration->getSetupType() === 1) {
             $integrationStoresIds = (array) $postData['integration_stores'];
             $this->disableAllStoreAssociations(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
@@ -128,7 +131,10 @@ class SavePlugin
     public function afterExecute(Save $subject, $result)
     {
         $postData = $subject->getRequest()->getPostValue();
-        if (isset($postData['integration_stores'])) {
+        $integration = $this->integrationService->get(
+            $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
+        );
+        if (isset($postData['integration_stores']) && (int) $integration->getSetupType() === 0) {
             $integrationStoreIds = $postData['integration_stores'];
             $this->disableAllStoreAssociations(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
