@@ -9,10 +9,18 @@ namespace Extend\Integration\Plugin\Controller\Adminhtml\Integration;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Extend\Integration\Model\ResourceModel\StoreIntegration;
 use Extend\Integration\Model\ResourceModel\StoreIntegration\CollectionFactory;
+use Extend\Integration\Service\Api\Integration as IntegrationService;
+use Extend\Integration\Service\Api\MetadataBuilder;
+use Magento\Directory\Helper\Data;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Integration\Api\IntegrationServiceInterface;
+use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Controller\Adminhtml\Integration;
 use Magento\Integration\Controller\Adminhtml\Integration\Save;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 
 class SavePlugin
 {
@@ -35,6 +43,12 @@ class SavePlugin
      * @var ManagerInterface
      */
     private ManagerInterface $messageManager;
+    private MetadataBuilder $metadataBuilder;
+    private IntegrationService $integration;
+    private OauthServiceInterface $oauthService;
+    private IntegrationServiceInterface $integrationService;
+    private ScopeConfigInterface $scopeConfig;
+    private StoreManagerInterface $storeManager;
 
     /**
      * @param StoreIntegrationRepositoryInterface $integrationStoresRepository
@@ -46,12 +60,24 @@ class SavePlugin
         StoreIntegrationRepositoryInterface $integrationStoresRepository,
         StoreIntegration $storeIntegrationResource,
         StoreIntegration\CollectionFactory $storeIntegrationCollection,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        MetadataBuilder $metadataBuilder,
+        IntegrationService $integration,
+        OauthServiceInterface $oauthService,
+        IntegrationServiceInterface $integrationService,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
     ) {
         $this->integrationStoresRepository = $integrationStoresRepository;
         $this->storeIntegrationResource = $storeIntegrationResource;
         $this->storeIntegrationCollection = $storeIntegrationCollection;
         $this->messageManager = $messageManager;
+        $this->metadataBuilder = $metadataBuilder;
+        $this->integration = $integration;
+        $this->oauthService = $oauthService;
+        $this->integrationService = $integrationService;
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -76,6 +102,10 @@ class SavePlugin
                     $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
                     $integrationStore
                 );
+                $this->sendIntegrationToExtend(
+                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                    $integrationStoreId
+                );
             }
             $this->messageManager->addSuccessMessage(
                 __('Your selected stores were saved to the Extend Integration.')
@@ -99,14 +129,18 @@ class SavePlugin
     {
         $postData = $subject->getRequest()->getPostValue();
         if (isset($postData['integration_stores'])) {
-            $integrationStores = $postData['integration_stores'];
+            $integrationStoreIds = $postData['integration_stores'];
             $this->disableAllStoreAssociations(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
             );
-            foreach ($integrationStores as $integrationStore) {
+            foreach ($integrationStoreIds as $integrationStoreId) {
                 $this->integrationStoresRepository->saveStoreToIntegration(
                     $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStore
+                    $integrationStoreId
+                );
+                $this->sendIntegrationToExtend(
+                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                    $integrationStoreId
                 );
             }
         }
@@ -135,5 +169,42 @@ class SavePlugin
             $storeIntegration->setDisabled(1);
             $this->storeIntegrationResource->save($storeIntegration);
         }
+    }
+
+    private function sendIntegrationToExtend($integrationId, $storeId)
+    {
+        $integrationStore = $this->integrationStoresRepository->getByStoreIdAndIntegrationId(
+            $toreId,
+            $integrationId
+        );
+        $integration = $this->integrationService->get($integrationId);
+        $oauth = $this->oauthService->loadConsumer($integration->getConsumerId());
+        $store = $this->storeManager->getStore($storeId);
+
+        $endpoint = [
+            'path' => IntegrationService::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+            'type' => 'middleware',
+        ];
+
+        [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
+            'magentoStoreUuid' => $integrationStore->getStoreUuid(),
+            'magentoStoreId' => $storeId,
+            'magentoConsumerKey' => $oauth->getKey(),
+            'storeDomain' => $this->scopeConfig->getValue(
+                Store::XML_PATH_UNSECURE_BASE_URL,
+                'store',
+                $storeId
+            ),
+            'magentoApiSecretId' => $oauth->getSecret(),
+            'name' => $store->getName(),
+            'websiteId' => $store->getWebsiteId(),
+            'weightUnit' => $this->scopeConfig->getValue(
+                Data::XML_PATH_WEIGHT_UNIT,
+                'store',
+                $storeId
+            ),
+        ]);
+
+        $this->integration->execute($integrationEndpoint, $body, $headers);
     }
 }
