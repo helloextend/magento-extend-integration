@@ -21,13 +21,16 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
     const addToCartButton = addToCartButtonForm.find('.action.tocart.primary')
 
     if (addToCartButton) {
-      addToCartButton.click(function () {
+      addToCartButton.click(function (event) {
+        event.stopPropagation()
+
         Extend.modal.open({
           referenceId: config[0].productId,
           price: config[0].productPrice * 100,
           category: config[0].productCategory,
           onClose: function (plan, product) {
             console.log('onClose invoked', plan, product)
+            addToCartButtonForm.submit()
           },
         })
       })
