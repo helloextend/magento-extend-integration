@@ -24,15 +24,22 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       addToCartButton.removeAttr('type').attr('type', 'button')
 
       addToCartButton.click(function (event) {
-        Extend.modal.open({
-          referenceId: config[0].productId,
-          price: config[0].productPrice * 100,
-          category: config[0].productCategory,
-          onClose: function (plan, product) {
-            console.log('onClose invoked', plan, product)
-            addToCartButtonForm.submit()
-          },
-        })
+        Extend.modal
+          .open({
+            referenceId: config[0].productId,
+            price: config[0].productPrice * 100,
+            category: config[0].productCategory,
+            onClose: function (plan, product) {
+              console.log('onClose invoked', plan, product)
+              addToCartButtonForm.submit()
+            },
+          })
+          .then(function () {
+            console.log('modal opened')
+          })
+          .catch(function (error) {
+            console.log('modal error', error)
+          })
       })
     } else {
       console.log('addToCartButton not found')
