@@ -89,8 +89,7 @@ class SavePlugin
     }
 
     /**
-     * Save stores to integration, using the Extend custom table,
-     * when an integration was preinstalled with the Extend Integration module
+     * Save stores to integration, using the Extend custom table
      *
      * @param Save $subject
      * @param callable $proceed
