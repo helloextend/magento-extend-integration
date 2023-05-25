@@ -13,6 +13,7 @@ use Extend\Integration\Service\Api\Integration as IntegrationService;
 use Extend\Integration\Service\Api\MetadataBuilder;
 use Magento\Directory\Helper\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
@@ -49,6 +50,7 @@ class SavePlugin
     private IntegrationServiceInterface $integrationService;
     private ScopeConfigInterface $scopeConfig;
     private StoreManagerInterface $storeManager;
+    private EncryptorInterface $encryptor;
 
     /**
      * @param StoreIntegrationRepositoryInterface $integrationStoresRepository
@@ -66,7 +68,8 @@ class SavePlugin
         OauthServiceInterface $oauthService,
         IntegrationServiceInterface $integrationService,
         ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        EncryptorInterface $encryptor
     ) {
         $this->integrationStoresRepository = $integrationStoresRepository;
         $this->storeIntegrationResource = $storeIntegrationResource;
@@ -78,6 +81,7 @@ class SavePlugin
         $this->integrationService = $integrationService;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -165,26 +169,27 @@ class SavePlugin
             'path' => IntegrationService::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
             'type' => 'middleware',
         ];
+        if ($oauth->getKey() && $oauth->getSecret()) {
+            [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
+                'magentoStoreUuid' => $integrationStore->getStoreUuid(),
+                'magentoStoreId' => $storeId,
+                'magentoConsumerKey' => $oauth->getKey(),
+                'storeDomain' => $this->scopeConfig->getValue(
+                    Store::XML_PATH_UNSECURE_BASE_URL,
+                    'store',
+                    $storeId
+                ),
+                'magentoApiSecretId' => $this->encryptor->decrypt($oauth->getSecret()),
+                'name' => $store->getName(),
+                'websiteId' => $store->getWebsiteId(),
+                'weightUnit' => $this->scopeConfig->getValue(
+                    Data::XML_PATH_WEIGHT_UNIT,
+                    'store',
+                    $storeId
+                ),
+            ]);
 
-        [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
-            'magentoStoreUuid' => $integrationStore->getStoreUuid(),
-            'magentoStoreId' => $storeId,
-            'magentoConsumerKey' => $oauth->getKey(),
-            'storeDomain' => $this->scopeConfig->getValue(
-                Store::XML_PATH_UNSECURE_BASE_URL,
-                'store',
-                $storeId
-            ),
-            'magentoApiSecretId' => $oauth->getSecret(),
-            'name' => $store->getName(),
-            'websiteId' => $store->getWebsiteId(),
-            'weightUnit' => $this->scopeConfig->getValue(
-                Data::XML_PATH_WEIGHT_UNIT,
-                'store',
-                $storeId
-            ),
-        ]);
-
-        $this->integration->execute($endpoint, $body, $headers);
+            $this->integration->execute($endpoint, $body, $headers);
+        }
     }
 }
