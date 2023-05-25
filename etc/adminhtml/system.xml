@@ -4,37 +4,38 @@
   ~ See Extend-COPYING.txt for license details.
   -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
-  <system>
-    <tab id="extend" translate="label" sortOrder="200">
-      <label>Extend</label>
-    </tab>
-    <section id="extend" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
-      <class>separator-top</class>
-      <label>Integration</label>
-      <tab>extend</tab>
-      <resource>Magento_Catalog::config_catalog</resource>
-      <group id="integration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>Integration</label>
-        <field id="environment" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
-          <label>Environment</label>
-          <source_model>Extend\Integration\Model\Config\Source\Environment</source_model>
-        </field>
-      </group>
-      <group id="product_protection" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-        <label>Product Protection</label>
-        <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
-          <label>Enable Product Protection (V2)</label>
-          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-          <frontend_model>Extend\Integration\Model\Config\Frontend\EnableProductProtection</frontend_model>
-        </field>
-      </group>
-    </section>
-    <section id="warranty">
-      <group id="enableExtend">
-        <field id="enable">
-          <backend_model>Extend\Integration\Model\Config\Backend\V1enable</backend_model>
-        </field>
-      </group>
-    </section>
-  </system>
+    <system>
+        <tab id="extend" translate="label" sortOrder="200">
+            <label>Extend</label>
+        </tab>
+        <section id="extend" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Integration</label>
+            <tab>extend</tab>
+            <resource>Magento_Catalog::config_catalog</resource>
+            <group id="integration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Integration</label>
+                <field id="environment" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Environment</label>
+                    <source_model>Extend\Integration\Model\Config\Source\Environment</source_model>
+                </field>
+            </group>
+            <group id="product_protection" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Product Protection</label>
+                <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                    <label>Enable Product Protection (V2)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>Extend\Integration\Model\Config\Frontend\EnableProductProtection</frontend_model>
+                    <backend_model>Extend\Integration\Model\Config\Backend\V2enable</backend_model>
+                </field>
+            </group>
+        </section>
+        <section id="warranty">
+            <group id="enableExtend">
+                <field id="enable">
+                    <backend_model>Extend\Integration\Model\Config\Backend\V1enable</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
 </config>
