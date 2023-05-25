@@ -44,8 +44,8 @@ class V2enable extends Value
      */
     public function afterSave()
     {
-        $value = (int) $this->getValue();
-        if ($value === 1) {
+        $isPPV2Enabled = (int) $this->getValue();
+        if ($isPPV2Enabled === 1) {
             $attributeSet = $this->attributeSetInstaller->createAttributeSet();
             $this->productInstaller->createProduct($attributeSet);
         }
