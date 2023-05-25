@@ -15,7 +15,11 @@ use Magento\Directory\Helper\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
+use Magento\Framework\Exception\IntegrationException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Oauth\Exception;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Controller\Adminhtml\Integration;
@@ -155,6 +159,17 @@ class SavePlugin
         }
     }
 
+    /**
+     * Send stores to Extend Magento Service when added to an integration after it's already been activated.
+     *
+     * @param $integrationId
+     * @param $storeId
+     * @return void
+     * @throws IntegrationException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     * @throws Exception
+     */
     private function sendIntegrationToExtend($integrationId, $storeId)
     {
         $integrationStore = $this->integrationStoresRepository->getByStoreIdAndIntegrationId(
