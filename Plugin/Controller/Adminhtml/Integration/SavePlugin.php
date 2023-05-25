@@ -95,7 +95,7 @@ class SavePlugin
         $integration = $this->integrationService->get(
             $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
         );
-        if (isset($postData['integration_stores']) && (int) $integration->getSetupType() === 1) {
+        if (isset($postData['integration_stores'])) {
             $integrationStoresIds = (array) $postData['integration_stores'];
             $this->disableAllStoreAssociations(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
@@ -113,45 +113,19 @@ class SavePlugin
             $this->messageManager->addSuccessMessage(
                 __('Your selected stores were saved to the Extend Integration.')
             );
+            if ((int) $integration->getSetupType() === 0) {
+                $proceed();
+            } else {
+                $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
+            }
+        } elseif ((int) $integration->getSetupType() === 1) {
+            $this->messageManager->addSuccessMessage(
+                __('No additional stores were saved to the Extend Integration.')
+            );
             $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
         } else {
             $proceed();
         }
-    }
-
-    /**
-     * Save stores to integration, using the Extend custom table,
-     * when an integration was created in the admin panel
-     *
-     * @param Save $subject
-     * @param $result
-     * @return mixed
-     * @throws AlreadyExistsException
-     */
-    public function afterExecute(Save $subject, $result)
-    {
-        $postData = $subject->getRequest()->getPostValue();
-        $integration = $this->integrationService->get(
-            $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
-        );
-        if (isset($postData['integration_stores']) && (int) $integration->getSetupType() === 0) {
-            $integrationStoreIds = $postData['integration_stores'];
-            $this->disableAllStoreAssociations(
-                $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
-            );
-            foreach ($integrationStoreIds as $integrationStoreId) {
-                $this->integrationStoresRepository->saveStoreToIntegration(
-                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStoreId
-                );
-                $this->sendIntegrationToExtend(
-                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStoreId
-                );
-            }
-        }
-
-        return $result;
     }
 
     /**
