@@ -18,10 +18,6 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
       ?.querySelector('form[data-role="tocart-form"]')
 
     if (addToCartForm) {
-      addToCartForm.addEventListener('submit', function (event) {
-        event.preventDefault()
-      })
-
       const addToCartButton = addToCartForm.querySelector('.action.tocart.primary')
 
       if (addToCartButton) {
