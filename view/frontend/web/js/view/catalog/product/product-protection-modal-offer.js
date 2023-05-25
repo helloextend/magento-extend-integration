@@ -3,7 +3,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
   'use strict'
 
   return function (config, element) {
@@ -11,16 +11,17 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
 
     const productSku = config[0].productSku
 
-    const addToCartForm = $('#product_protection_modal_offer_' + productSku)
+    const addToCartForm = document
+      .querySelector('#product_protection_modal_offer_' + productSku)
       ?.closest('.product.actions.product-item-actions')
-      ?.find('.actions-primary')
-      ?.find('form[data-role="tocart-form"]')
+      ?.querySelector('.actions-primary')
+      ?.querySelector('form[data-role="tocart-form"]')
 
     if (addToCartForm) {
-      const addToCartButton = addToCartForm.find('.action.tocart.primary')
+      const addToCartButton = addToCartForm.querySelector('.action.tocart.primary')
 
       if (addToCartButton) {
-        addToCartButton.click(function (event) {
+        addToCartButton.addEventListener('click', function (event) {
           // this button is of type submit so clicking it automatically submits the form, the form now gets submitted on modal close
           event.preventDefault()
 
@@ -35,7 +36,11 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
             },
           })
         })
+      } else {
+        console.error('Could not find addToCartButton')
       }
+    } else {
+      console.error('Could not find addToCartForm')
     }
   }
 })
