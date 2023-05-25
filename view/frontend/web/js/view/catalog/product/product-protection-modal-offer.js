@@ -3,7 +3,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
   'use strict'
 
   return function (config, element) {
@@ -18,7 +18,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       ?.querySelector('form[data-role="tocart-form"]')
 
     if (addToCartForm) {
-      const addToCartButton = addToCartForm.closest('.action.tocart.primary')
+      const addToCartButton = addToCartForm.querySelector('.action.tocart.primary')
 
       if (addToCartButton) {
         addToCartButton.addEventListener('click', function (event) {
