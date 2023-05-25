@@ -180,7 +180,7 @@ class SavePlugin
         $store = $this->storeManager->getStore($storeId);
 
         $endpoint = [
-            'path' => IntegrationService::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+            'path' => IntegrationService::EXTEND_INTEGRATION_ENDPOINTS['webhooks_stores_create'],
             'type' => 'middleware',
         ];
         if ($oauth->getKey() && $oauth->getSecret()) {
