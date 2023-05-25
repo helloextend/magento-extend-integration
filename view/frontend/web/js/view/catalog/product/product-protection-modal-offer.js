@@ -36,11 +36,7 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
             },
           })
         })
-      } else {
-        console.error('Could not find addToCartButton')
       }
-    } else {
-      console.error('Could not find addToCartForm')
     }
   }
 })
