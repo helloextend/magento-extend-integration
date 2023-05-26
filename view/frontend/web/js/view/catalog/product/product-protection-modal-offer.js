@@ -3,12 +3,11 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define([
-  'Magento_Customer/js/customer-data',
-  'Magento_Checkout/js/model/quote',
-  'extendSdk',
-  'ExtendMagento',
-], function (customerData, magentoQuote, Extend, ExtendMagento) {
+define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
+  customerData,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
 
   return function (config, element) {
@@ -33,14 +32,7 @@ define([
               const { planId, price, term, title, coverageType, offerId } = plan
               const { id: productId, price: listPrice } = product
               const cartItems = customerData.get('cart')().items
-              const totals = magentoQuote.getTotals()
-              console.log(
-                'modal closed, available data:',
-                { plan },
-                { product },
-                { cartItems },
-                { totals },
-              )
+              console.log('modal closed, available data:', { plan }, { product }, { cartItems })
 
               // ExtendMagento.upsertProductProtection({
               //   plan: {
