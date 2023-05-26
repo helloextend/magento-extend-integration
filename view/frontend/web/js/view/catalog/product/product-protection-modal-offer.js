@@ -15,7 +15,6 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
       .querySelector('#product_protection_modal_offer_' + productSku)
       ?.closest('.product.actions.product-item-actions')
       ?.querySelector('.actions-primary')
-      ?.querySelector('form[data-role="tocart-form"]')
       ?.querySelector('.action.tocart.primary')
 
     if (addToCartButton) {
