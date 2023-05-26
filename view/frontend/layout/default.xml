@@ -5,12 +5,12 @@
   -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="head.components">
-            <block name="extend.config" ifconfig="extend/product_protection/enable" template="Extend_Integration::extend-config.phtml">
+        <referenceContainer name="content">
+            <block name="extend.minicart" ifconfig="extend/product_protection/enable" template="Extend_Integration::minicart-simple-offer.phtml">
                 <arguments>
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
                 </arguments>
             </block>
-        </referenceBlock>
+        </referenceContainer>
     </body>
 </page>
