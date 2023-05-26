@@ -6,10 +6,6 @@ define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk
 ) {
   'use strict'
 
-  // return function (config, element) {
-  //   console.log(config, element)
-  // }
-
   return Component.extend({
     initialize: function () {
       this._super()
@@ -18,26 +14,30 @@ define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk
 
     handleUpdate: function () {
       const cartItems = customerData.get('cart')().items
+
       cartItems.forEach(cartItem => {
-        console.log(cartItem)
         const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
         if (qtyElem) {
-          const productItemElem = qtyElem.closest('[data-role=product-item]')
+          const itemContainerElem = qtyElem.closest('[data-role=product-item]')
 
-          if (productItemElem) {
-            var blockID = 'warranty-offers-' + cartItem.item_id
-            var warrantyElem = $('#' + blockID, productItemElem)
-            let productSku = cartItem.product_sku
+          if (itemContainerElem) {
+            const simpleOfferElemId = 'extend-minicart-simple-offer-' + cartItem.item_id
+            let simpleOfferElem = $('#' + simpleOfferElemId, itemContainerElem)
 
-            if (!warrantyElem.length) {
-              warrantyElem = $('<div>').attr('id', blockID).addClass('product-item-warranty')
+            if (simpleOfferElem.length) {
+              // TODO: If warranty already in cart, remove element
+            } else {
+              // TODO: If warranty already in cart, no need to render
 
-              const productItemDetailsElem = $('div.product-item-details', productItemElem)
+              simpleOfferElem = $('<div>')
+                .attr('id', simpleOfferElemId)
+                .addClass('extend-minicart-simple-offer')
+              const itemDetailsElem = $('div.product-item-details', itemContainerElem)
 
-              if (productItemDetailsElem.length) {
-                productItemDetailsElem.append(warrantyElem)
-                Extend.buttons.renderSimpleOffer(`#${blockID}`, {
-                  referenceId: productSku,
+              if (itemDetailsElem.length) {
+                itemDetailsElem.append(simpleOfferElem)
+                Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
+                  referenceId: cartItem.product_sku,
                   price: cartItem.product_price_value * 100,
                   // category: cartItem.category,
                   onAddToCart: function (opts) {
