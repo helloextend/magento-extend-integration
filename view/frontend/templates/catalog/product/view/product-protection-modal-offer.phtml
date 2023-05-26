@@ -1,0 +1,35 @@
+<?php
+$viewModel = $block->getData('viewModel');
+
+$extendStoreUuid = $viewModel->getExtendStoreUuid();
+$activeEnvironment = $viewModel->getActiveEnvironment();
+
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProduct();
+
+$productSku = $product->getSku();
+$productPrice = $product->getPrice();
+
+$categoryName = '';
+if ($category = $product->getCategory()) {
+    $categoryName = $category->getName();
+}
+?>
+
+<div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $productSku ?>"></div>
+
+<script type="text/x-magento-init">
+    {
+        "#product_protection_modal_offer_<?= $productSku ?>": {
+            "productProtectionModalOffer": [
+                {
+                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                    "activeEnvironment": "<?= $activeEnvironment ?>",
+                    "productSku": "<?= $productSku ?>",
+                    "productPrice": "<?= $productPrice ?>",
+                    "productCategory": "<?= $categoryName ?>"
+                }
+            ]
+        }
+    }
+</script>
