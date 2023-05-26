@@ -31,23 +31,38 @@ define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], func
             if (plan && product) {
               const { planId, price, term, title, coverageType, offerId } = plan
               const { id: productId, price: listPrice } = product
-              const cartItems = customerData.get('cart')().items
-              console.log('modal closed, available data:', { plan }, { product }, { cartItems })
+              const magentoCartItems = customerData.get('cart')().items
+              console.log(
+                'modal closed, available data:',
+                { plan },
+                { product },
+                { magentoCartItems },
+              )
+              const cartItems = magentoCartItems.map(item => {
+                return {
+                  name: item.product_name,
+                  sku: item.product_sku,
+                  qty: item.qty,
+                  price: item.product_price_value * 100,
+                  item_id: item.product_id,
+                  options: [],
+                }
+              })
 
-              // ExtendMagento.upsertProductProtection({
-              //   plan: {
-              //     planId,
-              //     price,
-              //     term,
-              //     title,
-              //     coverageType,
-              //   },
-              //   cartItems: [],
-              //   productId,
-              //   listPrice,
-              //   offerId,
-              //   quantity: 1,
-              // })
+              ExtendMagento.upsertProductProtection({
+                plan: {
+                  planId,
+                  price,
+                  term,
+                  title,
+                  coverageType,
+                },
+                cartItems,
+                productId,
+                listPrice,
+                offerId,
+                quantity: 1,
+              })
             }
           },
         })
