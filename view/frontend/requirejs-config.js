@@ -7,6 +7,8 @@ var config = {
   map: {
     '*': {
       productProtectionOffer: 'Extend_Integration/js/view/catalog/product/product-protection-offer',
+      simpleProductProtectionOffer:
+        'Extend_Integration/js/view/cart/product-protection-simple-offer',
     },
   },
 }
