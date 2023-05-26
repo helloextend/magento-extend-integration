@@ -11,6 +11,7 @@ var config = {
         'Extend_Integration/js/view/catalog/product/product-protection-modal-offer',
       simpleProductProtectionOffer:
         'Extend_Integration/js/view/cart/product-protection-simple-offer',
+      extendConfig: 'Extend_Integration/js/view/extend-config',
     },
   },
 }
