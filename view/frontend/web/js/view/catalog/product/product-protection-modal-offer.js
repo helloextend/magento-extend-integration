@@ -23,7 +23,7 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
       if (addToCartButton) {
         addToCartButton.addEventListener('click', function (event) {
           // this button is of type submit so clicking it automatically submits the form, the form now gets submitted on modal close
-          event.preventDefault()
+          // event.preventDefault()
 
           Extend.modal.open({
             referenceId: productSku,
@@ -32,7 +32,7 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
             onClose: function (plan, product) {
               // TODO: [PAR-4187] Add add to cart functionality
               console.log('onClose invoked', { plan }, { product })
-              addToCartForm.submit()
+              // addToCartForm.submit()
             },
           })
         })
