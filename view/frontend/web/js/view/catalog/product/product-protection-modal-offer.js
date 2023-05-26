@@ -3,7 +3,12 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
+define([
+  'Magento_Customer/js/customer-data',
+  'Magento_Checkout/js/model/quote',
+  'extendSdk',
+  'ExtendMagento',
+], function (customerData, magentoQuote, Extend, ExtendMagento) {
   'use strict'
 
   return function (config, element) {
@@ -24,8 +29,34 @@ define(['extendSdk', 'ExtendMagento'], function (Extend, ExtendMagento) {
           price: config[0].productPrice * 100,
           category: config[0].productCategory,
           onClose: function (plan, product) {
-            // TODO: [PAR-4187] Add add to cart functionality
-            console.log('onClose invoked', { plan }, { product })
+            if (plan && product) {
+              const { planId, price, term, title, coverageType, offerId } = plan
+              const { id: productId, price: listPrice } = product
+              const cartItems = customerData.get('cart')().items
+              const totals = magentoQuote.getTotals()
+              console.log(
+                'modal closed, available data:',
+                { plan },
+                { product },
+                { cartItems },
+                { totals },
+              )
+
+              // ExtendMagento.upsertProductProtection({
+              //   plan: {
+              //     planId,
+              //     price,
+              //     term,
+              //     title,
+              //     coverageType,
+              //   },
+              //   cartItems: [],
+              //   productId,
+              //   listPrice,
+              //   offerId,
+              //   quantity: 1,
+              // })
+            }
           },
         })
       })
