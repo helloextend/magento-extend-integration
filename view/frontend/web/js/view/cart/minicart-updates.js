@@ -57,6 +57,7 @@ define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk
   }
 
   const addToCartSuccess = function () {
+    // TODO: Handle successful add to cart
     console.log('addToCartSuccess')
     customerData.reload(['cart'], false)
   }
@@ -66,8 +67,6 @@ define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk
       storeId: config[0].extendStoreUuid,
       environment: config[0].activeEnvironment,
     }
-    // eslint-disable-next-line no-console
-    console.log('Setting Extend config', extendConfig)
     Extend.config(extendConfig)
 
     $(minicartSelector).on('contentUpdated', handleUpdate)
