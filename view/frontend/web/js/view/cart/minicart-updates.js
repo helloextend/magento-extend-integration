@@ -2,9 +2,8 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
+define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
   $,
-  Component,
   customerData,
   Extend,
 ) {
@@ -24,17 +23,19 @@ define(['jquery', 'uiComponent', 'Magento_Customer/js/customer-data', 'extendSdk
 
         if (itemContainerElem) {
           const simpleOfferElemId = `extend-minicart-simple-offer-${cartItem.item_id}`
-          let simpleOfferElem = $(`#${simpleOfferElemId}`, itemContainerElem)
+          let simpleOfferElem = itemContainerElem.querySelector(`#${simpleOfferElemId}`)
 
-          if (simpleOfferElem.length) {
+          if (simpleOfferElem) {
             // TODO: If warranty already in cart, remove element
           } else {
             // TODO: If warranty already in cart, no need to render
 
-            simpleOfferElem = $('<div>').attr('id', simpleOfferElemId).addClass(simpleOfferClass)
-            const itemDetailsElem = $(itemDetailsSelector, itemContainerElem)
+            simpleOfferElem = document.createElement('div')
+            simpleOfferElem.setAttribute('id', simpleOfferElemId)
+            simpleOfferElem.setAttribute('class', simpleOfferClass)
+            const itemDetailsElem = itemContainerElem.querySelector(itemDetailsSelector)
 
-            if (itemDetailsElem.length) {
+            if (itemDetailsElem) {
               itemDetailsElem.append(simpleOfferElem)
               Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
                 referenceId: cartItem.product_sku,
