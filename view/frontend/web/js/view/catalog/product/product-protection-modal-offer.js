@@ -62,6 +62,10 @@ define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], func
                 listPrice,
                 offerId,
                 quantity: 1,
+              }).then(() => {
+                const sectionsToUpdate = ['cart']
+                customerData.invalidate(sectionsToUpdate)
+                customerData.reload(sectionsToUpdate, true)
               })
             }
           },
