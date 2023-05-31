@@ -1,0 +1,23 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+$viewModel = $block->getData('viewModel');
+$extendStoreUuid = $viewModel->getExtendStoreUuid();
+$activeEnvironment = $viewModel->getActiveEnvironment();
+?>
+
+<div id="extendMinicartSimpleOffer"></div>
+<script type="text/x-magento-init">
+    {
+        "#extendMinicartSimpleOffer": {
+            "minicartSimpleOffer": [
+               {
+                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                    "activeEnvironment": "<?= $activeEnvironment ?>"
+                }
+            ]
+        }
+    }
+</script>

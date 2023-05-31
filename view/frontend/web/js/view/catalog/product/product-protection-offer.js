@@ -6,9 +6,10 @@
 define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
 
+  // Get the chosen simple product based on the configurable options selected.
   function getActiveProductConfig() {
     const swatches = $('div.swatch-attribute', '.product-info-main')
-    let selectedSku = null
+    let selectedProductSku = null
     let selectedPrice = null
 
     if (swatches.length > 0) {
@@ -22,17 +23,17 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         if (selectedId && selectedId !== '') {
           selectedPrice =
             swatchRenderer.options.jsonConfig.optionPrices[selectedId].finalPrice.amount
-          selectedSku = swatchRenderer.options.jsonConfig.skus[selectedId]
+          selectedProductSku = swatchRenderer.options.jsonConfig.skus[selectedId]
         }
       }
-    } else if (this.options.isInProductView) {
+    } else {
       const spConfig = $('#product_addtocart_form').data('mageConfigurable').options.spConfig
       const selectedId = $('input[name=selected_configurable_option]', '.product-info-main').val()
       if (selectedId && selectedId !== '') {
-        selectedSku = spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
+        selectedProductSku = spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
       }
     }
-    return { selectedSku, selectedPrice }
+    return { selectedProductSku, selectedPrice }
   }
 
   return function (config, element) {
@@ -44,14 +45,14 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         category: config[key].productCategory,
       })
     }
-
+    // Listening for product options being chosen on configurable products.  Display offer once all required options are chosen.
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
       const buttonInstance = Extend.buttons.instance(
         '#product_protection_offer_' + config[0].selectedProductSku,
       )
       const activeProductData = {
-        referenceId: selectedProduct.selectedSku,
+        referenceId: selectedProduct.selectedProductSku,
         price: selectedProduct.selectedPrice * 100,
         category: config.productCategory,
       }
@@ -62,6 +63,32 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
           '#product_protection_offer_' + config[0].selectedProductSku,
           activeProductData,
         )
+      }
+    })
+    // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
+    document.getElementById('product-addtocart-button').addEventListener('click', function () {
+      let selectedProduct
+      const buttonInstance = Extend.buttons.instance(
+        '#product_protection_offer_' + config[0].selectedProductSku,
+      )
+      if (buttonInstance) {
+        const plan = buttonInstance.getPlanSelection()
+        if (!plan && config.length === 1) {
+          if (buttonInstance.getActiveProduct().id === config[0].selectedProductSku) {
+            selectedProduct = config[0]
+          } else {
+            selectedProduct = getActiveProductConfig()
+          }
+          Extend.modal.open({
+            referenceId: selectedProduct.selectedProductSku,
+            price: selectedProduct.selectedPrice * 100,
+            category: config.productCategory,
+            onClose: function (plan, product) {
+              // TODO: [PAR-4187] Add add to cart functionality
+              console.log('onClose invoked', { plan }, { product })
+            },
+          })
+        }
       }
     })
   }
