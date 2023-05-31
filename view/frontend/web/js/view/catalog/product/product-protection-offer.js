@@ -34,6 +34,16 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
     customerData.reload(sectionsToUpdate, true)
   }
 
+  const getProductQuantity = function () {
+    let quantity = 1
+
+    const quantityInput = document.querySelector('.input-text.qty')
+
+    if (quantityInput) quantity = parseInt(quantityInput.value)
+
+    return quantity
+  }
+
   // Get the chosen simple product based on the configurable options selected.
   function getActiveProductConfig() {
     const swatches = $('div.swatch-attribute', '.product-info-main')
@@ -124,6 +134,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
                   coverageType,
                 }
                 const cartItems = getCartItems()
+                const quantity = getProductQuantity()
 
                 ExtendMagento.upsertProductProtection({
                   plan: planToUpsert,
@@ -131,7 +142,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
                   productId,
                   listPrice,
                   offerId,
-                  quantity: 1,
+                  quantity,
                 }).then(refreshCart)
               }
             },
