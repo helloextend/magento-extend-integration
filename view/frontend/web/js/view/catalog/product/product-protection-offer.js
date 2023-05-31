@@ -6,6 +6,7 @@
 define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
   'use strict'
 
+  // Get the chosen simple product based on the configurable options selected.
   function getActiveProductConfig() {
     const swatches = $('div.swatch-attribute', '.product-info-main')
     let selectedProductSku = null
@@ -44,7 +45,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         category: config[key].productCategory,
       })
     }
-
+    // Listening for product options being chosen on configurable products.  Display offer once all required options are chosen.
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
       const buttonInstance = Extend.buttons.instance(
@@ -64,7 +65,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         )
       }
     })
-
+    // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
     document.getElementById('product-addtocart-button').addEventListener('click', function () {
       let selectedProduct
       const buttonInstance = Extend.buttons.instance(
