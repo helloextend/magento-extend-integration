@@ -71,22 +71,24 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
       const buttonInstance = Extend.buttons.instance(
         '#product_protection_offer_' + config[0].selectedProductSku,
       )
-      const plan = buttonInstance.getPlanSelection()
-      if (!plan && config.length === 1) {
-        if (buttonInstance.getActiveProduct().id === config[0].selectedProductSku) {
-          selectedProduct = config[0]
-        } else {
-          selectedProduct = getActiveProductConfig()
+      if (buttonInstance) {
+        const plan = buttonInstance.getPlanSelection()
+        if (!plan && config.length === 1) {
+          if (buttonInstance.getActiveProduct().id === config[0].selectedProductSku) {
+            selectedProduct = config[0]
+          } else {
+            selectedProduct = getActiveProductConfig()
+          }
+          Extend.modal.open({
+            referenceId: selectedProduct.selectedProductSku,
+            price: selectedProduct.selectedPrice * 100,
+            category: config.productCategory,
+            onClose: function (plan, product) {
+              // TODO: [PAR-4187] Add add to cart functionality
+              console.log('onClose invoked', { plan }, { product })
+            },
+          })
         }
-        Extend.modal.open({
-          referenceId: selectedProduct.selectedProductSku,
-          price: selectedProduct.selectedPrice * 100,
-          category: config.productCategory,
-          onClose: function (plan, product) {
-            // TODO: [PAR-4187] Add add to cart functionality
-            console.log('onClose invoked', { plan }, { product })
-          },
-        })
       }
     })
   }
