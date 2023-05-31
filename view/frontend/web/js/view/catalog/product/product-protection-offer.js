@@ -3,8 +3,36 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
+  $,
+  customerData,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
+
+  const getCartItems = function () {
+    const cartItems = customerData
+      .get('cart')()
+      .items?.map(item => {
+        return {
+          name: item.product_name,
+          sku: item.product_sku,
+          qty: item.qty,
+          price: item.product_price_value * 100,
+          item_id: item.product_id,
+          options: [],
+        }
+      })
+
+    return cartItems ?? []
+  }
+
+  const refreshCart = function () {
+    const sectionsToUpdate = ['cart']
+    customerData.invalidate(sectionsToUpdate)
+    customerData.reload(sectionsToUpdate, true)
+  }
 
   // Get the chosen simple product based on the configurable options selected.
   function getActiveProductConfig() {
@@ -84,8 +112,28 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
             price: selectedProduct.selectedPrice * 100,
             category: config.productCategory,
             onClose: function (plan, product) {
-              // TODO: [PAR-4187] Add add to cart functionality
-              console.log('onClose invoked', { plan }, { product })
+              if (plan && product) {
+                const { planId, price, term, title, coverageType, offerId } = plan
+                const { id: productId, price: listPrice } = product
+
+                const planToUpsert = {
+                  planId,
+                  price,
+                  term,
+                  title,
+                  coverageType,
+                }
+                const cartItems = getCartItems()
+
+                ExtendMagento.upsertProductProtection({
+                  plan: planToUpsert,
+                  cartItems,
+                  productId,
+                  listPrice,
+                  offerId,
+                  quantity: 1,
+                }).then(refreshCart)
+              }
             },
           })
         }
