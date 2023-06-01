@@ -83,7 +83,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         productId,
         listPrice,
         offerId,
-        quantity: quantity ?? getProductQuantity(cartItems, product) ?? 1,
+        quantity: quantity ?? getProductQuantity(cartItems, product),
       }).then(cartUtils.refreshMiniCart)
     }
   }
