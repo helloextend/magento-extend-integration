@@ -3,35 +3,8 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
-  customerData,
-  Extend,
-  ExtendMagento,
-) {
+define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
   'use strict'
-
-  const getCartItems = function () {
-    const cartItems = customerData
-      .get('cart')()
-      .items?.map(item => {
-        return {
-          name: item.product_name,
-          sku: item.product_sku,
-          qty: item.qty,
-          price: item.product_price_value * 100,
-          item_id: item.product_id,
-          options: [],
-        }
-      })
-
-    return cartItems ?? []
-  }
-
-  const refreshCart = function () {
-    const sectionsToUpdate = ['cart']
-    customerData.invalidate(sectionsToUpdate)
-    customerData.reload(sectionsToUpdate, true)
-  }
 
   const handleAddToCartClick = function (opts) {
     const { plan, product, quantity } = opts
@@ -47,7 +20,7 @@ define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], func
         title,
         coverageType,
       }
-      const cartItems = getCartItems()
+      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
 
       ExtendMagento.upsertProductProtection({
         plan: planToUpsert,
@@ -56,11 +29,11 @@ define(['Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], func
         listPrice,
         offerId,
         quantity: quantity ?? 1,
-      }).then(refreshCart)
+      }).then(cartUtils.refreshMiniCart)
     }
   }
 
-  return function (config, element) {
+  return function (config) {
     const activeProductData = {
       referenceId: config[0].selectedProductSku,
       price: config[0].selectedProductPrice * 100,
