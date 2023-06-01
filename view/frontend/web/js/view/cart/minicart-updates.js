@@ -2,10 +2,11 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
+define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
   $,
   customerData,
   Extend,
+  ExtendMagento,
 ) {
   'use strict'
   const minicartSelector = '[data-block="minicart"]'
@@ -51,16 +52,63 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
     })
   }
 
-  const addToCart = function (opts) {
-    // TODO: Handle adding to cart
-    console.log('addToCart', opts)
-    addToCartSuccess()
+  const getCartItems = function () {
+    const cartItems = customerData
+      .get('cart')()
+      .items?.map(item => {
+        return {
+          name: item.product_name,
+          sku: item.product_sku,
+          qty: item.qty,
+          price: item.product_price_value * 100,
+          item_id: item.product_id,
+          options: [],
+        }
+      })
+
+    return cartItems ?? []
   }
 
-  const addToCartSuccess = function () {
-    // TODO: Handle successful add to cart
-    console.log('addToCartSuccess')
-    customerData.reload(['cart'], false)
+  const refreshCart = function () {
+    const sectionsToUpdate = ['cart']
+    customerData.invalidate(sectionsToUpdate)
+    customerData.reload(sectionsToUpdate, true)
+  }
+
+  const getProductQuantity = function (cartItems, product) {
+    let quantity = 1
+
+    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    if (matchedCartItem) quantity = matchedCartItem.qty
+
+    return quantity
+  }
+
+  const addToCart = function (opts) {
+    const { plan, product, quantity } = opts
+
+    if (plan && product) {
+      const { planId, price, term, title, coverageType, offerId } = plan
+      const { id: productId, price: listPrice } = product
+
+      const planToUpsert = {
+        planId,
+        price,
+        term,
+        title,
+        coverageType,
+      }
+      const cartItems = getCartItems()
+
+      ExtendMagento.upsertProductProtection({
+        plan: planToUpsert,
+        cartItems,
+        productId,
+        listPrice,
+        offerId,
+        quantity: quantity ?? getProductQuantity(cartItems, product) ?? 1,
+      }).then(refreshCart)
+    }
   }
 
   return function (config) {
