@@ -3,36 +3,13 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
+define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   $,
-  customerData,
+  cartUtils,
   Extend,
   ExtendMagento,
 ) {
   'use strict'
-
-  const getCartItems = function () {
-    const cartItems = customerData
-      .get('cart')()
-      .items?.map(item => {
-        return {
-          name: item.product_name,
-          sku: item.product_sku,
-          qty: item.qty,
-          price: item.product_price_value * 100,
-          item_id: item.product_id,
-          options: [],
-        }
-      })
-
-    return cartItems ?? []
-  }
-
-  const refreshCart = function () {
-    const sectionsToUpdate = ['cart']
-    customerData.invalidate(sectionsToUpdate)
-    customerData.reload(sectionsToUpdate, true)
-  }
 
   const getProductQuantity = function () {
     let quantity = 1
@@ -74,7 +51,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
     return { selectedProductSku, selectedPrice }
   }
 
-  return function (config, element) {
+  return function (config) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
     for (let key in config) {
       Extend.buttons.render('#product_protection_offer_' + config[key].selectedProductSku, {
@@ -133,7 +110,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
                   title,
                   coverageType,
                 }
-                const cartItems = getCartItems()
+                const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
                 const quantity = getProductQuantity()
 
                 ExtendMagento.upsertProductProtection({
@@ -143,7 +120,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
                   listPrice,
                   offerId,
                   quantity,
-                }).then(refreshCart)
+                }).then(cartUtils.refreshMiniCart)
               }
             },
           })
