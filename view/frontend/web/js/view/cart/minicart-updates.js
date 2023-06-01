@@ -2,9 +2,9 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagento'], function (
+define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   $,
-  customerData,
+  cartUtils,
   Extend,
   ExtendMagento,
 ) {
@@ -15,7 +15,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
   const handleUpdate = function () {
-    const cartItems = customerData.get('cart')().items
+    const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
       const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
@@ -52,29 +52,6 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
     })
   }
 
-  const getCartItems = function () {
-    const cartItems = customerData
-      .get('cart')()
-      .items?.map(item => {
-        return {
-          name: item.product_name,
-          sku: item.product_sku,
-          qty: item.qty,
-          price: item.product_price_value * 100,
-          item_id: item.product_id,
-          options: [],
-        }
-      })
-
-    return cartItems ?? []
-  }
-
-  const refreshCart = function () {
-    const sectionsToUpdate = ['cart']
-    customerData.invalidate(sectionsToUpdate)
-    customerData.reload(sectionsToUpdate, true)
-  }
-
   const getProductQuantity = function (cartItems, product) {
     let quantity = 1
 
@@ -98,7 +75,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
         title,
         coverageType,
       }
-      const cartItems = getCartItems()
+      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
 
       ExtendMagento.upsertProductProtection({
         plan: planToUpsert,
@@ -107,7 +84,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk', 'ExtendMagen
         listPrice,
         offerId,
         quantity: quantity ?? getProductQuantity(cartItems, product) ?? 1,
-      }).then(refreshCart)
+      }).then(cartUtils.refreshMiniCart)
     }
   }
 
