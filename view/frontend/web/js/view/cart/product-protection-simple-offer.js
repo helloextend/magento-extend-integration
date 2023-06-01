@@ -6,6 +6,15 @@
 define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
   'use strict'
 
+  const getProductQuantity = function (cartItems, product) {
+    let quantity = 1
+
+    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    if (matchedCartItem) quantity = matchedCartItem.qty
+
+    return quantity
+  }
+
   const handleAddToCartClick = function (opts) {
     const { plan, product, quantity } = opts
 
@@ -28,7 +37,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
         productId,
         listPrice,
         offerId,
-        quantity: quantity ?? 1,
+        quantity: quantity ?? getProductQuantity(cartItems, product),
       }).then(cartUtils.refreshMiniCart)
     }
   }
