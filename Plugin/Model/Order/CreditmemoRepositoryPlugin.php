@@ -8,6 +8,8 @@ namespace Extend\Integration\Plugin\Model\Order;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Api\OrderObserverHandler;
 use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 use Extend\Integration\Model\ShippingProtectionFactory;
@@ -24,15 +26,18 @@ class CreditmemoRepositoryPlugin
      */
     private \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory;
     private ShippingProtectionFactory $shippingProtectionFactory;
+    private OrderObserverHandler $orderObserverHandler;
 
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         \Magento\Sales\Api\Data\CreditmemoExtensionFactory $creditmemoExtensionFactory,
-        ShippingProtectionFactory $shippingProtectionFactory
-    ){
+        ShippingProtectionFactory $shippingProtectionFactory,
+        OrderObserverHandler $orderObserverHandler
+    ) {
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
+        $this->orderObserverHandler = $orderObserverHandler;
     }
 
     /**
@@ -43,8 +48,11 @@ class CreditmemoRepositoryPlugin
      * @param $creditMemoId
      * @return mixed
      */
-    public function afterGet(\Magento\Sales\Model\Order\CreditmemoRepository $subject, $result, $creditMemoId)
-    {
+    public function afterGet(
+        \Magento\Sales\Model\Order\CreditmemoRepository $subject,
+        $result,
+        $creditMemoId
+    ) {
         $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
             $creditMemoId,
             ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
@@ -62,8 +70,11 @@ class CreditmemoRepositoryPlugin
      * @param $creditMemo
      * @return mixed
      */
-    public function afterSave(\Magento\Sales\Model\Order\CreditmemoRepository $subject, $result, $creditMemo)
-    {
+    public function afterSave(
+        \Magento\Sales\Model\Order\CreditmemoRepository $subject,
+        $result,
+        $creditMemo
+    ) {
         $extensionAttributes = $creditMemo->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->creditmemoExtensionFactory->create();
@@ -77,6 +88,15 @@ class CreditmemoRepositoryPlugin
                 ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID
             );
         }
+        $this->orderObserverHandler->execute(
+            [
+                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'],
+                'type' => 'middleware',
+            ],
+            $result->getOrder(),
+            ['credit_memo_id' => $creditMemo->getId()]
+        );
+
         return $result;
     }
 }
