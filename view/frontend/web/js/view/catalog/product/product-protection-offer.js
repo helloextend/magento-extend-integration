@@ -3,8 +3,23 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
+  $,
+  cartUtils,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
+
+  const getProductQuantity = function () {
+    let quantity = 1
+
+    const quantityInput = document.querySelector('.input-text.qty')
+
+    if (quantityInput) quantity = parseInt(quantityInput.value)
+
+    return quantity
+  }
 
   // Get the chosen simple product based on the configurable options selected.
   function getActiveProductConfig() {
@@ -27,7 +42,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         }
       }
     } else {
-      const spConfig = $('#product_addtocart_form').data('mageConfigurable').options.spConfig
+      const spConfig = $('#product_addtocart_form').data('mageConfigurable')?.options?.spConfig
       const selectedId = $('input[name=selected_configurable_option]', '.product-info-main').val()
       if (selectedId && selectedId !== '') {
         selectedProductSku = spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
@@ -36,8 +51,9 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
     return { selectedProductSku, selectedPrice }
   }
 
-  return function (config, element) {
+  return function (config) {
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+
     for (let key in config) {
       Extend.buttons.render('#product_protection_offer_' + config[key].selectedProductSku, {
         referenceId: config[key].selectedProductSku,
@@ -45,6 +61,7 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         category: config[key].productCategory,
       })
     }
+
     // Listening for product options being chosen on configurable products.  Display offer once all required options are chosen.
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
@@ -65,29 +82,80 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         )
       }
     })
+
     // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
     document.getElementById('product-addtocart-button').addEventListener('click', function () {
-      let selectedProduct
       const buttonInstance = Extend.buttons.instance(
         '#product_protection_offer_' + config[0].selectedProductSku,
       )
+
       if (buttonInstance) {
-        const plan = buttonInstance.getPlanSelection()
-        if (!plan && config.length === 1) {
+        if (config.length === 1) {
+          let selectedProduct
+
           if (buttonInstance.getActiveProduct().id === config[0].selectedProductSku) {
             selectedProduct = config[0]
           } else {
             selectedProduct = getActiveProductConfig()
           }
-          Extend.modal.open({
-            referenceId: selectedProduct.selectedProductSku,
-            price: selectedProduct.selectedPrice * 100,
-            category: config.productCategory,
-            onClose: function (plan, product) {
-              // TODO: [PAR-4187] Add add to cart functionality
-              console.log('onClose invoked', { plan }, { product })
-            },
-          })
+
+          const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
+          const quantity = getProductQuantity()
+
+          const selectedPlan = buttonInstance.getPlanSelection()
+
+          // If a plan is selected, add it to the cart
+          if (selectedPlan) {
+            const { planId, price, term, title, coverageType, offerId } = selectedPlan
+            const { selectedProductSku: productId, selectedPrice: listPrice } = selectedProduct
+
+            const planToUpsert = {
+              planId,
+              price,
+              term,
+              title,
+              coverageType,
+            }
+
+            ExtendMagento.upsertProductProtection({
+              plan: planToUpsert,
+              cartItems,
+              productId,
+              listPrice,
+              offerId,
+              quantity,
+            }).then(cartUtils.refreshMiniCart)
+            // If no plan is selected, open the offer modal
+          } else {
+            Extend.modal.open({
+              referenceId: selectedProduct.selectedProductSku,
+              price: selectedProduct.selectedPrice * 100,
+              category: config.productCategory,
+              onClose: function (plan, product) {
+                if (plan && product) {
+                  const { planId, price, term, title, coverageType, offerId } = plan
+                  const { id: productId, price: listPrice } = product
+
+                  const planToUpsert = {
+                    planId,
+                    price,
+                    term,
+                    title,
+                    coverageType,
+                  }
+
+                  ExtendMagento.upsertProductProtection({
+                    plan: planToUpsert,
+                    cartItems,
+                    productId,
+                    listPrice,
+                    offerId,
+                    quantity,
+                  }).then(cartUtils.refreshMiniCart)
+                }
+              },
+            })
+          }
         }
       }
     })

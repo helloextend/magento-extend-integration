@@ -3,17 +3,51 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMagento) {
+define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
   'use strict'
 
-  return function (config, element) {
+  const getProductQuantity = function (cartItems, product) {
+    let quantity = 1
+
+    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    if (matchedCartItem) quantity = matchedCartItem.qty
+
+    return quantity
+  }
+
+  const handleAddToCartClick = function (opts) {
+    const { plan, product, quantity } = opts
+
+    if (plan && product) {
+      const { planId, price, term, title, coverageType, offerId } = plan
+      const { id: productId, price: listPrice } = product
+
+      const planToUpsert = {
+        planId,
+        price,
+        term,
+        title,
+        coverageType,
+      }
+      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
+
+      ExtendMagento.upsertProductProtection({
+        plan: planToUpsert,
+        cartItems,
+        productId,
+        listPrice,
+        offerId,
+        quantity: quantity ?? getProductQuantity(cartItems, product),
+      }).then(cartUtils.refreshMiniCart)
+    }
+  }
+
+  return function (config) {
     const activeProductData = {
       referenceId: config[0].selectedProductSku,
       price: config[0].selectedProductPrice * 100,
       category: config[0].productCategory,
-      onAddToCart: function (opts) {
-        console.log('onAddToCart invoked', opts)
-      },
+      onAddToCart: handleAddToCartClick,
     }
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
     Extend.buttons.renderSimpleOffer(

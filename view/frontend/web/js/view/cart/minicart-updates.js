@@ -2,10 +2,11 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
+define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   $,
-  customerData,
+  cartUtils,
   Extend,
+  ExtendMagento,
 ) {
   'use strict'
   const minicartSelector = '[data-block="minicart"]'
@@ -14,7 +15,7 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
   const handleUpdate = function () {
-    const cartItems = customerData.get('cart')().items
+    const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
       const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
@@ -51,16 +52,40 @@ define(['jquery', 'Magento_Customer/js/customer-data', 'extendSdk'], function (
     })
   }
 
-  const addToCart = function (opts) {
-    // TODO: Handle adding to cart
-    console.log('addToCart', opts)
-    addToCartSuccess()
+  const getProductQuantity = function (cartItems, product) {
+    let quantity = 1
+
+    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    if (matchedCartItem) quantity = matchedCartItem.qty
+
+    return quantity
   }
 
-  const addToCartSuccess = function () {
-    // TODO: Handle successful add to cart
-    console.log('addToCartSuccess')
-    customerData.reload(['cart'], false)
+  const addToCart = function (opts) {
+    const { plan, product, quantity } = opts
+
+    if (plan && product) {
+      const { planId, price, term, title, coverageType, offerId } = plan
+      const { id: productId, price: listPrice } = product
+
+      const planToUpsert = {
+        planId,
+        price,
+        term,
+        title,
+        coverageType,
+      }
+      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
+
+      ExtendMagento.upsertProductProtection({
+        plan: planToUpsert,
+        cartItems,
+        productId,
+        listPrice,
+        offerId,
+        quantity: quantity ?? getProductQuantity(cartItems, product),
+      }).then(cartUtils.refreshMiniCart)
+    }
   }
 
   return function (config) {
