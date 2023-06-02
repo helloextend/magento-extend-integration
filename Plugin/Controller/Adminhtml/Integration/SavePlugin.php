@@ -99,37 +99,41 @@ class SavePlugin
     public function aroundExecute(Save $subject, callable $proceed)
     {
         $postData = $subject->getRequest()->getPostValue();
-        $integration = $this->integrationService->get(
-            $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
-        );
-        if (isset($postData['integration_stores'])) {
-            $integrationStoresIds = (array) $postData['integration_stores'];
-            $this->disableAllStoreAssociations(
+        if ($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)) {
+            $integration = $this->integrationService->get(
                 $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
             );
-            foreach ($integrationStoresIds as $integrationStoreId) {
-                $this->integrationStoresRepository->saveStoreToIntegration(
-                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStoreId
+            if (isset($postData['integration_stores'])) {
+                $integrationStoresIds = (array) $postData['integration_stores'];
+                $this->disableAllStoreAssociations(
+                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
                 );
-                $this->sendIntegrationToExtend(
-                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                    $integrationStoreId
+                foreach ($integrationStoresIds as $integrationStoreId) {
+                    $this->integrationStoresRepository->saveStoreToIntegration(
+                        $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                        $integrationStoreId
+                    );
+                    $this->sendIntegrationToExtend(
+                        $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
+                        $integrationStoreId
+                    );
+                }
+                $this->messageManager->addSuccessMessage(
+                    __('Your selected stores were saved to the Extend Integration.')
                 );
-            }
-            $this->messageManager->addSuccessMessage(
-                __('Your selected stores were saved to the Extend Integration.')
-            );
-            if ((int) $integration->getSetupType() === 0) {
-                $proceed();
-            } else {
+                if ((int) $integration->getSetupType() === 0) {
+                    $proceed();
+                } else {
+                    $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
+                }
+            } elseif ((int) $integration->getSetupType() === 1) {
+                $this->messageManager->addSuccessMessage(
+                    __('No additional stores were saved to the Extend Integration.')
+                );
                 $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
+            } else {
+                $proceed();
             }
-        } elseif ((int) $integration->getSetupType() === 1) {
-            $this->messageManager->addSuccessMessage(
-                __('No additional stores were saved to the Extend Integration.')
-            );
-            $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
         } else {
             $proceed();
         }
