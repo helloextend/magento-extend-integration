@@ -104,8 +104,29 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
           const selectedPlan = buttonInstance.getPlanSelection()
 
-          // If no plan is selected, open the offer modal
-          if (!selectedPlan) {
+          // If a plan is selected, add it to the cart
+          if (selectedPlan) {
+            const { planId, price, term, title, coverageType, offerId } = selectedPlan
+            const { selectedProductSku: productId, selectedPrice: listPrice } = selectedProduct
+
+            const planToUpsert = {
+              planId,
+              price,
+              term,
+              title,
+              coverageType,
+            }
+
+            ExtendMagento.upsertProductProtection({
+              plan: planToUpsert,
+              cartItems,
+              productId,
+              listPrice,
+              offerId,
+              quantity,
+            }).then(cartUtils.refreshMiniCart)
+            // If no plan is selected, open the offer modal
+          } else {
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
               price: selectedProduct.selectedPrice * 100,
@@ -134,27 +155,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
                 }
               },
             })
-            // If a plan is selected, add it to the cart
-          } else {
-            const { planId, price, term, title, coverageType, offerId } = selectedPlan
-            const { selectedProductSku: productId, selectedPrice: listPrice } = selectedProduct
-
-            const planToUpsert = {
-              planId,
-              price,
-              term,
-              title,
-              coverageType,
-            }
-
-            ExtendMagento.upsertProductProtection({
-              plan: planToUpsert,
-              cartItems,
-              productId,
-              listPrice,
-              offerId,
-              quantity,
-            }).then(cartUtils.refreshMiniCart)
           }
         }
       }
