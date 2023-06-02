@@ -12,20 +12,15 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order;
 use Psr\log\LoggerInterface;
 
-class OrderObserverHandler extends BaseObserverHandler {
-
+class OrderObserverHandler extends BaseObserverHandler
+{
     public function __construct(
         LoggerInterface $logger,
         Integration $integration,
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder
-    ){
-        parent::__construct(
-            $logger,
-            $integration,
-            $storeManager,
-            $metadataBuilder
-        );
+    ) {
+        parent::__construct($logger, $integration, $storeManager, $metadataBuilder);
     }
 
     /**
@@ -43,20 +38,26 @@ class OrderObserverHandler extends BaseObserverHandler {
             $orderArray = [
                 'order_id' => $orderId,
                 'order_status' => $orderStatus,
-                'additional_fields' => $additionalFields
+                'additional_fields' => $additionalFields,
             ];
 
-            [$headers, $body] = $this->metadataBuilder->execute([$order->getStoreId()], $integrationEndpoint, $orderArray);
-
-            $this->integration->execute(
+            [$headers, $body] = $this->metadataBuilder->execute(
+                [$order->getStoreId()],
                 $integrationEndpoint,
-                $body,
-                $headers
+                $orderArray
             );
+
+            $this->integration->execute($integrationEndpoint, $body, $headers);
         } catch (\Exception $exception) {
             // silently handle errors
-            $this->logger->error('Extend Order Observer encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            $this->logger->error(
+                'Extend Order Observer encountered the following error: ' . $exception->getMessage()
+            );
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error'
+            );
         }
     }
 }

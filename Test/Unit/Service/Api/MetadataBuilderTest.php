@@ -15,7 +15,8 @@ use Extend\Integration\Service\Api\MetadataBuilder;
 use Magento\Framework\App\ProductMetadataInterface;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
 
-class MetadataBuilderTest extends TestCase {
+class MetadataBuilderTest extends TestCase
+{
     private IdentityService $identityService;
     private StoreIntegrationInterface $storeIntegration;
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
@@ -34,17 +35,23 @@ class MetadataBuilderTest extends TestCase {
             ->onlyMethods(['generateId'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->identityService->expects($this->any())->method('generateId')->willReturn($this->generatedUUIDMock);
+        $this->identityService
+            ->expects($this->any())
+            ->method('generateId')
+            ->willReturn($this->generatedUUIDMock);
 
         $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
             ->onlyMethods(['getStoreUuid'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->storeIntegrationRepository = $this->getMockBuilder(StoreIntegrationRepositoryInterface::class)
+        $this->storeIntegrationRepository = $this->getMockBuilder(
+            StoreIntegrationRepositoryInterface::class
+        )
             ->onlyMethods(['getByStoreIdAndActiveEnvironment', 'getListByIntegration'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->storeIntegrationRepository->expects($this->any())
+        $this->storeIntegrationRepository
+            ->expects($this->any())
             ->method('getByStoreIdAndActiveEnvironment')
             ->with($this->magentoStoreIdMocks[0])
             ->willReturn($this->storeIntegration);
@@ -57,7 +64,7 @@ class MetadataBuilderTest extends TestCase {
             ->expects($this->any())
             ->method('getAccessToken')
             ->willReturn($this->extendAccessToken);
-        
+
         $this->productMetadata = $this->getMockBuilder(ProductMetadataInterface::class)
             ->onlyMethods(['getVersion'])
             ->disableOriginalConstructor()
@@ -66,17 +73,14 @@ class MetadataBuilderTest extends TestCase {
             ->expects($this->any())
             ->method('getVersion')
             ->willReturn($this->magentoVersion);
-    
+
         $this->objectManager = new ObjectManager($this);
-        $this->metadataBuilder = $this->objectManager->getObject(
-            MetadataBuilder::class,
-            [
-                'identityService' => $this->identityService,
-                'storeIntegrationRepository' => $this->storeIntegrationRepository,
-                'productMetadata' => $this->productMetadata,
-                'accessTokenBuilder' => $this->accessTokenBuilder,
-            ]
-        );
+        $this->metadataBuilder = $this->objectManager->getObject(MetadataBuilder::class, [
+            'identityService' => $this->identityService,
+            'storeIntegrationRepository' => $this->storeIntegrationRepository,
+            'productMetadata' => $this->productMetadata,
+            'accessTokenBuilder' => $this->accessTokenBuilder,
+        ]);
     }
 
     public function testExecutesMetadataBuilder(): void
@@ -86,7 +90,7 @@ class MetadataBuilderTest extends TestCase {
             'path' => '/webhooks/' . $topic,
         ];
         $data = [
-            'key' => 'value'
+            'key' => 'value',
         ];
 
         $expectedHeaders = [
@@ -97,7 +101,7 @@ class MetadataBuilderTest extends TestCase {
         $expectedBody = [
             'webhook_id' => $this->generatedUUIDMock,
             'topic' => $topic,
-            'data' => $data
+            'data' => $data,
         ];
 
         [$actualHeaders, $actualBody] = $this->metadataBuilder->execute(
@@ -106,9 +110,15 @@ class MetadataBuilderTest extends TestCase {
             $data
         );
 
-        $this->assertEquals($expectedHeaders['X-Extend-Access-Token'], $actualHeaders['X-Extend-Access-Token']);
+        $this->assertEquals(
+            $expectedHeaders['X-Extend-Access-Token'],
+            $actualHeaders['X-Extend-Access-Token']
+        );
         $this->assertEquals($expectedHeaders['Content-Type'], $actualHeaders['Content-Type']);
-        $this->assertEquals($expectedHeaders['X-Magento-Version'], $actualHeaders['X-Magento-Version']);
+        $this->assertEquals(
+            $expectedHeaders['X-Magento-Version'],
+            $actualHeaders['X-Magento-Version']
+        );
         $this->assertEquals($expectedBody['webhook_id'], $actualBody['webhook_id']);
         $this->assertEquals($expectedBody['topic'], $actualBody['topic']);
         $this->assertEquals($expectedBody['data'], $actualBody['data']);

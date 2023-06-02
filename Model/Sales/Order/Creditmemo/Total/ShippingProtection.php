@@ -19,7 +19,7 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         ShippingProtectionFactory $shippingProtectionFactory
-    ){
+    ) {
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
     }
@@ -33,16 +33,17 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
      */
     public function collect(Creditmemo $creditmemo): ShippingProtection
     {
-
         // Check for credit memos which have already refunded shipping protection
-
 
         if ($shippingProtection = $creditmemo->getExtensionAttributes()->getShippingProtection()) {
             $shippingProtectionBasePrice = $shippingProtection->getBase();
             $shippingProtectionPrice = $shippingProtection->getPrice();
 
             $existingCreditMemoCount = 0;
-            $existingCreditMemos = $creditmemo->getOrder()->getCreditmemosCollection()->getItems();
+            $existingCreditMemos = $creditmemo
+                ->getOrder()
+                ->getCreditmemosCollection()
+                ->getItems();
             if ($existingCreditMemos) {
                 foreach ($existingCreditMemos as $existingCreditMemo) {
                     if (
@@ -51,7 +52,10 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
                             \Extend\Integration\Api\Data\ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID
                         )
                     ) {
-                        if ($shippingProtectionEntity->getData() && $shippingProtectionEntity->getShippingProtectionPrice() > 0) {
+                        if (
+                            $shippingProtectionEntity->getData() &&
+                            $shippingProtectionEntity->getShippingProtectionPrice() > 0
+                        ) {
                             $existingCreditMemoCount = 1;
                             break;
                         }
@@ -59,11 +63,18 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
                 }
             }
 
-            if (count($creditmemo->getOrder()->getShipmentsCollection()) === 0 && $existingCreditMemoCount === 0) {
+            if (
+                count($creditmemo->getOrder()->getShipmentsCollection()) === 0 &&
+                $existingCreditMemoCount === 0
+            ) {
                 $creditmemo->setBaseShippingProtection($shippingProtectionBasePrice);
                 $creditmemo->setShippingProtection($shippingProtectionPrice);
-                $creditmemo->setGrandTotal($creditmemo->getGrandTotal() + $creditmemo->getShippingProtection());
-                $creditmemo->setBaseGrandTotal($creditmemo->getBaseGrandTotal() + $creditmemo->getBaseShippingProtection());
+                $creditmemo->setGrandTotal(
+                    $creditmemo->getGrandTotal() + $creditmemo->getShippingProtection()
+                );
+                $creditmemo->setBaseGrandTotal(
+                    $creditmemo->getBaseGrandTotal() + $creditmemo->getBaseShippingProtection()
+                );
             } else {
                 $this->zeroOutShippingProtection($creditmemo, $shippingProtection);
             }
@@ -81,16 +92,18 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
      * @param ShippingProtectionInterface $shippingProtection
      * @return void
      */
-    private function zeroOutShippingProtection(Creditmemo $creditmemo, ShippingProtectionInterface $shippingProtectionTotal)
-    {
-        $creditmemo->setBaseShippingProtection(0.00);
-        $creditmemo->setShippingProtection(0.00);
+    private function zeroOutShippingProtection(
+        Creditmemo $creditmemo,
+        ShippingProtectionInterface $shippingProtectionTotal
+    ) {
+        $creditmemo->setBaseShippingProtection(0.0);
+        $creditmemo->setShippingProtection(0.0);
 
         $shippingProtection = $this->shippingProtectionFactory->create();
 
-        $shippingProtection->setBase(0.00);
+        $shippingProtection->setBase(0.0);
         $shippingProtection->setBaseCurrency($shippingProtectionTotal->getBaseCurrency());
-        $shippingProtection->setPrice(0.00);
+        $shippingProtection->setPrice(0.0);
         $shippingProtection->setCurrency($shippingProtectionTotal->getCurrency());
         $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
 

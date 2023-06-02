@@ -8,7 +8,6 @@ namespace Extend\Integration\Model\ResourceModel\StoreIntegration;
 
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
-
     /**
      * @var string
      */
@@ -19,7 +18,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('Extend\Integration\Model\StoreIntegration', 'Extend\Integration\Model\ResourceModel\StoreIntegration');
+        $this->_init(
+            'Extend\Integration\Model\StoreIntegration',
+            'Extend\Integration\Model\ResourceModel\StoreIntegration'
+        );
     }
-
 }

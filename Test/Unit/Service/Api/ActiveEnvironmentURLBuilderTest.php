@@ -14,7 +14,8 @@ use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 
-class ActiveEnvironmentURLBuilderTest extends TestCase {
+class ActiveEnvironmentURLBuilderTest extends TestCase
+{
     private ScopeConfigInterface $scopeConfig;
     private LoggerInterface $logger;
     private IntegrationServiceInterface $integrationService;
@@ -30,7 +31,8 @@ class ActiveEnvironmentURLBuilderTest extends TestCase {
 
     protected function setUp(): void
     {
-        $this->lowerEnvIntegrationEndpoint = $this->lowerEnvironmentIntegrationBaseURL . '/auth/start';
+        $this->lowerEnvIntegrationEndpoint =
+            $this->lowerEnvironmentIntegrationBaseURL . '/auth/start';
         $this->prodIntegrationEndpoint = $this->prodIntegrationBaseURL . '/auth/start';
         $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
             ->onlyMethods(['getValue'])
@@ -67,7 +69,7 @@ class ActiveEnvironmentURLBuilderTest extends TestCase {
             [
                 'scopeConfig' => $this->scopeConfig,
                 'logger' => $this->logger,
-                'integrationService' => $this->integrationService 
+                'integrationService' => $this->integrationService,
             ]
         );
     }

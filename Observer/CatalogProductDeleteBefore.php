@@ -15,56 +15,66 @@ use Psr\Log\LoggerInterface;
 
 class CatalogProductDeleteBefore implements ObserverInterface
 {
-  /**
-   * @var LoggerInterface
-   */
-  private $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-  /**
-   * @var ProductObserverHandler
-   */
-  private $productObserverHandler;
+    /**
+     * @var ProductObserverHandler
+     */
+    private $productObserverHandler;
 
-  /**
-   * @var Integration
-   */
-  private $integration;
+    /**
+     * @var Integration
+     */
+    private $integration;
 
-  /**
-   * @var StoreManagerInterface
-   */
-  private $storeManager;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
-  public function __construct(
-    LoggerInterface $logger,
-    ProductObserverHandler $productObserverHandler,
-    Integration $integration,
-    StoreManagerInterface $storeManager
-  ) {
-    $this->logger = $logger;
-    $this->productObserverHandler = $productObserverHandler;
-    $this->integration = $integration;
-    $this->storeManager = $storeManager;
-  }
-
-  /**
-   * @param Observer $observer
-   * @return void
-   */
-  public function execute(Observer $observer)
-  {
-    try {
-      $product = $observer->getEvent()->getProduct();
-
-      $this->productObserverHandler->execute(
-        ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'], 'type' => 'middleware'],
-        $product,
-        []
-      );
-    } catch (\Exception $exception) {
-      // silently handle errors
-      $this->logger->error('Extend Order Observer Handler encountered the following error: ' . $exception->getMessage());
-      $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+    public function __construct(
+        LoggerInterface $logger,
+        ProductObserverHandler $productObserverHandler,
+        Integration $integration,
+        StoreManagerInterface $storeManager
+    ) {
+        $this->logger = $logger;
+        $this->productObserverHandler = $productObserverHandler;
+        $this->integration = $integration;
+        $this->storeManager = $storeManager;
     }
-  }
+
+    /**
+     * @param Observer $observer
+     * @return void
+     */
+    public function execute(Observer $observer)
+    {
+        try {
+            $product = $observer->getEvent()->getProduct();
+
+            $this->productObserverHandler->execute(
+                [
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_delete'],
+                    'type' => 'middleware',
+                ],
+                $product,
+                []
+            );
+        } catch (\Exception $exception) {
+            // silently handle errors
+            $this->logger->error(
+                'Extend Order Observer Handler encountered the following error: ' .
+                    $exception->getMessage()
+            );
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error'
+            );
+        }
+    }
 }

@@ -11,10 +11,9 @@ class Environment implements \Magento\Framework\Data\OptionSourceInterface
 
     public function __construct(
         \Magento\Integration\Model\ResourceModel\Integration\CollectionFactory $collectionFactory
-    ){
+    ) {
         $this->collectionFactory = $collectionFactory;
     }
-
 
     /**
      * {@inheritdoc}
