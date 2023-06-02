@@ -104,6 +104,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
           const selectedPlan = buttonInstance.getPlanSelection()
 
+          // If no plan is selected, open the offer modal
           if (!selectedPlan) {
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
@@ -133,6 +134,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
                 }
               },
             })
+            // If a plan is selected, add it to the cart
           } else {
             const { planId, price, term, title, coverageType, offerId } = selectedPlan
             const { selectedProductSku: productId, selectedPrice: listPrice } = selectedProduct
