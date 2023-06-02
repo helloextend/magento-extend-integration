@@ -65,15 +65,12 @@ define(['jquery', 'extendSdk', 'ExtendMagento'], function ($, Extend, ExtendMage
         )
       }
     })
-
     // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
-
     document.getElementById('product-addtocart-button').addEventListener('click', function () {
       let selectedProduct
       const buttonInstance = Extend.buttons.instance(
         '#product_protection_offer_' + config[0].selectedProductSku,
       )
-
       if (buttonInstance) {
         const plan = buttonInstance.getPlanSelection()
         if (!plan && config.length === 1) {
