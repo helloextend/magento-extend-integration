@@ -183,7 +183,7 @@ class ProductProtection implements ProductProtectionInterface
                     ->setIsSuperMode(true);
             }
 
-            $options = $this->createOptions($product, $item, [
+            $optionValues = [
                 'Plan Type' => $coverageType,
                 'Term' => $term,
                 'List Price' => $listPrice,
@@ -191,7 +191,13 @@ class ProductProtection implements ProductProtectionInterface
                 'Lead Token' => $leadToken,
                 'Associated Product' => $productId,
                 'Plan ID' => $planId,
-            ]);
+            ];
+
+            if (isset($leadToken) && !isset($cartItemId)) {
+                $optionValues['Lead Quantity'] = $quantity;
+            }
+
+            $options = $this->createOptions($product, $item, $optionValues);
             $item->setOptions($options);
             $quote->addItem($item);
             $this->quoteRepository->save($quote->collectTotals());
