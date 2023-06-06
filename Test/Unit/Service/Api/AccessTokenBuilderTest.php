@@ -16,7 +16,8 @@ use Magento\Framework\HTTP\Client\Curl;
 use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
 
-class AccessTokenBuilderTest extends TestCase {
+class AccessTokenBuilderTest extends TestCase
+{
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
     private ScopeConfigInterface $scopeConfig;
     private Curl $curl;
@@ -45,7 +46,7 @@ class AccessTokenBuilderTest extends TestCase {
             'grant_type' => $this->tokenGrantType,
             'client_id' => $this->clientId,
             'client_secret' => $this->decryptedClientSecret,
-            'scope' => $this->scope
+            'scope' => $this->scope,
         ];
 
         $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
@@ -58,7 +59,9 @@ class AccessTokenBuilderTest extends TestCase {
             ->with(\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
 
-        $this->storeIntegrationRepository = $this->getMockBuilder(StoreIntegrationRepositoryInterface::class)
+        $this->storeIntegrationRepository = $this->getMockBuilder(
+            StoreIntegrationRepositoryInterface::class
+        )
             ->onlyMethods(['getListByIntegration', 'getByStoreIdAndIntegrationId'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
@@ -73,7 +76,9 @@ class AccessTokenBuilderTest extends TestCase {
             ->with($this->encryptedClientSecret)
             ->willReturn($this->decryptedClientSecret);
 
-        $this->activeEnvironmentURLBuilder = $this->getMockBuilder(ActiveEnvironmentURLBuilder::class)
+        $this->activeEnvironmentURLBuilder = $this->getMockBuilder(
+            ActiveEnvironmentURLBuilder::class
+        )
             ->onlyMethods(['getApiURL'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -88,16 +93,13 @@ class AccessTokenBuilderTest extends TestCase {
             ->getMock();
 
         $this->objectManager = new ObjectManager($this);
-        $this->accessTokenBuilder = $this->objectManager->getObject(
-            AccessTokenBuilder::class,
-            [
-                'storeIntegrationRepository' => $this->storeIntegrationRepository,
-                'scopeConfig' => $this->scopeConfig,
-                'curl' => $this->curl,
-                'encryptor' => $this->encryptor,
-                'activeEnvironmentURLBuilder' => $this->activeEnvironmentURLBuilder
-            ]
-        );
+        $this->accessTokenBuilder = $this->objectManager->getObject(AccessTokenBuilder::class, [
+            'storeIntegrationRepository' => $this->storeIntegrationRepository,
+            'scopeConfig' => $this->scopeConfig,
+            'curl' => $this->curl,
+            'encryptor' => $this->encryptor,
+            'activeEnvironmentURLBuilder' => $this->activeEnvironmentURLBuilder,
+        ]);
     }
 
     public function testGetAccessTokenReturnsAccessTokenWhenRepoReturnsValidIntegrationAndAPIResponseComesBackWithAccessToken()
@@ -113,26 +115,29 @@ class AccessTokenBuilderTest extends TestCase {
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getListByIntegration')
-            ->with((int)$this->integrationId)
+            ->with((int) $this->integrationId)
             ->willReturn([$this->storeId]);
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getByStoreIdAndIntegrationId')
-            ->with((int)$this->integrationId, $this->storeId)
+            ->with((int) $this->integrationId, $this->storeId)
             ->willReturn($this->storeIntegration);
-        $this->curl->expects($this->once())->method('post')->with(
-            $this->activeEnvironmentApiURL . AccessTokenBuilder::TOKEN_EXCHANGE_ENDPOINT,
-            $this->payload
-        );
-        $this->curl->expects($this->once())
+        $this->curl
+            ->expects($this->once())
+            ->method('post')
+            ->with(
+                $this->activeEnvironmentApiURL . AccessTokenBuilder::TOKEN_EXCHANGE_ENDPOINT,
+                $this->payload
+            );
+        $this->curl
+            ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode([
-                'access_token' => $this->accessToken
-            ]));
-        $this->assertEquals(
-            $this->accessToken,
-            $this->accessTokenBuilder->getAccessToken()
-        );
+            ->willReturn(
+                json_encode([
+                    'access_token' => $this->accessToken,
+                ])
+            );
+        $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
     }
 
     public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoDoesNotReturnStoreIds()
@@ -140,12 +145,9 @@ class AccessTokenBuilderTest extends TestCase {
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getListByIntegration')
-            ->with((int)$this->integrationId)
+            ->with((int) $this->integrationId)
             ->willReturn([]);
-        $this->assertEquals(
-            '',
-            $this->accessTokenBuilder->getAccessToken()
-        );
+        $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
     public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoReturnsIntegrationWithoutClientInfo()
@@ -161,17 +163,14 @@ class AccessTokenBuilderTest extends TestCase {
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getListByIntegration')
-            ->with((int)$this->integrationId)
+            ->with((int) $this->integrationId)
             ->willReturn([$this->storeId]);
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getByStoreIdAndIntegrationId')
-            ->with((int)$this->integrationId, $this->storeId)
+            ->with((int) $this->integrationId, $this->storeId)
             ->willReturn($this->storeIntegration);
-        $this->assertEquals(
-            '',
-            $this->accessTokenBuilder->getAccessToken()
-        );
+        $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
     public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoReturnsValidIntegrationAndAPIResponseComesBackWithNoAccessToken()
@@ -187,22 +186,22 @@ class AccessTokenBuilderTest extends TestCase {
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getListByIntegration')
-            ->with((int)$this->integrationId)
+            ->with((int) $this->integrationId)
             ->willReturn([$this->storeId]);
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getByStoreIdAndIntegrationId')
-            ->with((int)$this->integrationId, $this->storeId)
+            ->with((int) $this->integrationId, $this->storeId)
             ->willReturn($this->storeIntegration);
         $this->curl->expects($this->once())->method('post');
-        $this->curl->expects($this->once())
+        $this->curl
+            ->expects($this->once())
             ->method('getBody')
-            ->willReturn(json_encode([
-                'other_property' => 'value'
-            ]));
-        $this->assertEquals(
-            '',
-            $this->accessTokenBuilder->getAccessToken()
-        );
+            ->willReturn(
+                json_encode([
+                    'other_property' => 'value',
+                ])
+            );
+        $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 }

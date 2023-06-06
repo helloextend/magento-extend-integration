@@ -10,7 +10,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Psr\Log\LoggerInterface;
 
-class ActiveEnvironmentURLBuilder {
+class ActiveEnvironmentURLBuilder
+{
     const INTEGRATION_ENVIRONMENT_CONFIG = 'extend/integration/environment';
 
     private ScopeConfigInterface $scopeConfig;
@@ -33,7 +34,8 @@ class ActiveEnvironmentURLBuilder {
      *
      * @return string
      */
-    public function getIntegrationURL(): string {
+    public function getIntegrationURL(): string
+    {
         try {
             $integrationId = $this->scopeConfig->getValue(self::INTEGRATION_ENVIRONMENT_CONFIG);
             $integration = $this->integrationService->get($integrationId);
@@ -52,21 +54,28 @@ class ActiveEnvironmentURLBuilder {
      *
      * @return string
      */
-    public function getApiURL(): string {
+    public function getApiURL(): string
+    {
         $integrationURL = $this->getIntegrationURL();
 
-        if (empty($integrationURL)) return '';
+        if (empty($integrationURL)) {
+            return '';
+        }
 
-        $environment = self::isProductionURL($integrationURL) ? '' : '-' . self::getEnvironmentFromURL($integrationURL);
+        $environment = self::isProductionURL($integrationURL)
+            ? ''
+            : '-' . self::getEnvironmentFromURL($integrationURL);
 
         return 'https://api' . $environment . '.helloextend.com';
     }
 
-    private function isProductionURL(string $url): bool {
+    private function isProductionURL(string $url): bool
+    {
         return $this->getEnvironmentFromURL($url) === 'prod';
     }
 
-    public function getEnvironmentFromURL(string $url): string {
+    public function getEnvironmentFromURL(string $url): string
+    {
         if (str_contains($url, 'https://integ-mage-')) {
             $urlParts = explode('https://integ-mage-', $url);
             $urlParts = explode('.', $urlParts[1]);

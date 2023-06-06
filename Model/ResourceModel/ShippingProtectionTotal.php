@@ -8,7 +8,6 @@ namespace Extend\Integration\Model\ResourceModel;
 
 class ShippingProtectionTotal extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
-
     public const EXTEND_SHIPPING_PROTECTION_TABLE = 'extend_shipping_protection';
 
     /**
@@ -16,6 +15,9 @@ class ShippingProtectionTotal extends \Magento\Framework\Model\ResourceModel\Db\
      */
     protected function _construct()
     {
-        $this->_init(self::EXTEND_SHIPPING_PROTECTION_TABLE,  self::EXTEND_SHIPPING_PROTECTION_TABLE . '_id');
+        $this->_init(
+            self::EXTEND_SHIPPING_PROTECTION_TABLE,
+            self::EXTEND_SHIPPING_PROTECTION_TABLE . '_id'
+        );
     }
 }
