@@ -40,16 +40,15 @@ class StoreRepositoryPlugin
     {
         $integrationStores = $this->integrationStoresRepository->get($code);
 
-        if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0)
+        if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0) {
             return $result;
+        }
 
         $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setUuid(
-            [
-                'magento' => $integrationStores->getStoreUuid(),
-                'extend' => $integrationStores->getExtendStoreUuid()
-            ]
-        );
+        $extensionAttributes->setUuid([
+            'magento' => $integrationStores->getStoreUuid(),
+            'extend' => $integrationStores->getExtendStoreUuid(),
+        ]);
         $result->setExtensionAttributes($extensionAttributes);
 
         return $result;
@@ -67,16 +66,15 @@ class StoreRepositoryPlugin
     {
         $integrationStores = $this->integrationStoresRepository->getById($storeId);
 
-        if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0)
+        if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0) {
             return $result;
+        }
 
         $extensionAttributes = $result->getExtensionAttributes();
-        $extensionAttributes->setUuid(
-            [
-                'magento' => $integrationStores->getStoreUuid(),
-                'extend' => $integrationStores->getExtendStoreUuid()
-            ]
-        );
+        $extensionAttributes->setUuid([
+            'magento' => $integrationStores->getStoreUuid(),
+            'extend' => $integrationStores->getExtendStoreUuid(),
+        ]);
         $result->setExtensionAttributes($extensionAttributes);
 
         return $result;

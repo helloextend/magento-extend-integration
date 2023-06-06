@@ -17,55 +17,65 @@ use Psr\Log\LoggerInterface;
 
 class SalesOrderShipmentTrackSaveAfter implements ObserverInterface
 {
-  /**
-   * @var LoggerInterface
-   */
-  private $logger;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-  /**
-   * @var ShipmentObserverHandler
-   */
-  private $shipmentObserverHandler;
+    /**
+     * @var ShipmentObserverHandler
+     */
+    private $shipmentObserverHandler;
 
-  /**
-   * @var Integration
-   */
-  private $integration;
+    /**
+     * @var Integration
+     */
+    private $integration;
 
-  /**
-   * @var StoreManagerInterface
-   */
-  private $storeManager;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
-  public function __construct(
-    LoggerInterface $logger,
-    ShipmentObserverHandler $shipmentObserverHandler,
-    Integration $integration,
-    StoreManagerInterface $storeManager
-  ) {
-    $this->logger = $logger;
-    $this->shipmentObserverHandler = $shipmentObserverHandler;
-    $this->integration = $integration;
-    $this->storeManager = $storeManager;
-  }
-
-  /**
-   * @param Observer $observer
-   * @return void
-   */
-  public function execute(Observer $observer)
-  {
-    try {
-      /** @var Track */
-      $track = $observer->getEvent()->getTrack();
-      /** @var Shipment */
-      $shipment = $track->getShipment();
-      $endpoint = ['path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'], 'type' => 'middleware'];
-      $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
-    } catch (\Exception $exception) {
-      // silently handle errors
-      $this->logger->error('Extend Shipment Observer Handler encountered the following error: ' . $exception->getMessage());
-      $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+    public function __construct(
+        LoggerInterface $logger,
+        ShipmentObserverHandler $shipmentObserverHandler,
+        Integration $integration,
+        StoreManagerInterface $storeManager
+    ) {
+        $this->logger = $logger;
+        $this->shipmentObserverHandler = $shipmentObserverHandler;
+        $this->integration = $integration;
+        $this->storeManager = $storeManager;
     }
-  }
+
+    /**
+     * @param Observer $observer
+     * @return void
+     */
+    public function execute(Observer $observer)
+    {
+        try {
+            /** @var Track */
+            $track = $observer->getEvent()->getTrack();
+            /** @var Shipment */
+            $shipment = $track->getShipment();
+            $endpoint = [
+                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'],
+                'type' => 'middleware',
+            ];
+            $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
+        } catch (\Exception $exception) {
+            // silently handle errors
+            $this->logger->error(
+                'Extend Shipment Observer Handler encountered the following error: ' .
+                    $exception->getMessage()
+            );
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error'
+            );
+        }
+    }
 }

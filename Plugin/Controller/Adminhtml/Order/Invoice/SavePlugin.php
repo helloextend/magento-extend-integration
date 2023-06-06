@@ -38,7 +38,7 @@ class SavePlugin
         Registry $registry,
         InvoiceExtensionFactory $invoiceExtensionFactory,
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
-    ){
+    ) {
         $this->registry = $registry;
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
@@ -51,8 +51,10 @@ class SavePlugin
      * @param $result
      * @return mixed
      */
-    public function afterExecute(\Magento\Sales\Controller\Adminhtml\Order\Invoice\Save $subject, $result)
-    {
+    public function afterExecute(
+        \Magento\Sales\Controller\Adminhtml\Order\Invoice\Save $subject,
+        $result
+    ) {
         $invoice = $this->registry->registry('current_invoice');
         if ($invoice) {
             $invoiceExtensionAttributes = $invoice->getExtensionAttributes();
