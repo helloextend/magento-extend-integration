@@ -44,54 +44,63 @@ class OrderItemRepositoryPlugin
     ): OrderItemSearchResultInterface {
         $orderItems = $searchResult->getItems();
 
-        foreach ($orderItems as &$item) {
-            if ($item->getSku() === 'extend-protection-plan') {
-                // create extension attributes
-                $extensionAttributes = $this->orderItemExtensionFactory->create();
+        // if order items exist and are an array
+        if (isset($orderItems) && is_array($orderItems)) {
+            $orderItems = $searchResult->getItems();
 
-                // get the relevant quote item
-                $quoteItemId = $item->getQuoteItemId();
-                $quoteItemCollection = $this->quoteItemCollectionFactory->create();
-                $quoteItem = $quoteItemCollection
-                    ->addFieldToSelect('*')
-                    ->addFieldToFilter('item_id', $quoteItemId)
-                    ->getFirstItem();
+            foreach ($orderItems as &$item) {
+                if ($item->getSku() === 'extend-protection-plan') {
+                    // create extension attributes
+                    $extensionAttributes = $this->orderItemExtensionFactory->create();
 
-                // get the quote item's product's options
-                $productOptions = $quoteItem->getProduct()->getOptions();
+                    // get the relevant quote item
+                    $quoteItemId = $item->getQuoteItemId();
+                    $quoteItemCollection = $this->quoteItemCollectionFactory->create();
+                    $quoteItem = $quoteItemCollection
+                        ->addFieldToSelect('*')
+                        ->addFieldToFilter('item_id', $quoteItemId)
+                        ->getFirstItem();
 
-                // for each of the product's configured options, set the corresponding extension attribute
-                // according to the quote item's corresponding option value.
-                foreach ($productOptions as $o) {
-                    $optionId = $o->getId();
-                    if ($existingOption = $quoteItem->getOptionByCode("option_$optionId")) {
-                        $optionTitle = $o->getTitle();
-                        switch ($optionTitle) {
-                            case 'Plan ID':
-                                $extensionAttributes->setPlanId($existingOption->getValue());
-                                break;
-                            case 'Plan Type':
-                                $extensionAttributes->setPlanType($existingOption->getValue());
-                                break;
-                            case 'Associated Product':
-                                $extensionAttributes->setAssociatedProduct(
-                                    $existingOption->getValue()
-                                );
-                                break;
-                            case 'Term':
-                                $extensionAttributes->setTerm($existingOption->getValue());
-                                break;
-                            case 'Order Offer Plan Id':
-                                $extensionAttributes->setOfferPlanId($existingOption->getValue());
-                                break;
+                    // get the quote item's product's options
+                    $productOptions = $quoteItem->getProduct()->getOptions();
+
+                    // for each of the product's configured options, set the corresponding extension attribute
+                    // according to the quote item's corresponding option value.
+                    foreach ($productOptions as $o) {
+                        $optionId = $o->getId();
+                        if ($existingOption = $quoteItem->getOptionByCode("option_$optionId")) {
+                            $optionTitle = $o->getTitle();
+                            switch ($optionTitle) {
+                                case 'Plan ID':
+                                    $extensionAttributes->setPlanId($existingOption->getValue());
+                                    break;
+                                case 'Plan Type':
+                                    $extensionAttributes->setPlanType($existingOption->getValue());
+                                    break;
+                                case 'Associated Product':
+                                    $extensionAttributes->setAssociatedProduct(
+                                        $existingOption->getValue()
+                                    );
+                                    break;
+                                case 'Term':
+                                    $extensionAttributes->setTerm($existingOption->getValue());
+                                    break;
+                                case 'Order Offer Plan Id':
+                                    $extensionAttributes->setOfferPlanId(
+                                        $existingOption->getValue()
+                                    );
+                                    break;
+                            }
                         }
                     }
-                }
 
-                $item->setExtensionAttributes($extensionAttributes);
+                    // set the extension attributes to the item
+                    $item->setExtensionAttributes($extensionAttributes);
+                }
             }
         }
 
+        // return the search result
         return $searchResult;
     }
 }
