@@ -70,25 +70,31 @@ class OrderItemRepositoryPlugin
                         $optionId = $o->getId();
                         if ($existingOption = $quoteItem->getOptionByCode("option_$optionId")) {
                             $optionTitle = $o->getTitle();
+                            $optionValue = $existingOption->getValue();
                             switch ($optionTitle) {
                                 case 'Plan ID':
-                                    $extensionAttributes->setPlanId($existingOption->getValue());
+                                    $extensionAttributes->setPlanId($optionValue);
                                     break;
                                 case 'Plan Type':
-                                    $extensionAttributes->setPlanType($existingOption->getValue());
+                                    $extensionAttributes->setPlanType($optionValue);
                                     break;
                                 case 'Associated Product':
-                                    $extensionAttributes->setAssociatedProduct(
-                                        $existingOption->getValue()
-                                    );
+                                    $extensionAttributes->setAssociatedProduct($optionValue);
                                     break;
                                 case 'Term':
-                                    $extensionAttributes->setTerm($existingOption->getValue());
+                                    $extensionAttributes->setTerm($optionValue);
                                     break;
                                 case 'Order Offer Plan Id':
-                                    $extensionAttributes->setOfferPlanId(
-                                        $existingOption->getValue()
-                                    );
+                                    $extensionAttributes->setOfferPlanId($optionValue);
+                                    break;
+                                case 'List Price':
+                                    $extensionAttributes->setListPrice($optionValue);
+                                    break;
+                                case 'Lead Token':
+                                    $extensionAttributes->setLeadtoken($optionValue);
+                                    break;
+                                case 'Lead Quantity':
+                                    $extensionAttributes->setLeadQuantity($optionValue);
                                     break;
                             }
                         }

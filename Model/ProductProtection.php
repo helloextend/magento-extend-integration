@@ -136,6 +136,39 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     }
 
     /**
+     * Set lead_token
+     *
+     * @param string $leadToken
+     * @return void
+     */
+    public function setLeadToken(string $leadToken)
+    {
+        $this->setData(self::LEAD_TOKEN, $leadToken);
+    }
+
+    /**
+     * Set lead_quantity
+     *
+     * @param int $leadQuantity
+     * @return void
+     */
+    public function setLeadQuantity(int $leadQuantity)
+    {
+        $this->setData(self::LEAD_QUANTITY, $leadQuantity);
+    }
+
+    /**
+     * Set list_price
+     *
+     * @param string $listPrice
+     * @return void
+     */
+    public function setListPrice(string $listPrice)
+    {
+        $this->setData(self::LIST_PRICE, $listPrice);
+    }
+
+    /**
      * Get plan_id
      *
      * @return string
@@ -183,6 +216,36 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     public function getOfferPlanId(): string
     {
         return $this->getData(self::OFFER_PLAN_ID);
+    }
+
+    /**
+     * Get lead_token
+     *
+     * @return string
+     */
+    public function getLeadToken(): string
+    {
+        return $this->getData(self::LEAD_TOKEN);
+    }
+
+    /**
+     * Get lead_quantity
+     *
+     * @return int
+     */
+    public function getLeadQuantity(): int
+    {
+        return $this->getData(self::LEAD_QUANTITY);
+    }
+
+    /**
+     * Get list_price
+     *
+     * @return string
+     */
+    public function getListPrice(): string
+    {
+        return $this->getData(self::LIST_PRICE);
     }
 
     /**

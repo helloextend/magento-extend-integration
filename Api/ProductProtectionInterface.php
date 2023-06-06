@@ -21,6 +21,12 @@ interface ProductProtectionInterface
 
     const OFFER_PLAN_ID = 'offer_plan_id';
 
+    const LEAD_TOKEN = 'lead_token';
+
+    const LEAD_QUANTITY = 'lead_quantity';
+
+    const LIST_PRICE = 'list_price';
+
     /**
      * Set plan_id
      *
@@ -62,6 +68,28 @@ interface ProductProtectionInterface
     public function setOfferPlanId(string $offerPlanId);
 
     /**
+     * Set lead_token
+     *
+     * @param string $leadToken
+     * @return void
+     */
+    public function setLeadToken(string $leadToken);
+    /**
+     * Set lead_quantity
+     *
+     * @param int $leadQuantity
+     * @return void
+     */
+    public function setLeadQuantity(int $leadQuantity);
+    /**
+     * Set list_price
+     *
+     * @param string $listPrice
+     * @return void
+     */
+    public function setListPrice(string $listPrice);
+
+    /**
      * Get plan_id
      *
      * @return string
@@ -95,6 +123,27 @@ interface ProductProtectionInterface
      * @return string
      */
     public function getOfferPlanId(): string;
+
+    /**
+     * Get lead_token
+     *
+     * @return string
+     */
+    public function getLeadToken(): string;
+
+    /**
+     * Get lead_quantity
+     *
+     * @return int
+     */
+    public function getLeadQuantity(): int;
+
+    /**
+     * Get list_price
+     *
+     * @return string
+     */
+    public function getListPrice(): string;
 
     /**
      * Upsert product protection in cart
