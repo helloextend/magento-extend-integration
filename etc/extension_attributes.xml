@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
@@ -20,18 +20,21 @@
         <attribute code="sp_quote_id" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Store\Api\Data\StoreInterface">
-        <attribute code="uuid" type="string"/>
+        <attribute code="uuid" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_parent_id" type="string"></attribute>
+        <attribute code="extend_parent_id" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_parent_sku" type="string"></attribute>
+        <attribute code="extend_parent_sku" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_manufacturer" type="string"></attribute>
+        <attribute code="extend_manufacturer" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_categories" type="array"></attribute>
+        <attribute code="extend_categories" type="array" />
+    </extension_attributes>
+    <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
+        <attribute code="product_protection" type="Extend\Integration\Api\ProductProtectionInterface" />
     </extension_attributes>
 </config>

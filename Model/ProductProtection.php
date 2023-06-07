@@ -21,7 +21,8 @@ use Psr\Log\LoggerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Exception;
 
-class ProductProtection implements ProductProtectionInterface
+class ProductProtection extends \Magento\Framework\Model\AbstractModel implements
+    ProductProtectionInterface
 {
     /**
      * @var ItemFactory
@@ -77,6 +78,174 @@ class ProductProtection implements ProductProtectionInterface
         $this->integration = $integration;
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
+    }
+
+    /**
+     * Set plan_id
+     *
+     * @param string $planId
+     * @return void
+     */
+    public function setPlanId(?string $planId)
+    {
+        $this->setData(self::PLAN_ID, $planId);
+    }
+
+    /**
+     * Set plan_type
+     *
+     * @param string $planType
+     * @return void
+     */
+    public function setPlanType(?string $planType)
+    {
+        $this->setData(self::PLAN_TYPE, $planType);
+    }
+
+    /**
+     * Set associated_product
+     *
+     * @param string $associatedProduct
+     * @return void
+     */
+    public function setAssociatedProduct(?string $associatedProduct)
+    {
+        $this->setData(self::ASSOCIATED_PRODUCT, $associatedProduct);
+    }
+
+    /**
+     * Set term
+     *
+     * @param string $term
+     * @return void
+     */
+    public function setTerm(?string $term)
+    {
+        $this->setData(self::TERM, $term);
+    }
+
+    /**
+     * Set offer_plan_id
+     *
+     * @param string $offerPlanId
+     * @return void
+     */
+    public function setOfferPlanId(?string $offerPlanId)
+    {
+        $this->setData(self::OFFER_PLAN_ID, $offerPlanId);
+    }
+
+    /**
+     * Set lead_token
+     *
+     * @param string $leadToken
+     * @return void
+     */
+    public function setLeadToken(?string $leadToken)
+    {
+        $this->setData(self::LEAD_TOKEN, $leadToken);
+    }
+
+    /**
+     * Set lead_quantity
+     *
+     * @param int $leadQuantity
+     * @return void
+     */
+    public function setLeadQuantity(?int $leadQuantity)
+    {
+        $this->setData(self::LEAD_QUANTITY, $leadQuantity);
+    }
+
+    /**
+     * Set list_price
+     *
+     * @param string $listPrice
+     * @return void
+     */
+    public function setListPrice(?string $listPrice)
+    {
+        $this->setData(self::LIST_PRICE, $listPrice);
+    }
+
+    /**
+     * Get plan_id
+     *
+     * @return string
+     */
+    public function getPlanId(): ?string
+    {
+        return $this->getData(self::PLAN_ID);
+    }
+
+    /**
+     * Get plan_type
+     *
+     * @return string
+     */
+    public function getPlanType(): ?string
+    {
+        return $this->getData(self::PLAN_TYPE);
+    }
+
+    /**
+     * Get associated_product
+     *
+     * @return string
+     */
+    public function getAssociatedProduct(): ?string
+    {
+        return $this->getData(self::ASSOCIATED_PRODUCT);
+    }
+
+    /**
+     * Get term
+     *
+     * @return string
+     */
+    public function getTerm(): ?string
+    {
+        return $this->getData(self::TERM);
+    }
+
+    /**
+     * Get offer_plan_id
+     *
+     * @return string
+     */
+    public function getOfferPlanId(): ?string
+    {
+        return $this->getData(self::OFFER_PLAN_ID);
+    }
+
+    /**
+     * Get lead_token
+     *
+     * @return string
+     */
+    public function getLeadToken(): ?string
+    {
+        return $this->getData(self::LEAD_TOKEN);
+    }
+
+    /**
+     * Get lead_quantity
+     *
+     * @return int
+     */
+    public function getLeadQuantity(): ?int
+    {
+        return $this->getData(self::LEAD_QUANTITY);
+    }
+
+    /**
+     * Get list_price
+     *
+     * @return string
+     */
+    public function getListPrice(): ?string
+    {
+        return $this->getData(self::LIST_PRICE);
     }
 
     /**

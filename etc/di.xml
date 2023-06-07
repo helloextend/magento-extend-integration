@@ -45,4 +45,7 @@
     <type name="Magento\Quote\Model\ChangeQuoteControl">
         <plugin sortOrder="1" name="extendIntegrationChangeQuoteControl" type="Extend\Integration\Plugin\Model\Quote\ChangeQuoteControlPlugin" />
     </type>
+    <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
+        <plugin sortOrder="1" name="extendIntegrationOrderItemRepository" type="Extend\Integration\Plugin\Model\OrderItemRepositoryPlugin" />
+    </type>
 </config>
