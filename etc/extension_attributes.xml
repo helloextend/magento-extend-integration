@@ -35,13 +35,6 @@
         <attribute code="extend_categories" type="array" />
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
-        <attribute code="plan_id" type="string" />
-        <attribute code="plan_type" type="string" />
-        <attribute code="associated_product" type="string" />
-        <attribute code="term" type="string" />
-        <attribute code="offer_plan_id" type="string" />
-        <attribute code="list_price" type="string" />
-        <attribute code="lead_token" type="string" />
-        <attribute code="lead_quantity" type="int" />
+        <attribute code="product_protection" type="Extend\Integration\Api\ProductProtectionInterface" />
     </extension_attributes>
 </config>

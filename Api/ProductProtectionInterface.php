@@ -33,7 +33,7 @@ interface ProductProtectionInterface
      * @param string $planId
      * @return void
      */
-    public function setPlanId(string $planId);
+    public function setPlanId(?string $planId);
 
     /**
      * Set plan_type
@@ -41,7 +41,7 @@ interface ProductProtectionInterface
      * @param string $planType
      * @return void
      */
-    public function setPlanType(string $planType);
+    public function setPlanType(?string $planType);
 
     /**
      * Set associated_product
@@ -49,7 +49,7 @@ interface ProductProtectionInterface
      * @param string $associatedProduct
      * @return void
      */
-    public function setAssociatedProduct(string $associatedProduct);
+    public function setAssociatedProduct(?string $associatedProduct);
 
     /**
      * Set term
@@ -57,7 +57,7 @@ interface ProductProtectionInterface
      * @param string $term
      * @return void
      */
-    public function setTerm(string $term);
+    public function setTerm(?string $term);
 
     /**
      * Set offer_plan_id
@@ -65,7 +65,7 @@ interface ProductProtectionInterface
      * @param string $offerPlanId
      * @return void
      */
-    public function setOfferPlanId(string $offerPlanId);
+    public function setOfferPlanId(?string $offerPlanId);
 
     /**
      * Set lead_token
@@ -73,77 +73,77 @@ interface ProductProtectionInterface
      * @param string $leadToken
      * @return void
      */
-    public function setLeadToken(string $leadToken);
+    public function setLeadToken(?string $leadToken);
     /**
      * Set lead_quantity
      *
      * @param int $leadQuantity
      * @return void
      */
-    public function setLeadQuantity(int $leadQuantity);
+    public function setLeadQuantity(?int $leadQuantity);
     /**
      * Set list_price
      *
      * @param string $listPrice
      * @return void
      */
-    public function setListPrice(string $listPrice);
+    public function setListPrice(?string $listPrice);
 
     /**
      * Get plan_id
      *
      * @return string
      */
-    public function getPlanId(): string;
+    public function getPlanId(): ?string;
 
     /**
      * Get plan_type
      *
      * @return string
      */
-    public function getPlanType(): string;
+    public function getPlanType(): ?string;
 
     /**
      * Get associated_product
      *
      * @return string
      */
-    public function getAssociatedProduct(): string;
+    public function getAssociatedProduct(): ?string;
 
     /**
      * Get term
      *
      * @return string
      */
-    public function getTerm(): string;
+    public function getTerm(): ?string;
 
     /**
      * Get offer_plan_id
      *
      * @return string
      */
-    public function getOfferPlanId(): string;
+    public function getOfferPlanId(): ?string;
 
     /**
      * Get lead_token
      *
      * @return string
      */
-    public function getLeadToken(): string;
+    public function getLeadToken(): ?string;
 
     /**
      * Get lead_quantity
      *
      * @return int
      */
-    public function getLeadQuantity(): int;
+    public function getLeadQuantity(): ?int;
 
     /**
      * Get list_price
      *
      * @return string
      */
-    public function getListPrice(): string;
+    public function getListPrice(): ?string;
 
     /**
      * Upsert product protection in cart

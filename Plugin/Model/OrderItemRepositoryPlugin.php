@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Plugin\Model;
 
+use Extend\Integration\Model\ProductProtectionFactory;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Magento\Sales\Api\Data\OrderItemSearchResultInterface;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
@@ -23,12 +24,19 @@ class OrderItemRepositoryPlugin
      */
     private CollectionFactory $quoteItemCollectionFactory;
 
+    /**
+     * @var ProductProtectionFactory
+     */
+    private ProductProtectionFactory $productProtectionFactory;
+
     public function __construct(
         OrderItemExtensionFactory $orderItemExtensionFactory,
-        CollectionFactory $quoteItemCollectionFactory
+        CollectionFactory $quoteItemCollectionFactory,
+        ProductProtectionFactory $productProtectionFactory
     ) {
         $this->orderItemExtensionFactory = $orderItemExtensionFactory;
         $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
+        $this->productProtectionFactory = $productProtectionFactory;
     }
 
     /**
@@ -64,6 +72,8 @@ class OrderItemRepositoryPlugin
                     // get the quote item's product's options
                     $productOptions = $quoteItem->getProduct()->getOptions();
 
+                    $productProtection = $this->productProtectionFactory->create();
+
                     // for each of the product's configured options, set the corresponding extension attribute
                     // according to the quote item's corresponding option value.
                     foreach ($productOptions as $o) {
@@ -73,32 +83,34 @@ class OrderItemRepositoryPlugin
                             $optionValue = $existingOption->getValue();
                             switch ($optionTitle) {
                                 case 'Plan ID':
-                                    $extensionAttributes->setPlanId($optionValue);
+                                    $productProtection->setPlanId($optionValue);
                                     break;
                                 case 'Plan Type':
-                                    $extensionAttributes->setPlanType($optionValue);
+                                    $productProtection->setPlanType($optionValue);
                                     break;
                                 case 'Associated Product':
-                                    $extensionAttributes->setAssociatedProduct($optionValue);
+                                    $productProtection->setAssociatedProduct($optionValue);
                                     break;
                                 case 'Term':
-                                    $extensionAttributes->setTerm($optionValue);
+                                    $productProtection->setTerm($optionValue);
                                     break;
                                 case 'Order Offer Plan Id':
-                                    $extensionAttributes->setOfferPlanId($optionValue);
+                                    $productProtection->setOfferPlanId($optionValue);
                                     break;
                                 case 'List Price':
-                                    $extensionAttributes->setListPrice($optionValue);
+                                    $productProtection->setListPrice($optionValue);
                                     break;
                                 case 'Lead Token':
-                                    $extensionAttributes->setLeadtoken($optionValue);
+                                    $productProtection->setLeadtoken($optionValue);
                                     break;
                                 case 'Lead Quantity':
-                                    $extensionAttributes->setLeadQuantity($optionValue);
+                                    $productProtection->setLeadQuantity($optionValue);
                                     break;
                             }
                         }
                     }
+
+                    $extensionAttributes->setProductProtection($productProtection);
 
                     // set the extension attributes to the item
                     $item->setExtensionAttributes($extensionAttributes);

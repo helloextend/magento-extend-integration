@@ -86,7 +86,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $planId
      * @return void
      */
-    public function setPlanId(string $planId)
+    public function setPlanId(?string $planId)
     {
         $this->setData(self::PLAN_ID, $planId);
     }
@@ -97,7 +97,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $planType
      * @return void
      */
-    public function setPlanType(string $planType)
+    public function setPlanType(?string $planType)
     {
         $this->setData(self::PLAN_TYPE, $planType);
     }
@@ -108,7 +108,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $associatedProduct
      * @return void
      */
-    public function setAssociatedProduct(string $associatedProduct)
+    public function setAssociatedProduct(?string $associatedProduct)
     {
         $this->setData(self::ASSOCIATED_PRODUCT, $associatedProduct);
     }
@@ -119,7 +119,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $term
      * @return void
      */
-    public function setTerm(string $term)
+    public function setTerm(?string $term)
     {
         $this->setData(self::TERM, $term);
     }
@@ -130,7 +130,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $offerPlanId
      * @return void
      */
-    public function setOfferPlanId(string $offerPlanId)
+    public function setOfferPlanId(?string $offerPlanId)
     {
         $this->setData(self::OFFER_PLAN_ID, $offerPlanId);
     }
@@ -141,7 +141,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $leadToken
      * @return void
      */
-    public function setLeadToken(string $leadToken)
+    public function setLeadToken(?string $leadToken)
     {
         $this->setData(self::LEAD_TOKEN, $leadToken);
     }
@@ -152,7 +152,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param int $leadQuantity
      * @return void
      */
-    public function setLeadQuantity(int $leadQuantity)
+    public function setLeadQuantity(?int $leadQuantity)
     {
         $this->setData(self::LEAD_QUANTITY, $leadQuantity);
     }
@@ -163,7 +163,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param string $listPrice
      * @return void
      */
-    public function setListPrice(string $listPrice)
+    public function setListPrice(?string $listPrice)
     {
         $this->setData(self::LIST_PRICE, $listPrice);
     }
@@ -173,7 +173,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getPlanId(): string
+    public function getPlanId(): ?string
     {
         return $this->getData(self::PLAN_ID);
     }
@@ -183,7 +183,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getPlanType(): string
+    public function getPlanType(): ?string
     {
         return $this->getData(self::PLAN_TYPE);
     }
@@ -193,7 +193,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getAssociatedProduct(): string
+    public function getAssociatedProduct(): ?string
     {
         return $this->getData(self::ASSOCIATED_PRODUCT);
     }
@@ -203,7 +203,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getTerm(): string
+    public function getTerm(): ?string
     {
         return $this->getData(self::TERM);
     }
@@ -213,7 +213,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getOfferPlanId(): string
+    public function getOfferPlanId(): ?string
     {
         return $this->getData(self::OFFER_PLAN_ID);
     }
@@ -223,7 +223,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getLeadToken(): string
+    public function getLeadToken(): ?string
     {
         return $this->getData(self::LEAD_TOKEN);
     }
@@ -233,7 +233,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return int
      */
-    public function getLeadQuantity(): int
+    public function getLeadQuantity(): ?int
     {
         return $this->getData(self::LEAD_QUANTITY);
     }
@@ -243,7 +243,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      *
      * @return string
      */
-    public function getListPrice(): string
+    public function getListPrice(): ?string
     {
         return $this->getData(self::LIST_PRICE);
     }
