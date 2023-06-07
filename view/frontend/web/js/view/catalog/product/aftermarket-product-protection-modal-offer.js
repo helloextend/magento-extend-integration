@@ -21,8 +21,9 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
             term,
             title,
             coverageType,
+            token: leadToken,
           }
-          const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem)
+          const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
 
           console.log('upserting: ', {
             plan: planToUpsert,
