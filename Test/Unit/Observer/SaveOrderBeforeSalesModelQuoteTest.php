@@ -10,6 +10,8 @@ use Extend\Integration\Observer\SaveOrderBeforeSalesModelQuote;
 
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
+use Magento\Quote\Api\Data\CartExtensionFactory;
+use Magento\Quote\Api\Data\CartExtensionInterface;
 use Magento\Framework\DataObject\Copy;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -47,6 +49,11 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
     private $orderExtensionFactory;
 
     /**
+     * @var CartExtensionFactory|MockObject
+     */
+    private $cartExtensionFactory;
+
+    /**
      * @var Observer|MockObject
      */
     private $observer;
@@ -64,12 +71,21 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
     /**
      * @var OrderExtensionInterface|MockObject
      */
-    protected $extensionAttributes;
+    protected $orderExtensionAttributes;
+
+    /**
+     * @var CartExtensionInterface|MockObject
+     */
+    protected $quoteExtensionAttributes;
 
     protected function setUp(): void
     {
-        $this->extensionAttributes = $this->getMockBuilder(OrderExtensionInterface::class)
-            ->setMethods(['getShippingProtection', 'setShippingProtection'])
+        $this->orderExtensionAttributes = $this->getMockBuilder(OrderExtensionInterface::class)
+            ->setMethods(['getShippingProtection'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $this->quoteExtensionAttributes = $this->getMockBuilder(CartExtensionInterface::class)
+            ->setMethods(['getShippingProtection'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $this->orderExtensionFactory = $this->getMockBuilder(OrderExtensionFactory::class)
@@ -78,7 +94,14 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
         $this->orderExtensionFactory
             ->expects($this->any())
             ->method('create')
-            ->willReturn($this->extensionAttributes);
+            ->willReturn($this->orderExtensionAttributes);
+        $this->cartExtensionFactory = $this->getMockBuilder(CartExtensionFactory::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->cartExtensionFactory
+            ->expects($this->any())
+            ->method('create')
+            ->willReturn($this->quoteExtensionAttributes);
         $this->objectCopyService = $this->createMock(Copy::class);
         $this->order = $this->getMockBuilder(Order::class)
             ->setMethods(['getExtensionAttributes', 'setExtensionAttributes'])
@@ -103,6 +126,7 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
         $this->import = $this->objectManager->getObject(SaveOrderBeforeSalesModelQuote::class, [
             'objectCopyService' => $this->objectCopyService,
             'orderExtensionFactory' => $this->orderExtensionFactory,
+            'cartExtensionFactory' => $this->cartExtensionFactory,
         ]);
     }
 
@@ -111,12 +135,15 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
         $this->order
             ->expects($this->any())
             ->method('getExtensionAttributes')
-            ->willReturn($this->extensionAttributes);
-        $this->extensionAttributes
+            ->willReturn($this->orderExtensionAttributes);
+        $this->quote
+            ->expects($this->any())
+            ->method('getExtensionAttributes')
+            ->willReturn($this->quoteExtensionAttributes);
+        $this->quoteExtensionAttributes
             ->expects($this->any())
             ->method('getShippingProtection')
             ->willReturn([]);
-        $this->extensionAttributes->expects($this->never())->method('setShippingProtection');
         $this->orderExtensionFactory->expects($this->never())->method('create');
         $this->order->expects($this->once())->method('setExtensionAttributes');
         $this->objectCopyService
@@ -133,13 +160,30 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
 
     public function testReturnsExpectedIfExtensionAttributesAreNull()
     {
+        $this->quote
+            ->expects($this->any())
+            ->method('getExtensionAttributes')
+            ->willReturn(null);
+        $this->cartExtensionFactory
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->quoteExtensionAttributes);
+        $this->quoteExtensionAttributes
+            ->expects($this->any())
+            ->method('getShippingProtection')
+            ->willReturn([]);
         $this->order
             ->expects($this->any())
             ->method('getExtensionAttributes')
             ->willReturn(null);
-        $this->orderExtensionFactory->expects($this->once())->method('create');
-        $this->extensionAttributes->expects($this->once())->method('setShippingProtection');
-        $this->order->expects($this->once())->method('setExtensionAttributes');
+        $this->orderExtensionFactory
+            ->expects($this->any())
+            ->method('create')
+            ->willReturn($this->orderExtensionAttributes);
+        $this->order
+            ->expects($this->once())
+            ->method('setExtensionAttributes')
+            ->with($this->orderExtensionAttributes);
         $this->objectCopyService
             ->expects($this->once())
             ->method('copyFieldsetToTarget')
