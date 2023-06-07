@@ -224,6 +224,10 @@ class ProductInstaller
                     'title' => 'Lead Token',
                     'is_require' => 0,
                 ],
+                [
+                    'title' => 'Lead Quantity',
+                    'is_require' => 0,
+                ],
             ];
 
             foreach ($options as $arrayOption) {
