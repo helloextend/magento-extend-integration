@@ -8,33 +8,35 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
 
   return function openModal(config) {
     const leadToken = config[0].leadToken
-    Extend.aftermarketModal.open({
-      leadToken,
-      onClose: function (plan, product, quantity) {
-        if (plan && product) {
-          const { planId, price, term, title, coverageType, offerId } = plan
-          const { id: productId, price: listPrice } = product
+    if (leadToken) {
+      Extend.aftermarketModal.open({
+        leadToken,
+        onClose: function (plan, product, quantity) {
+          if (plan && product) {
+            const { planId, price, term, title, coverageType, offerId } = plan
+            const { id: productId, price: listPrice } = product
 
-          const planToUpsert = {
-            planId,
-            price,
-            term,
-            title,
-            coverageType,
-            token: leadToken,
+            const planToUpsert = {
+              planId,
+              price,
+              term,
+              title,
+              coverageType,
+              token: leadToken,
+            }
+            const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
+
+            ExtendMagento.upsertProductProtection({
+              plan: planToUpsert,
+              cartItems,
+              productId,
+              listPrice,
+              offerId,
+              quantity,
+            }).then(cartUtils.refreshMiniCart)
           }
-          const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
-
-          ExtendMagento.upsertProductProtection({
-            plan: planToUpsert,
-            cartItems,
-            productId,
-            listPrice,
-            offerId,
-            quantity,
-          }).then(cartUtils.refreshMiniCart)
-        }
-      },
-    })
+        },
+      })
+    }
   }
 })
