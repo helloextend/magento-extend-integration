@@ -1,5 +1,9 @@
 <?php
 $viewModel = $block->getData('viewModel');
+
+$extendStoreUuid = $viewModel->getExtendStoreUuid();
+$activeEnvironment = $viewModel->getActiveEnvironment();
+
 $leadToken = $escaper->escapeHtml($escaper->escapeJs($viewModel->getLeadTokenFromUrl()));
 ?>
 <script type="text/x-magento-init">
@@ -7,6 +11,8 @@ $leadToken = $escaper->escapeHtml($escaper->escapeJs($viewModel->getLeadTokenFro
         "*": {
             "aftermarketProductProtectionModalOffer": [
                 {
+                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                    "activeEnvironment": "<?= $activeEnvironment ?>",
                     "leadToken": "<?= /* @noEscape */ $leadToken ?>"
                 }
             ]

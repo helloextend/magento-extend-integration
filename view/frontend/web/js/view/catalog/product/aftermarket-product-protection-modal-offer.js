@@ -8,9 +8,12 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
 
   return function openModal(config) {
     const leadToken = config[0].leadToken
+    const storeId = config[0].extendStoreUuid
+    Extend.config({ storeId, environment: config[0].activeEnvironment })
     if (leadToken) {
       Extend.aftermarketModal.open({
         leadToken,
+        storeId,
         onClose: function (plan, product, quantity) {
           if (plan && product) {
             const { planId, price, term, title, coverageType, offerId } = plan
