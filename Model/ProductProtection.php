@@ -280,6 +280,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         try {
             $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             $quote = $this->checkoutSession->getQuote();
+            $this->logger->debug('1: initial quote state', ['quote' => $quote->getData()]);
             $quoteId = $quote->getId();
 
             if ($price === 0) {
@@ -334,6 +335,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             if (!isset($quoteId)) {
                 $this->quoteRepository->save($quote);
                 $quote = $this->checkoutSession->getQuote();
+                $this->logger->debug('2: quote state after save', ['quote' => $quote->getData()]);
                 $quoteId = $quote->getId();
             }
 
@@ -370,6 +372,15 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             $item->setOptions($options);
             $quote->addItem($item);
             $this->quoteRepository->save($quote->collectTotals());
+            $this->logger->debug('3: final quote state', [
+                'quote from session' => $this->checkoutSession->getQuote()->getData(),
+            ]);
+            $this->logger->debug('4: quote items', [
+                'items' => $this->checkoutSession
+                    ->getQuote()
+                    ->getItemsCollection()
+                    ->getData(),
+            ]);
         } catch (Exception | LocalizedException $exception) {
             $this->logger->error(
                 'Extend Product Protection Upsert Encountered the Following Exception ' .

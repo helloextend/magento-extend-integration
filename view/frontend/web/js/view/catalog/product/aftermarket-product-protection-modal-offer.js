@@ -25,15 +25,6 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
           }
           const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
 
-          console.log('upserting: ', {
-            plan: planToUpsert,
-            cartItems,
-            productId,
-            listPrice,
-            offerId,
-            quantity,
-          })
-
           ExtendMagento.upsertProductProtection({
             plan: planToUpsert,
             cartItems,
