@@ -278,17 +278,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         string $orderOfferPlanId = null
     ): void {
         try {
-            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
-            $quote = $this->checkoutSession->getQuote();
-            $quoteId = $quote->getId();
-
             if ($price === 0) {
                 throw new LocalizedException(
                     new Phrase('Cannot add/update product protection with a price of 0')
                 );
             }
-
-            $quote->setData('_xtd_is_extend_quote_save', true);
 
             if (isset($cartItemId)) {
                 $item = $this->checkoutSession->getQuote()->getItemById($cartItemId);
@@ -304,6 +298,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     new Phrase('Cannot remove product protection without cart item id')
                 );
             }
+
+            // get the quote
+            $quote = $this->checkoutSession->getQuote();
 
             // if quantity is 0, remove the item from the quote
             if ($quantity === 0 && isset($cartItemId)) {
@@ -330,14 +327,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 $item = $this->itemFactory->create();
             }
 
-            // if quote has not been saved yet, save it so that we have an id
-            if (!isset($quoteId)) {
-                $this->quoteRepository->save($quote);
-                $quote = $this->checkoutSession->getQuote();
-                $quoteId = $quote->getId();
-            }
-
-            $item->setQuoteId($quoteId);
+            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             $item->setProduct($product);
 
             if (isset($quantity)) {
@@ -368,7 +358,15 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
             $options = $this->createOptions($product, $item, $optionValues);
             $item->setOptions($options);
+
+            // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);
+            $this->quoteRepository->save($quote);
+
+            // fetch the quote once more so that the new item is loaded
+            $quote = $this->checkoutSession->getQuote();
+
+            //save the quote once more with the totals collected
             $this->quoteRepository->save($quote->collectTotals());
         } catch (Exception | LocalizedException $exception) {
             $this->logger->error(

@@ -9,6 +9,8 @@ var config = {
       productProtectionOffer: 'Extend_Integration/js/view/catalog/product/product-protection-offer',
       productProtectionModalOffer:
         'Extend_Integration/js/view/catalog/product/product-protection-modal-offer',
+      aftermarketProductProtectionModalOffer:
+        'Extend_Integration/js/view/catalog/product/aftermarket-product-protection-modal-offer',
       simpleProductProtectionOffer:
         'Extend_Integration/js/view/cart/product-protection-simple-offer',
       minicartSimpleOffer: 'Extend_Integration/js/view/cart/minicart-updates',

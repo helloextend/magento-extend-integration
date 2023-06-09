@@ -26,4 +26,9 @@ class Extend
     public const SHIPPING_PROTECTION_LABEL = 'Shipping Protection';
 
     public const ENABLE_PRODUCT_PROTECTION = 'extend/product_protection/enable';
+
+    /**
+     * Lead token url param
+     */
+    public const LEAD_TOKEN_URL_PARAM = 'leadToken';
 }
