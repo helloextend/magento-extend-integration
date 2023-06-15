@@ -198,7 +198,6 @@ class SavePlugin
                     'store',
                     $storeId
                 ),
-                'magentoApiSecretId' => $this->encryptor->decrypt($oauth->getSecret()),
                 'name' => $store->getName(),
                 'websiteId' => $store->getWebsiteId(),
                 'weightUnit' => $this->scopeConfig->getValue(
