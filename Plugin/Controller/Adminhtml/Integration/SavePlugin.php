@@ -192,7 +192,7 @@ class SavePlugin
                 'magentoStoreUuid' => $integrationStore->getStoreUuid(),
                 'magentoStoreId' => $storeId,
                 'magentoConsumerKey' => $oauth->getKey(),
-                'extendStoreUuid' => $integrationStore->getExtendStoreUuid(),
+                'extendStoreId' => $integrationStore->getExtendStoreUuid(),
                 'storeDomain' => $this->scopeConfig->getValue(
                     Store::XML_PATH_UNSECURE_BASE_URL,
                     'store',
