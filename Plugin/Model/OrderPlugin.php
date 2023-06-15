@@ -11,7 +11,6 @@ use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 
 class OrderPlugin
 {
-
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
 
     public function __construct(
