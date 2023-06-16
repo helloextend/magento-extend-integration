@@ -195,7 +195,7 @@ class SavePlugin
                 'extendStoreId' => $integrationStore->getExtendStoreUuid(),
                 'storeDomain' => rtrim(
                     str_replace(
-                        'https://',
+                        ['https://', 'http://'],
                         '',
                         $this->scopeConfig->getValue(
                             Store::XML_PATH_UNSECURE_BASE_URL,
