@@ -18,6 +18,15 @@
                     <item name="components" xsi:type="array">
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
+                                <item name="authentication" xsi:type="array">
+                                    <item name="component" xsi:type="string">uiComponent</item>
+                                    <item name="displayArea" xsi:type="string">authentication</item>
+                                    <item name="children" xsi:type="array">
+                                        <item name="additional_block" xsi:type="array">
+                                            <item name="component" xsi:type="string">Extend_Integration/js/view/checkout/summary/normalize-cart</item>
+                                        </item>
+                                    </item>
+                                </item>
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
                                         <item name="shipping-step" xsi:type="array">
