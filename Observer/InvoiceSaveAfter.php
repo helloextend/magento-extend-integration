@@ -6,10 +6,14 @@
 
 namespace Extend\Integration\Observer;
 
+use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\OrderObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Store\Model\StoreManagerInterface;
+//JM
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 
 class InvoiceSaveAfter implements ObserverInterface
 {
@@ -25,12 +29,16 @@ class InvoiceSaveAfter implements ObserverInterface
         \Psr\log\LoggerInterface $logger,
         OrderObserverHandler $orderObserverHandler,
         Integration $integration,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
+        InvoiceExtensionFactory $invoiceExtensionFactory
     ) {
         $this->logger = $logger;
         $this->orderObserverHandler = $orderObserverHandler;
         $this->integration = $integration;
         $this->storeManager = $storeManager;
+        $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->invoiceExtensionFactory = $invoiceExtensionFactory;
     }
 
     /**
@@ -40,6 +48,19 @@ class InvoiceSaveAfter implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         try {
+            $extensionAttributes = $observer->getInvoice()->getExtensionAttributes();
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->invoiceExtensionFactory->create();
+            }
+            $shippingProtection = $extensionAttributes->getShippingProtection();
+
+            if ($observer->getInvoice() && $shippingProtection) {
+                $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                    $shippingProtection,
+                    $observer->getInvoice(),
+                    ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
+                );
+            }
             $this->orderObserverHandler->execute(
                 [
                     'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
