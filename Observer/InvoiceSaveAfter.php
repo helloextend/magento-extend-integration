@@ -11,7 +11,6 @@ use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\OrderObserverHandler;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Store\Model\StoreManagerInterface;
-//JM
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 
