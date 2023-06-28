@@ -41,7 +41,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
               Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
                 referenceId: cartItem.product_sku,
                 price: cartItem.product_price_value * 100,
-                category: cartItem.product_category,
                 onAddToCart: function (opts) {
                   addToCart(opts)
                 },
