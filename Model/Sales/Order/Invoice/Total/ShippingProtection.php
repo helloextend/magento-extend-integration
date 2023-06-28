@@ -43,9 +43,8 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
     public function collect(Invoice $invoice): ShippingProtection
     {
         if (
-            $shippingProtection =
-                $invoice->getExtensionAttributes()->getShippingProtection() &&
-                $invoice->getOrderId()
+            ($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()) &&
+            $invoice->getOrderId()
         ) {
             foreach (
                 $invoice
