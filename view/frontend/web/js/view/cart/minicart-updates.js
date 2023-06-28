@@ -14,7 +14,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   const itemDetailsSelector = 'div.product-item-details'
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
-  const handleUpdate = function () {
+  const handleUpdate = function (config) {
     const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
@@ -95,6 +95,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     }
     Extend.config(extendConfig)
 
-    $(minicartSelector).on('contentUpdated', handleUpdate)
+    $(minicartSelector).on('contentUpdated', () => handleUpdate(config))
   }
 })
