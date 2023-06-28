@@ -58,7 +58,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
       Extend.buttons.render('#product_protection_offer_' + config[key].selectedProductSku, {
         referenceId: config[key].selectedProductSku,
         price: config[key].selectedProductPrice * 100,
-        category: config[key].productCategory,
       })
     }
 
@@ -71,7 +70,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
       const activeProductData = {
         referenceId: selectedProduct.selectedProductSku,
         price: selectedProduct.selectedPrice * 100,
-        category: config.productCategory,
       }
       if (buttonInstance) {
         buttonInstance.setActiveProduct(activeProductData)
@@ -129,8 +127,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
           } else {
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
-              price: selectedProduct.selectedPrice * 100,
-              category: config.productCategory,
+              price: selectedProduct.selectedProductPrice * 100,
               onClose: function (plan, product) {
                 if (plan && product) {
                   const { planId, price, term, title, coverageType, offerId } = plan
