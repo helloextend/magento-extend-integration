@@ -6,7 +6,7 @@ define(['Magento_Customer/js/customer-data'], function (customerData) {
   'use strict'
 
   const getCartItems = function () {
-    return customerData.get('cart')().items ?? []
+    return customerData.get('cart')().items
   }
 
   const refreshMiniCart = function () {

@@ -14,14 +14,14 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   const itemDetailsSelector = 'div.product-item-details'
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
-  const handleUpdate = function (config) {
+  const handleUpdate = function () {
     const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
-      if (cartItem.product_sku === 'extend-protection-plan') return
       const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
       if (qtyElem) {
         const itemContainerElem = qtyElem.closest(productItemSelector)
+
         if (itemContainerElem) {
           const simpleOfferElemId = `extend-minicart-simple-offer-${cartItem.item_id}`
           let simpleOfferElem = itemContainerElem.querySelector(`#${simpleOfferElemId}`)
@@ -95,6 +95,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     }
     Extend.config(extendConfig)
 
-    $(minicartSelector).on('contentUpdated', () => handleUpdate(config))
+    $(minicartSelector).on('contentUpdated', handleUpdate)
   }
 })
