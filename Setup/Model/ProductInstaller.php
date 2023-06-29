@@ -201,6 +201,9 @@ class ProductInstaller
 
             $options = [
                 [
+                    'title' => 'Product Name',
+                ],
+                [
                     'title' => 'Associated Product',
                 ],
                 [

@@ -356,6 +356,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 $optionValues['Lead Quantity'] = $quantity;
             }
 
+            $associatedProduct = $this->productRepository->get($productId);
+            if ($associatedProduct) {
+                $optionValues['Product Name'] = $associatedProduct->getName();
+            }
+
             $options = $this->createOptions($product, $item, $optionValues);
             $item->setOptions($options);
 

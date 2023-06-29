@@ -15,6 +15,26 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
   const handleUpdate = function () {
+    const productItemNameSpanElems = document.querySelectorAll(
+      '[data-block="minicart"] .product-item-name span',
+    )
+
+    productItemNameSpanElems.forEach(productItemNameSpanElem => {
+      if (productItemNameSpanElem.innerText === 'Extend Protection Plan') {
+        const productItemDetails = productItemNameSpanElem.closest('.product-item-details')
+        const optionElems = productItemDetails.querySelector('dl.product.options.list').children
+
+        for (let i = 0; i < optionElems.length; i = i + 2) {
+          const optionLabelElem = optionElems[i]
+          const optionValueElem = optionElems[i + 1]
+          if (optionLabelElem.innerText !== 'Product Name') {
+            optionLabelElem.style.display = 'none'
+            optionValueElem.style.display = 'none'
+          }
+        }
+      }
+    })
+
     const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
