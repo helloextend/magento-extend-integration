@@ -43,13 +43,16 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
   }
 
   return function (config) {
+    const sku = config[0].selectedProductSku
+    if (sku === 'extend-protection-plan') return
+
     const activeProductData = {
       referenceId: config[0].selectedProductSku,
       price: config[0].selectedProductPrice * 100,
-      category: config[0].productCategory,
       onAddToCart: handleAddToCartClick,
     }
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+
     Extend.buttons.renderSimpleOffer(
       '#product_protection_offer_' + config[0].selectedProductSku,
       activeProductData,

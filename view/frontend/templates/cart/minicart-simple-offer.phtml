@@ -6,6 +6,8 @@
 $viewModel = $block->getData('viewModel');
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
+$categoriesForMinicartProducts = $block->getData('categoriesForMinicartProducts');
+$productsCategories = $categoriesForMinicartProducts->getProductCategories();
 ?>
 
 <div id="extendMinicartSimpleOffer"></div>
@@ -15,7 +17,8 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
             "minicartSimpleOffer": [
                {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                    "activeEnvironment": "<?= $activeEnvironment ?>"
+                    "activeEnvironment": "<?= $activeEnvironment ?>",
+                    "productsCategories": <?= json_encode($productsCategories) ?>
                 }
             ]
         }
