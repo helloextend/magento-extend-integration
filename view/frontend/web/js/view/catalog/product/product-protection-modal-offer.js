@@ -45,7 +45,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
     const productCategory = config[0].productCategory
 
     const addToCartButton = document
-      .querySelector('#product_protection_modal_offer_' + productSku.replace('/\s+/', '_'))
+      .querySelector('#product_protection_modal_offer_' + encodeURI(productSku))
       ?.closest('.product.actions.product-item-actions')
       ?.querySelector('.actions-primary')
       ?.querySelector('.action.tocart.primary')
