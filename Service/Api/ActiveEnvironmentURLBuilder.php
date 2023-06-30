@@ -74,14 +74,14 @@ class ActiveEnvironmentURLBuilder
         return $this->getEnvironmentFromURL($url) === 'prod';
     }
 
-    public function getEnvironmentFromURL(string $url): string
+    public function getEnvironmentFromURL(?string $url): string
     {
-        if (str_contains($url, 'https://integ-mage-')) {
+        if ($url !== null && str_contains($url, 'https://integ-mage-')) {
             $urlParts = explode('https://integ-mage-', $url);
             $urlParts = explode('.', $urlParts[1]);
             return $urlParts[0];
         }
-        if (str_contains($url, 'https://integ-mage.')) {
+        if ($url !== null && str_contains($url, 'https://integ-mage.')) {
             return 'prod';
         }
         return '';

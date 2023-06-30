@@ -121,10 +121,12 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         $integrationData = $this->_coreRegistry->registry(
             Integration::REGISTRY_KEY_CURRENT_INTEGRATION
         );
+
         if (
             isset($integrationData['integration_id']) &&
-            str_contains($integrationData['endpoint'], 'extend.com') &&
-            str_contains($integrationData['endpoint'], 'integ-mage')
+            isset($integrationData['endpoint']) &&
+            (str_contains($integrationData['endpoint'], 'extend.com') &&
+                str_contains($integrationData['endpoint'], 'integ-mage'))
         ) {
             return true;
         }
