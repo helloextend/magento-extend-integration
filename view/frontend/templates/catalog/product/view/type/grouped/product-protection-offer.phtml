@@ -7,6 +7,8 @@
 /** @var $block Magento\GroupedProduct\Block\Product\View\Type\Grouped */
 
 $categoryName = '';
+/** replace whitespace as being used as a div id */
+$normalizedProductSku = preg_replace('/\s+/', '_', $product->getSku());
 
 if ($category = $block->getProduct()->getCategory()) {
     $categoryName = $category->getName();
@@ -16,7 +18,7 @@ if ($category = $block->getProduct()->getCategory()) {
 <table id="product_protection_offers">
     <?php foreach ($block->getAssociatedProducts() as $product): ?>
         <tr>
-            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= $product->getSku(); ?>" colspan="3" style="border-top: 0 !important"></td>
+            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= $normalizedProductSku; ?>" colspan="3" style="border-top: 0 !important"></td>
         </tr>
     <?php endforeach; ?>
 </table>
@@ -28,7 +30,7 @@ if ($category = $block->getProduct()->getCategory()) {
                     {
                         "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                         "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                        "selectedProductSku": "<?= $product->getSku(); ?>",
+                        "selectedProductSku": "<?= $normalizedProductSku; ?>",
                         "selectedProductPrice": "<?= $product->getPrice(); ?>",
                         "productCategory": "<?= $categoryName; ?>"
                     }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
