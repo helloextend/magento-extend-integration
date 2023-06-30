@@ -27,6 +27,10 @@ class Extend
 
     public const ENABLE_PRODUCT_PROTECTION = 'extend/product_protection/enable';
 
+    public const ENABLE_SHIPPING_PROTECTION = 'extend/shipping_protection/enable';
+
+    public const ENABLE_EXTEND = 'extend/integration/enable';
+
     /**
      * Lead token url param
      */

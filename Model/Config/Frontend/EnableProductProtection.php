@@ -50,8 +50,9 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->checkIfV1PPEnabledInAnyStores() &&
-            $this->manager->isEnabled('Extend_Warranty')
+            ($this->checkIfV1PPEnabledInAnyStores() &&
+                $this->manager->isEnabled('Extend_Warranty')) ||
+            $this->checkIfV2ExtendEnabled()
         ) {
             $element->setDisabled(true);
             $element->setValue(0);
@@ -74,8 +75,9 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
         if (
-            $this->checkIfV1PPEnabledInAnyStores() &&
-            $this->manager->isEnabled('Extend_Warranty')
+            ($this->checkIfV1PPEnabledInAnyStores() &&
+                $this->manager->isEnabled('Extend_Warranty')) ||
+            $this->checkIfV2ExtendEnabled()
         ) {
             $element->setIsDisableInheritance(true);
         }

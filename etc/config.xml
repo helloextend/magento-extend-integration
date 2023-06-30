@@ -1,0 +1,19 @@
+<!--
+  ~ Copyright Extend (c) 2023. All rights reserved.
+  ~ See Extend-COPYING.txt for license details.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <extend>
+            <integration>
+                <enable>1</enable>
+            </integration>
+            <shipping_protection>
+                <enable>1</enable>
+            </shipping_protection>
+            <product_protection>
+                <enable>0</enable>
+            </product_protection>
+        </extend>
+    </default>
+</config>
