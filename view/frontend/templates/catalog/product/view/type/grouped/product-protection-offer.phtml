@@ -16,7 +16,7 @@ if ($category = $block->getProduct()->getCategory()) {
 <table id="product_protection_offers">
     <?php foreach ($block->getAssociatedProducts() as $product): ?>
         <tr>
-            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
+            <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= rawurlencode($product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
         </tr>
     <?php endforeach; ?>
 </table>
@@ -28,7 +28,7 @@ if ($category = $block->getProduct()->getCategory()) {
                     {
                         "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                         "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                        "selectedProductSku": "<?= $product->getSku() ?>",
+                        "selectedProductSku": "<?= $product->getSku(); ?>",
                         "selectedProductPrice": "<?= $product->getPrice(); ?>",
                         "productCategory": "<?= $categoryName; ?>"
                     }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
