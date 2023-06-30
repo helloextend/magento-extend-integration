@@ -124,9 +124,9 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
 
         if (
             isset($integrationData['integration_id']) &&
-            ($integrationData['endpoint'] === null ||
-                (str_contains($integrationData['endpoint'], 'extend.com') &&
-                    str_contains($integrationData['endpoint'], 'integ-mage')))
+            isset($integrationData['endpoint']) &&
+            (str_contains($integrationData['endpoint'], 'extend.com') &&
+                str_contains($integrationData['endpoint'], 'integ-mage'))
         ) {
             return true;
         }
