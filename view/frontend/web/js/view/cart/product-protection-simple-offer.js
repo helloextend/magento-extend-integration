@@ -43,8 +43,13 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
   }
 
   return function (config) {
+    const cartItems = cartUtils.getCartItems()
     const sku = config[0].selectedProductSku
-    if (sku === 'extend-protection-plan') return
+    const isWarrantyInCart = ExtendMagento.warrantyInCart({
+      lineItemSku: sku,
+      lineItems: cartItems,
+    })
+    if (sku === 'extend-protection-plan' || isWarrantyInCart) return
 
     const activeProductData = {
       referenceId: config[0].selectedProductSku,
