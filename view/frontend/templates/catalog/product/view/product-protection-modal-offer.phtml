@@ -6,9 +6,9 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
 
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $block->getProduct();
-
+$productSku = $product->getSku();
 /** encoding to prevent whitespace and other abnormal characters from being used in a div id */
-$encodedProductSku = rawurlencode($product->getSku());
+$encodedProductSku = rawurlencode($productSku);
 $productPrice = $product->getPrice();
 
 $categoryName = '';
@@ -26,7 +26,7 @@ if ($category = $product->getCategory()) {
                 {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",
                     "activeEnvironment": "<?= $activeEnvironment ?>",
-                    "productSku": "<?= $product->getSku() ?>",
+                    "productSku": "<?= $productSku ?>",
                     "productPrice": "<?= $productPrice ?>",
                     "productCategory": "<?= $categoryName ?>"
                 }
