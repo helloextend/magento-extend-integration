@@ -6,8 +6,9 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
 
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $block->getProduct();
-
 $productSku = $product->getSku();
+/** encoding to prevent whitespace and other abnormal characters from being used in a div id */
+$encodedProductSku = rawurlencode($productSku);
 $productPrice = $product->getPrice();
 
 $categoryName = '';
@@ -16,11 +17,11 @@ if ($category = $product->getCategory()) {
 }
 ?>
 
-<div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $productSku ?>"></div>
+<div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $encodedProductSku ?>"></div>
 
 <script type="text/x-magento-init">
     {
-        "#product_protection_modal_offer_<?= $productSku ?>": {
+        "#product_protection_modal_offer_<?= $encodedProductSku ?>": {
             "productProtectionModalOffer": [
                 {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",

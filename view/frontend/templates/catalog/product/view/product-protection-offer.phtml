@@ -14,10 +14,10 @@ if ($category = $block->getProduct()->getCategory()) {
 
 ?>
 
-<div class="product-protection-offer" id="product_protection_offer_<?= $block->getProduct()->getSku(); ?>"></div>
+<div class="product-protection-offer" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>"></div>
 <script type="text/x-magento-init">
     {
-        "#product_protection_offer_<?= $block->getProduct()->getSku(); ?>": {
+        "#product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>": {
             "productProtectionOffer": [
                 {
                     "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
