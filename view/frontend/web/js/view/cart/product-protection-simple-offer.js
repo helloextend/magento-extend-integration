@@ -59,7 +59,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
     Extend.buttons.renderSimpleOffer(
-      '#product_protection_offer_' + encodeURI(config[0].selectedProductSku),
+      '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       activeProductData,
     )
   }

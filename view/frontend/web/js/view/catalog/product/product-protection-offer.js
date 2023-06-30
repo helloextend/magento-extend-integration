@@ -56,7 +56,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
     for (let key in config) {
       Extend.buttons.render(
-        '#product_protection_offer_' + encodeURI(config[key].selectedProductSku),
+        '#product_protection_offer_' + encodeURIComponent(config[key].selectedProductSku),
         {
           referenceId: config[key].selectedProductSku,
           price: config[key].selectedProductPrice * 100,
@@ -68,7 +68,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
       const buttonInstance = Extend.buttons.instance(
-        '#product_protection_offer_' + encodeURI(config[0].selectedProductSku),
+        '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       )
       const activeProductData = {
         referenceId: selectedProduct.selectedProductSku,
@@ -78,7 +78,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         buttonInstance.setActiveProduct(activeProductData)
       } else {
         Extend.buttons.render(
-          '#product_protection_offer_' + encodeURI(config[0].selectedProductSku),
+          '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
           activeProductData,
         )
       }
@@ -87,7 +87,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
     document.getElementById('product-addtocart-button').addEventListener('click', function () {
       const buttonInstance = Extend.buttons.instance(
-        '#product_protection_offer_' + encodeURI(config[0].selectedProductSku),
+        '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       )
 
       if (buttonInstance) {

@@ -7,8 +7,6 @@
 /** @var $block \Magento\Catalog\Block\Product\View */
 
 $categoryName = '';
-/** encoding to prevent whitespace and other abnormal characters from being used in a div id */
-$encodedProductSku = urlencode($product->getSku());
 
 if ($category = $block->getProduct()->getCategory()) {
     $categoryName = $category->getName();
@@ -16,15 +14,15 @@ if ($category = $block->getProduct()->getCategory()) {
 
 ?>
 
-<div class="product-protection-offer" id="product_protection_offer_<?= $encodedProductSku; ?>"></div>
+<div class="product-protection-offer" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()) ?>"></div>
 <script type="text/x-magento-init">
     {
-        "#product_protection_offer_<?= $encodedProductSku; ?>": {
+        "#product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>": {
             "productProtectionOffer": [
                 {
                     "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                     "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                    "selectedProductSku": "<?= $encodedProductSku; ?>",
+                    "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
                     "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
                     "productCategory": "<?= $categoryName; ?>"
                 }

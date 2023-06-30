@@ -8,7 +8,7 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
 $product = $block->getProduct();
 
 /** encoding to prevent whitespace and other abnormal characters from being used in a div id */
-$encodedProductSku = urlencode($product->getSku());
+$encodedProductSku = rawurlencode($product->getSku());
 $productPrice = $product->getPrice();
 
 $categoryName = '';
@@ -26,7 +26,7 @@ if ($category = $product->getCategory()) {
                 {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",
                     "activeEnvironment": "<?= $activeEnvironment ?>",
-                    "productSku": "<?= $encodedProductSku ?>",
+                    "productSku": "<?= $product->getSku() ?>",
                     "productPrice": "<?= $productPrice ?>",
                     "productCategory": "<?= $categoryName ?>"
                 }
