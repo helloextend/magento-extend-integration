@@ -10,7 +10,7 @@ class ZendClientPreference extends \Magento\Framework\HTTP\ZendClient
 {
     protected function _trySetCurlAdapter()
     {
-        $host = $this->getUri()?->getHost() ?? null;
+        $host = $this->getUri() ? $this->getUri()->getHost() : null;
 
         if (str_contains($host, 'extend.com')) {
             $this->setAdapter('Zend_Http_Client_Adapter_Curl');
