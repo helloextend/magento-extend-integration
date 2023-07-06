@@ -92,6 +92,8 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     }
 
     /**
+     * Check if the old product protection is enabled on any store
+     *
      * @return bool
      */
     private function checkIfV1PPEnabledInAnyStores()
@@ -110,6 +112,11 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         return in_array(1, $values);
     }
 
+    /**
+     * Check if the new Product Protection is enabled
+     *
+     * @return mixed
+     */
     private function checkIfV2ExtendEnabled()
     {
         return $this->scopeConfig->getValue(Extend::ENABLE_EXTEND);
