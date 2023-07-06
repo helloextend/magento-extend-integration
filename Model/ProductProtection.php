@@ -379,7 +379,6 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
                 self::LEAD_TOKEN => $leadToken,
                 self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
-                self::ASSOCIATED_PRODUCT_NAME_CODE => 'JOMAR',
                 self::PLAN_ID_CODE => $planId,
             ];
 
@@ -389,6 +388,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
             $options = $this->createOptions($product, $item, $optionValues);
             $item->setOptions($options);
+
+            $this->addAdditionalOptions($item, $productId, $term);
 
             // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);
@@ -439,6 +440,36 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 $options[] = $existingOption;
             }
         }
+        return $options;
+    }
+
+    /**
+     * Adds additional options to the product protection quote item
+     *
+     * @param $item
+     * @param $productId
+     * @param $term
+     */
+    private function addAdditionalOptions($item, $productId, $term): void
+    {
+        $associatedProduct = $this->productRepository->get($productId);
+        if (!$associatedProduct) {
+            throw new LocalizedException(
+                new Phrase('Product with SKU %1 does not exist', $productId)
+            );
+        }
+
+        $numYears = $term / 12;
+        $termText = "{$numYears} years";
+        if ($term === 999) {
+            $termText = 'Lifetime';
+        } elseif ($term === 1) {
+            $termText = '1 month';
+        } elseif ($term % 12 !== 0) {
+            $termText = "{$term} months";
+        } elseif ($term === 12) {
+            $termText = '1 year';
+        }
 
         $item->addOption([
             'product_id' => $item->getProductId(),
@@ -446,19 +477,17 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             'value' => $this->serializer->serialize([
                 [
                     'label' => 'Product Name',
-                    'value' => 'JOMAR1',
+                    'value' => $associatedProduct->getName(),
                 ],
                 [
                     'label' => 'SKU',
-                    'value' => 'JOMAR2',
+                    'value' => $productId,
                 ],
                 [
                     'label' => 'Term',
-                    'value' => 'JOMAR3',
+                    'value' => $termText,
                 ],
             ]),
         ]);
-
-        return $options;
     }
 }
