@@ -21,9 +21,9 @@ class V1enable extends Value
         \Magento\Framework\Registry $registry,
         \Magento\Framework\App\Config\ScopeConfigInterface $config,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        WriterInterface $writer,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        WriterInterface $writer
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
     ) {
         parent::__construct(
             $context,

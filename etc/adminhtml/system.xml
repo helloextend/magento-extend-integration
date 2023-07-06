@@ -25,6 +25,12 @@
                     <backend_model>Extend\Integration\Model\Config\Backend\Enable</backend_model>
                 </field>
             </group>
+        </section>
+        <section id="extend_plans" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Protection Plans</label>
+            <tab>extend</tab>
+            <resource>Magento_Catalog::config_catalog</resource>
             <group id="shipping_protection" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Shipping Protection</label>
                 <field id="enable" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
@@ -49,6 +55,7 @@
                     <backend_model>Extend\Integration\Model\Config\Backend\V1enable</backend_model>
                 </field>
             </group>
+            <label>Legacy Protection Plans</label>
         </section>
     </system>
 </config>

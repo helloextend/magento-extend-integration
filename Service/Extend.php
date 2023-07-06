@@ -25,9 +25,9 @@ class Extend
 
     public const SHIPPING_PROTECTION_LABEL = 'Shipping Protection';
 
-    public const ENABLE_PRODUCT_PROTECTION = 'extend/product_protection/enable';
+    public const ENABLE_PRODUCT_PROTECTION = 'extend_plans/product_protection/enable';
 
-    public const ENABLE_SHIPPING_PROTECTION = 'extend/shipping_protection/enable';
+    public const ENABLE_SHIPPING_PROTECTION = 'extend_plans/shipping_protection/enable';
 
     public const ENABLE_EXTEND = 'extend/integration/enable';
 
