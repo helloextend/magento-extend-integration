@@ -419,8 +419,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
     /**
      * Creates the product options for the product protection item
-     * These options won't appear on the FE via not defining the "option_ids" option
-     * They are converted to order at extension attributes when retrieving an order
+     * These options will not appear on the storefront/admin because the "option_ids" option is not included
+     * They are converted to order extension attributes when retrieving an order
      *
      * @param $product
      * @param $item
@@ -449,7 +449,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
     /**
      * Adds additional options to the product protection quote item
-     * These are used to display the product protection information on the FE
+     * These are used to display the product protection information on the storefront/admin
      * They are also leveraged by the Magento SDK add-on (e.g. normalization)
      *
      * @param $item
