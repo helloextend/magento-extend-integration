@@ -19,11 +19,34 @@ use Magento\Quote\Model\Quote\Item\OptionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Exception;
 
 class ProductProtection extends \Magento\Framework\Model\AbstractModel implements
     ProductProtectionInterface
 {
+    const PLAN_TYPE_CODE = 'plan_type';
+    const TERM_CODE = 'term';
+    const LIST_PRICE_CODE = 'list_price';
+    const OFFER_PLAN_ID_CODE = 'offer_plan_id';
+    const LEAD_TOKEN_CODE = 'lead_token';
+    const ASSOCIATED_PRODUCT_SKU_CODE = 'associated_product_sku';
+    const ASSOCIATED_PRODUCT_NAME_CODE = 'associated_product_name';
+    const PLAN_ID_CODE = 'plan_id';
+    const LEAD_QUANTITY_CODE = 'lead_quantity';
+
+    const CUSTOM_OPTION_CODES = [
+        self::PLAN_TYPE_CODE,
+        self::TERM_CODE,
+        self::LIST_PRICE_CODE,
+        self::OFFER_PLAN_ID_CODE,
+        self::LEAD_TOKEN_CODE,
+        self::ASSOCIATED_PRODUCT_SKU_CODE,
+        self::ASSOCIATED_PRODUCT_NAME_CODE,
+        self::PLAN_ID_CODE,
+        self::LEAD_QUANTITY_CODE,
+    ];
+
     /**
      * @var ItemFactory
      */
@@ -58,6 +81,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     private ProductRepositoryInterface $productRepository;
 
     /**
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    /**
      * @return void
      */
     public function __construct(
@@ -68,7 +96,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         Session $checkoutSession,
         Integration $integration,
         StoreManagerInterface $storeManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SerializerInterface $serializer
     ) {
         $this->logger = $logger;
         $this->quoteRepository = $quoteRepository;
@@ -78,6 +107,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         $this->integration = $integration;
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -343,17 +373,18 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             $optionValues = [
-                'Plan Type' => $coverageType,
-                'Term' => $term,
-                'List Price' => $listPrice,
-                'Order Offer Plan Id' => $orderOfferPlanId,
-                'Lead Token' => $leadToken,
-                'Associated Product' => $productId,
-                'Plan ID' => $planId,
+                self::PLAN_TYPE_CODE => $coverageType,
+                self::TERM_CODE => $term,
+                self::LIST_PRICE_CODE => $listPrice,
+                self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
+                self::LEAD_TOKEN => $leadToken,
+                self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
+                self::ASSOCIATED_PRODUCT_NAME_CODE => 'JOMAR',
+                self::PLAN_ID_CODE => $planId,
             ];
 
             if (isset($leadToken) && !isset($cartItemId)) {
-                $optionValues['Lead Quantity'] = $quantity;
+                $optionValues[self::LEAD_QUANTITY_CODE] = $quantity;
             }
 
             $options = $this->createOptions($product, $item, $optionValues);
@@ -394,30 +425,40 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     private function createOptions($product, $item, $updatedOptions): array
     {
         $options = [];
-        $optionIds = [];
-        foreach ($product->getOptions() as $o) {
-            $optionId = $o->getId();
-            $existingOption = $item->getOptionByCode("option_$optionId");
+        foreach (self::CUSTOM_OPTION_CODES as $optionCode) {
+            $existingOption = $item->getOptionByCode($optionCode);
             // if the option is in the updated options/values, create a new option
             // if there is no update to the option, use the existing option
-            if (isset($updatedOptions[$o->getTitle()])) {
+            if (isset($updatedOptions[$optionCode])) {
                 $option = $this->itemOptionFactory->create();
                 $option->setProduct($product);
-                $option->setCode("option_$optionId");
-                $option->setValue($updatedOptions[$o->getTitle()]);
+                $option->setCode($optionCode);
+                $option->setValue($updatedOptions[$optionCode]);
                 $options[] = $option;
-                $optionIds[] = $optionId;
             } elseif (isset($existingOption)) {
                 $options[] = $existingOption;
-                $optionIds[] = $optionId;
             }
         }
-        // build record of option ids for the product options that have values
-        $option = $this->itemOptionFactory->create();
-        $option->setProduct($product);
-        $option->setCode('option_ids');
-        $option->setValue(join(',', $optionIds));
-        $options[] = $option;
+
+        $item->addOption([
+            'product_id' => $item->getProductId(),
+            'code' => 'additional_options',
+            'value' => $this->serializer->serialize([
+                [
+                    'label' => 'Product Name',
+                    'value' => 'JOMAR1',
+                ],
+                [
+                    'label' => 'SKU',
+                    'value' => 'JOMAR2',
+                ],
+                [
+                    'label' => 'Term',
+                    'value' => 'JOMAR3',
+                ],
+            ]),
+        ]);
+
         return $options;
     }
 }

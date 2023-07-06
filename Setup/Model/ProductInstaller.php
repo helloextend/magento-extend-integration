@@ -152,7 +152,7 @@ class ProductInstaller
 
             $product
                 ->setSku(Extend::WARRANTY_PRODUCT_SKU)
-                ->setName('Extend Protection Plan')
+                ->setName(Extend::WARRANTY_PRODUCT_NAME)
                 ->setWebsiteIds(array_keys($this->storeManager->getWebsites()))
                 ->setAttributeSetId($attributeSet->getAttributeSetId())
                 ->setStatus(Status::STATUS_ENABLED)

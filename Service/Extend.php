@@ -14,6 +14,11 @@ class Extend
     public const WARRANTY_PRODUCT_SKU = 'extend-protection-plan';
 
     /**
+     * warranty product name
+     */
+    public const WARRANTY_PRODUCT_NAME = 'Extend Protection Plan';
+
+    /**
      * warranty product sku
      */
     public const WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME = 'Extend Products';
