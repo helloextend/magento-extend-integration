@@ -22,8 +22,8 @@ class AdditionalConfigVars implements \Magento\Checkout\Model\ConfigProviderInte
      */
     public function getConfig()
     {
-        $config['extend_enable'] = $this->scopeConfig->getValue(
-            \Extend\Integration\Service\Extend::ENABLE_EXTEND
+        $config['extendEnable'] = $this->scopeConfig->getValue(
+            \Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION
         );
         return $config;
     }

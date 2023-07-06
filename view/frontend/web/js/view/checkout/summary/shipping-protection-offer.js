@@ -18,7 +18,12 @@ define([
       template: 'Extend_Integration/checkout/summary/shipping-protection-offer',
     },
     shouldRenderSP: function () {
-      if (window.ExtendConfig && window.ExtendConfig.environment && window.ExtendConfig.storeId)
+      if (
+        window.ExtendConfig &&
+        window.ExtendConfig.environment &&
+        window.ExtendConfig.storeId &&
+        window.checkoutConfig.extendEnable === '1'
+      )
         return true
       return false
     },

@@ -14,7 +14,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 use Magento\Store\Model\StoreManagerInterface;
 
-class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\Field
+class EnableShippingProtection extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
      * @var ScopeConfigInterface
@@ -50,23 +50,9 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _getElementHtml(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')) ||
-            !$this->checkIfV2ExtendEnabled()
-        ) {
+        if (!$this->checkIfV2ExtendEnabled()) {
             $element->setDisabled(true);
             $element->setValue(0);
-            if (
-                $this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')
-            ) {
-                $element->setComment(
-                    __(
-                        'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is completely disabled on all stores.'
-                    )
-                );
-            }
         }
         return parent::_getElementHtml($element);
     }
@@ -80,34 +66,11 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _renderInheritCheckbox(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')) ||
-            !$this->checkIfV2ExtendEnabled()
-        ) {
+        if (!$this->checkIfV2ExtendEnabled()) {
             $element->setIsDisableInheritance(true);
         }
 
         return parent::_renderInheritCheckbox($element);
-    }
-
-    /**
-     * @return bool
-     */
-    private function checkIfV1PPEnabledInAnyStores()
-    {
-        $values = [];
-        $stores = $this->storeManager->getStores();
-
-        foreach ($stores as $store) {
-            $values[] = $this->scopeConfig->getValue(
-                'warranty/enableExtend/enable',
-                'stores',
-                $store->getId()
-            );
-        }
-
-        return in_array(1, $values);
     }
 
     private function checkIfV2ExtendEnabled()

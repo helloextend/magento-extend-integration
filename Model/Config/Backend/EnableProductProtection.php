@@ -9,11 +9,13 @@ namespace Extend\Integration\Model\Config\Backend;
 use Magento\Framework\App\Config\Value;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductInstaller;
+use Magento\Framework\App\Config\Storage\WriterInterface;
 
-class V2enable extends Value
+class EnableProductProtection extends Value
 {
     private AttributeSetInstaller $attributeSetInstaller;
     private ProductInstaller $productInstaller;
+    private WriterInterface $writer;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -23,7 +25,8 @@ class V2enable extends Value
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        WriterInterface $writer
     ) {
         parent::__construct(
             $context,
@@ -35,12 +38,14 @@ class V2enable extends Value
         );
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->productInstaller = $productInstaller;
+        $this->writer = $writer;
     }
 
     /**
      * This will create a new Product Protection product when V2 PP is enabled
+     * If disabled, shipping protection and V2 product protection is disabled as well.
      *
-     * @return V2enable
+     * @return EnableProductProtection
      */
     public function afterSave()
     {
