@@ -382,14 +382,16 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 self::PLAN_ID_CODE => $planId,
             ];
 
+            $leadQuantity = null;
             if (isset($leadToken) && !isset($cartItemId)) {
                 $optionValues[self::LEAD_QUANTITY_CODE] = $quantity;
+                $leadQuantity = $quantity;
             }
 
             $options = $this->createOptions($product, $item, $optionValues);
             $item->setOptions($options);
 
-            $this->addAdditionalOptions($item, $productId, $term);
+            $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
 
             // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);
@@ -417,6 +419,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
     /**
      * Creates the product options for the product protection item
+     * These options won't appear on the FE via not defining the "option_ids" option
+     * They are converted to order at extension attributes when retrieving an order
      *
      * @param $product
      * @param $item
@@ -445,12 +449,16 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
     /**
      * Adds additional options to the product protection quote item
+     * These are used to display the product protection information on the FE
+     * They are also leveraged by the Magento SDK add-on (e.g. normalization)
      *
      * @param $item
      * @param $productId
      * @param $term
+     * @param $leadToken
+     * @param $leadQuantity
      */
-    private function addAdditionalOptions($item, $productId, $term): void
+    private function addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity): void
     {
         $associatedProduct = $this->productRepository->get($productId);
         if (!$associatedProduct) {
@@ -471,23 +479,39 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             $termText = '1 year';
         }
 
+        $additionalOptions = [
+            [
+                'label' => 'Associated Product',
+                'value' => $productId,
+            ],
+            [
+                'label' => 'Product Name',
+                'value' => $associatedProduct->getName(),
+            ],
+            [
+                'label' => 'Term',
+                'value' => $termText,
+            ],
+        ];
+
+        if ($leadToken) {
+            $additionalOptions[] = [
+                'label' => 'Lead Token',
+                'value' => $leadToken,
+            ];
+        }
+
+        if ($leadQuantity) {
+            $additionalOptions[] = [
+                'label' => 'Lead Quantity',
+                'value' => $leadQuantity,
+            ];
+        }
+
         $item->addOption([
             'product_id' => $item->getProductId(),
             'code' => 'additional_options',
-            'value' => $this->serializer->serialize([
-                [
-                    'label' => 'Product Name',
-                    'value' => $associatedProduct->getName(),
-                ],
-                [
-                    'label' => 'SKU',
-                    'value' => $productId,
-                ],
-                [
-                    'label' => 'Term',
-                    'value' => $termText,
-                ],
-            ]),
+            'value' => $this->serializer->serialize($additionalOptions),
         ]);
     }
 }
