@@ -23,6 +23,15 @@ class ToOrderItemPlugin
         $this->serializer = $serializer;
     }
 
+    /**
+     * After converting quote item to order item, migrate additional options to order item
+     *
+     * @param QuoteToOrderItem $subject
+     * @param OrderItem $orderItem
+     * @param AbstractItem $quoteItem
+     * @param array $data
+     * @return OrderItem
+     */
     public function afterConvert(
         QuoteToOrderItem $subject,
         OrderItem $orderItem,
