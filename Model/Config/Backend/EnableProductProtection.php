@@ -24,9 +24,9 @@ class EnableProductProtection extends Value
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
+        WriterInterface $writer,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        WriterInterface $writer
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
     ) {
         parent::__construct(
             $context,
