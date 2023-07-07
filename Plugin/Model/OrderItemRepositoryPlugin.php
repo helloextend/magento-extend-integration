@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Plugin\Model;
 
+use Extend\Integration\Model\ProductProtection;
 use Extend\Integration\Model\ProductProtectionFactory;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Magento\Sales\Api\Data\OrderItemSearchResultInterface;
@@ -76,34 +77,33 @@ class OrderItemRepositoryPlugin
 
                     // for each of the product's configured options, set the corresponding extension attribute
                     // according to the quote item's corresponding option value.
-                    foreach ($productOptions as $o) {
-                        $optionId = $o->getId();
-                        if ($existingOption = $quoteItem->getOptionByCode("option_$optionId")) {
-                            $optionTitle = $o->getTitle();
+                    foreach (ProductProtection::CUSTOM_OPTION_CODES as $optionCode) {
+                        $existingOption = $quoteItem->getOptionByCode($optionCode);
+                        if ($existingOption) {
                             $optionValue = $existingOption->getValue();
-                            switch ($optionTitle) {
-                                case 'Plan ID':
+                            switch ($optionCode) {
+                                case ProductProtection::PLAN_ID_CODE:
                                     $productProtection->setPlanId($optionValue);
                                     break;
-                                case 'Plan Type':
+                                case ProductProtection::PLAN_TYPE_CODE:
                                     $productProtection->setPlanType($optionValue);
                                     break;
-                                case 'Associated Product':
+                                case ProductProtection::ASSOCIATED_PRODUCT_SKU_CODE:
                                     $productProtection->setAssociatedProduct($optionValue);
                                     break;
-                                case 'Term':
+                                case ProductProtection::TERM_CODE:
                                     $productProtection->setTerm($optionValue);
                                     break;
-                                case 'Order Offer Plan Id':
+                                case ProductProtection::OFFER_PLAN_ID_CODE:
                                     $productProtection->setOfferPlanId($optionValue);
                                     break;
-                                case 'List Price':
+                                case ProductProtection::LIST_PRICE_CODE:
                                     $productProtection->setListPrice($optionValue);
                                     break;
-                                case 'Lead Token':
+                                case ProductProtection::LEAD_TOKEN_CODE:
                                     $productProtection->setLeadtoken($optionValue);
                                     break;
-                                case 'Lead Quantity':
+                                case ProductProtection::LEAD_QUANTITY_CODE:
                                     $productProtection->setLeadQuantity($optionValue);
                                     break;
                             }

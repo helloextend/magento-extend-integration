@@ -55,29 +55,30 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
 
     for (let key in config) {
-      Extend.buttons.render('#product_protection_offer_' + config[key].selectedProductSku, {
-        referenceId: config[key].selectedProductSku,
-        price: config[key].selectedProductPrice * 100,
-        category: config[key].productCategory,
-      })
+      Extend.buttons.render(
+        '#product_protection_offer_' + encodeURIComponent(config[key].selectedProductSku),
+        {
+          referenceId: config[key].selectedProductSku,
+          price: config[key].selectedProductPrice * 100,
+        },
+      )
     }
 
     // Listening for product options being chosen on configurable products.  Display offer once all required options are chosen.
     $('div.product-options-wrapper', '.product-info-main').on('change', function () {
       const selectedProduct = getActiveProductConfig()
       const buttonInstance = Extend.buttons.instance(
-        '#product_protection_offer_' + config[0].selectedProductSku,
+        '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       )
       const activeProductData = {
         referenceId: selectedProduct.selectedProductSku,
         price: selectedProduct.selectedPrice * 100,
-        category: config.productCategory,
       }
       if (buttonInstance) {
         buttonInstance.setActiveProduct(activeProductData)
       } else {
         Extend.buttons.render(
-          '#product_protection_offer_' + config[0].selectedProductSku,
+          '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
           activeProductData,
         )
       }
@@ -86,7 +87,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
     document.getElementById('product-addtocart-button').addEventListener('click', function () {
       const buttonInstance = Extend.buttons.instance(
-        '#product_protection_offer_' + config[0].selectedProductSku,
+        '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       )
 
       if (buttonInstance) {
@@ -129,8 +130,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
           } else {
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
-              price: selectedProduct.selectedPrice * 100,
-              category: config.productCategory,
+              price: selectedProduct.selectedProductPrice * 100,
               onClose: function (plan, product) {
                 if (plan && product) {
                   const { planId, price, term, title, coverageType, offerId } = plan

@@ -18,10 +18,14 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     const cartItems = cartUtils.getCartItems()
 
     cartItems.forEach(cartItem => {
+      const isWarrantyInCart = ExtendMagento.warrantyInCart({
+        lineItemSku: cartItem.product_sku,
+        lineItems: cartItems,
+      })
+      if (cartItem.product_sku === 'extend-protection-plan' || isWarrantyInCart) return
       const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
       if (qtyElem) {
         const itemContainerElem = qtyElem.closest(productItemSelector)
-
         if (itemContainerElem) {
           const simpleOfferElemId = `extend-minicart-simple-offer-${cartItem.item_id}`
           let simpleOfferElem = itemContainerElem.querySelector(`#${simpleOfferElemId}`)
