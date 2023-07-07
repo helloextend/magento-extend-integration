@@ -146,8 +146,8 @@ interface ProductProtectionInterface
     public function getListPrice(): ?string;
 
     /**
-     * Upsert product protection in cart from storefront
-     * Utilizes checkout session which is only available for calls coming from the storefront
+     * Upsert product protection in cart via checkout session
+     * Utilizes checkout session which is only available for calls made from the storefront
      *
      * @param int|null $quantity
      * @param string|null $cartItemId
@@ -177,8 +177,7 @@ interface ProductProtectionInterface
     ): void;
 
     /**
-     * Upsert product protection in cart as an admin
-     * Utilizes a cart id instead of the checkout session which is only available for calls coming from the storefront
+     * Upsert product protection in cart via cart id
      *
      * @param int|null $quantity
      * @param string|null $cartId
