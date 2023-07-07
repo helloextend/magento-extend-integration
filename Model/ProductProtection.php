@@ -458,7 +458,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function upsertStorefront(
+    public function upsertSession(
         int $quantity = null,
         string $cartItemId = null,
         string $productId = null,
@@ -504,7 +504,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function upsertAdmin(
+    public function upsertCartId(
         int $quantity = null,
         string $cartId = null,
         string $cartItemId = null,
