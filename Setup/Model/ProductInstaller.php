@@ -101,7 +101,7 @@ class ProductInstaller
             if ($product = $this->createProtectionPlanProduct($attributeSet)) {
                 $this->addImageToPubMedia();
                 $this->processMediaGalleryEntry($this->getMediaImagePath(), $product->getSku());
-                // $this->addOptionsToProtectionPlanProduct($product);
+                $this->addOptionsToProtectionPlanProduct($product);
                 $this->createSourceItem();
             }
         } catch (Exception $exception) {
