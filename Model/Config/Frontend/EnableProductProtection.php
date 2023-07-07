@@ -42,7 +42,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     }
 
     /**
-     * This will prevent enabling of product protection on the new module, if it's enabled on the old module.
+     * This will prevent enabling of product protection on the new module, if it's enabled on the old module, or if the new Extend Module is disabled.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
@@ -72,7 +72,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     }
 
     /**
-     * This will disable the inherit checkbox if the old Product Protection module is enabled
+     * This will disable the inherit checkbox if the old Product Protection module is enabled, or if the Extend module is disabled.
      *
      * @param AbstractElement $element
      * @return string
