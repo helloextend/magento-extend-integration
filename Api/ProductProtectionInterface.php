@@ -146,7 +146,8 @@ interface ProductProtectionInterface
     public function getListPrice(): ?string;
 
     /**
-     * Upsert product protection in cart
+     * Upsert product protection in cart via checkout session
+     * Utilizes checkout session which is only available for calls made from the storefront
      *
      * @param int|null $quantity
      * @param string|null $cartItemId
@@ -162,8 +163,40 @@ interface ProductProtectionInterface
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function upsert(
+    public function upsertSession(
         int $quantity = null,
+        string $cartItemId = null,
+        string $productId = null,
+        string $planId = null,
+        int $price = null,
+        int $term = null,
+        string $coverageType = null,
+        string $leadToken = null,
+        string $listPrice = null,
+        string $orderOfferPlanId = null
+    ): void;
+
+    /**
+     * Upsert product protection in cart via cart id
+     *
+     * @param int|null $quantity
+     * @param string|null $cartId
+     * @param string|null $cartItemId
+     * @param string|null $productId
+     * @param string|null $planId
+     * @param int|null $price
+     * @param int|null $term
+     * @param string|null $coverageType
+     * @param string|null $leadToken
+     * @param string|null $listPrice
+     * @param string|null $orderOfferPlanId
+     * @return void
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
+     */
+    public function upsertCartId(
+        int $quantity = null,
+        string $cartId = null,
         string $cartItemId = null,
         string $productId = null,
         string $planId = null,

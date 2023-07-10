@@ -73,9 +73,15 @@
         </resources>
     </route>
     <route url="/V1/extend/integration/pp/upsert" method="POST">
-        <service class="Extend\Integration\Api\ProductProtectionInterface" method="upsert" />
+        <service class="Extend\Integration\Api\ProductProtectionInterface" method="upsertSession" />
         <resources>
             <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/extend/integration/pp/upsert/:cart_id" method="POST">
+        <service class="Extend\Integration\Api\ProductProtectionInterface" method="upsertCartId" />
+        <resources>
+            <resource ref="Extend_Integration::manage" />
         </resources>
     </route>
 </routes>

@@ -20,6 +20,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
 use Exception;
 
 class ProductProtection extends \Magento\Framework\Model\AbstractModel implements
@@ -86,6 +87,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     private SerializerInterface $serializer;
 
     /**
+     * @var MaskedQuoteIdToQuoteIdInterface
+     */
+    private MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId;
+
+    /**
      * @return void
      */
     public function __construct(
@@ -97,7 +103,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         Integration $integration,
         StoreManagerInterface $storeManager,
         LoggerInterface $logger,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId
     ) {
         $this->logger = $logger;
         $this->quoteRepository = $quoteRepository;
@@ -108,6 +115,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
         $this->serializer = $serializer;
+        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
     }
 
     /**
@@ -282,6 +290,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * Upsert product protection in cart
      *
      * @param int|null $quantity
+     * @param string|null $cartId
      * @param string|null $cartItemId
      * @param string|null $productId
      * @param string|null $planId
@@ -295,8 +304,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws NoSuchEntityException
      * @throws LocalizedException
      */
-    public function upsert(
+    private function upsert(
         int $quantity = null,
+        string $cartId = null,
         string $cartItemId = null,
         string $productId = null,
         string $planId = null,
@@ -314,8 +324,20 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 );
             }
 
+            $unmaskedCartId = null;
+            if ($cartId) {
+                try {
+                    $unmaskedCartId = $this->maskedQuoteIdToQuoteId->execute($cartId);
+                    $quote = $this->quoteRepository->get($unmaskedCartId);
+                } catch (NoSuchEntityException $exception) {
+                    throw new LocalizedException(new Phrase('Cart not found'));
+                }
+            } else {
+                $quote = $this->checkoutSession->getQuote();
+            }
+
             if (isset($cartItemId)) {
-                $item = $this->checkoutSession->getQuote()->getItemById($cartItemId);
+                $item = $quote->getItemById($cartItemId);
                 if ($item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU) {
                     throw new LocalizedException(
                         new Phrase('Cannot update non product-protection item')
@@ -328,9 +350,6 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     new Phrase('Cannot remove product protection without cart item id')
                 );
             }
-
-            // get the quote
-            $quote = $this->checkoutSession->getQuote();
 
             // if quantity is 0, remove the item from the quote
             if ($quantity === 0 && isset($cartItemId)) {
@@ -398,7 +417,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             $this->quoteRepository->save($quote);
 
             // fetch the quote once more so that the new item is loaded
-            $quote = $this->checkoutSession->getQuote();
+            if ($unmaskedCartId) {
+                $quote = $this->quoteRepository->get($unmaskedCartId);
+            } else {
+                $quote = $this->checkoutSession->getQuote();
+            }
 
             //save the quote once more with the totals collected
             $this->quoteRepository->save($quote->collectTotals());
@@ -415,6 +438,97 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             // this is handled by magento error handler
             throw $exception;
         }
+    }
+
+    /**
+     * Upsert product protection in cart via checkout session
+     * Utilizes checkout session which is only available for calls made from the storefront
+     *
+     * @param int|null $quantity
+     * @param string|null $cartItemId
+     * @param string|null $productId
+     * @param string|null $planId
+     * @param int|null $price
+     * @param int|null $term
+     * @param string|null $coverageType
+     * @param string|null $leadToken
+     * @param string|null $listPrice
+     * @param string|null $orderOfferPlanId
+     * @return void
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
+     */
+    public function upsertSession(
+        int $quantity = null,
+        string $cartItemId = null,
+        string $productId = null,
+        string $planId = null,
+        int $price = null,
+        int $term = null,
+        string $coverageType = null,
+        string $leadToken = null,
+        string $listPrice = null,
+        string $orderOfferPlanId = null
+    ): void {
+        $this->upsert(
+            $quantity,
+            null,
+            $cartItemId,
+            $productId,
+            $planId,
+            $price,
+            $term,
+            $coverageType,
+            $leadToken,
+            $listPrice,
+            $orderOfferPlanId
+        );
+    }
+
+    /**
+     * Upsert product protection in cart via cart id
+     *
+     * @param int|null $quantity
+     * @param string|null $cartId
+     * @param string|null $cartItemId
+     * @param string|null $productId
+     * @param string|null $planId
+     * @param int|null $price
+     * @param int|null $term
+     * @param string|null $coverageType
+     * @param string|null $leadToken
+     * @param string|null $listPrice
+     * @param string|null $orderOfferPlanId
+     * @return void
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
+     */
+    public function upsertCartId(
+        int $quantity = null,
+        string $cartId = null,
+        string $cartItemId = null,
+        string $productId = null,
+        string $planId = null,
+        int $price = null,
+        int $term = null,
+        string $coverageType = null,
+        string $leadToken = null,
+        string $listPrice = null,
+        string $orderOfferPlanId = null
+    ): void {
+        $this->upsert(
+            $quantity,
+            $cartId,
+            $cartItemId,
+            $productId,
+            $planId,
+            $price,
+            $term,
+            $coverageType,
+            $leadToken,
+            $listPrice,
+            $orderOfferPlanId
+        );
     }
 
     /**
