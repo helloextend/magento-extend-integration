@@ -32,7 +32,7 @@ class ConfigPlugin
     public function afterGetObservers(\Magento\Framework\Event\Config $subject, $result)
     {
         if ($result) {
-            foreach ($result as $resultItem) {
+            foreach ($result as $resultItemKey => $resultItem) {
                 $thisClassPath = get_class($this);
                 $thisExplodedClass = explode('\\', (string) $thisClassPath);
                 $resultNameExplodedClass = explode('\\', $resultItem['instance']);
@@ -41,7 +41,8 @@ class ConfigPlugin
                     $thisExplodedClass[1] == $resultNameExplodedClass[1] &&
                     $this->scopeConfig->getValue(Extend::ENABLE_EXTEND) === '0'
                 ) {
-                    $resultItem['disabled'] = 1;
+                    $resultItem['disabled'] = true;
+                    $result[$resultItemKey] = $resultItem;
                 }
             }
         }
