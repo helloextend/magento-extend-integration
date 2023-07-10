@@ -101,7 +101,6 @@ class ProductInstaller
             if ($product = $this->createProtectionPlanProduct($attributeSet)) {
                 $this->addImageToPubMedia();
                 $this->processMediaGalleryEntry($this->getMediaImagePath(), $product->getSku());
-                $this->addOptionsToProtectionPlanProduct($product);
                 $this->createSourceItem();
             }
         } catch (Exception $exception) {
@@ -175,78 +174,6 @@ class ProductInstaller
         } catch (Exception $exception) {
             throw new SetupException(
                 new Phrase('There was a problem create the Extend Protection Product: ', [
-                    $exception->getMessage(),
-                ])
-            );
-        }
-    }
-
-    /**
-     * Adds customizable options to the protection plan product
-     *
-     * @param Product $product
-     * @return void
-     * @throws SetupException
-     */
-    private function addOptionsToProtectionPlanProduct(Product $product)
-    {
-        try {
-            $default_values = [
-                'type' => 'field',
-                'price_type' => 'fixed',
-                'price' => '0.00',
-                'sort_order' => 0,
-                'is_require' => 1,
-            ];
-
-            $options = [
-                [
-                    'title' => 'Associated Product',
-                ],
-                [
-                    'title' => 'Plan Type',
-                ],
-                [
-                    'title' => 'Plan ID',
-                ],
-                [
-                    'title' => 'Term',
-                ],
-                [
-                    'title' => 'List Price',
-                    'is_require' => 0,
-                ],
-                [
-                    'title' => 'Order Offer Plan Id',
-                    'is_require' => 0,
-                ],
-                [
-                    'title' => 'Lead Token',
-                    'is_require' => 0,
-                ],
-                [
-                    'title' => 'Lead Quantity',
-                    'is_require' => 0,
-                ],
-            ];
-
-            foreach ($options as $arrayOption) {
-                // If the input arrays have the same string keys, then the later value for that key will overwrite the previous one.
-                $optionData = array_merge($default_values, $arrayOption);
-
-                $option = $this->catalogOptionFactory->create();
-
-                $option
-                    ->setProductId($product->getId())
-                    ->setStoreId($product->getStoreId())
-                    ->setProductSku($product->getSku())
-                    ->addData($optionData);
-
-                $this->optionRepository->save($option);
-            }
-        } catch (Exception $exception) {
-            throw new SetupException(
-                new Phrase('There was a problem adding the Extend Protection Product options: ', [
                     $exception->getMessage(),
                 ])
             );
