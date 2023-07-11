@@ -36,6 +36,8 @@ class Extend
 
     public const ENABLE_EXTEND = 'extend/integration/enable';
 
+    public const ENABLE_PRODUCT_PROTECTION_CART_OFFER = 'extend_plans/product_protection/enable_cart_offer';
+
     /**
      * Lead token url param
      */

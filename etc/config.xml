@@ -13,6 +13,7 @@
             </shipping_protection>
             <product_protection>
                 <enable>0</enable>
+                <enable_cart_offer>0</enable_cart_offer>
             </product_protection>
         </extend>
     </default>
