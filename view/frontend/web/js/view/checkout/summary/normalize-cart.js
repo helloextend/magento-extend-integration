@@ -39,7 +39,9 @@ define([
       template: 'Extend_Integration/checkout/summary/normalize-cart',
     },
     shouldNormalize: function () {
-      return true
+      if (window.checkoutConfig.extendEnable === '1') {
+        return true
+      }
     },
     normalizeCart: normalize,
     initialize: function () {

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
@@ -6,8 +6,7 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="creditmemo_totals">
-            <block class="Extend\Integration\Block\Adminhtml\Sales\Totals"
-                   name="shipping_protection" as="shipping_protection"/>
+            <block class="Extend\Integration\Block\Adminhtml\Sales\Totals" name="shipping_protection" as="shipping_protection" ifconfig="extend_plans/shipping_protection/enable" />
         </referenceBlock>
     </body>
 </page>

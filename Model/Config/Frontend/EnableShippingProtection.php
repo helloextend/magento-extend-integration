@@ -14,7 +14,7 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 use Magento\Store\Model\StoreManagerInterface;
 
-class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\Field
+class EnableShippingProtection extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
      * @var ScopeConfigInterface
@@ -42,7 +42,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     }
 
     /**
-     * This will prevent enabling of product protection on the new module, if it's enabled on the old module, or if the new Extend Module is disabled.
+     * This will prevent enabling of shipping protection, if the Extend module is disabled.
      *
      * @param \Magento\Framework\Data\Form\Element\AbstractElement $element
      * @return string
@@ -50,29 +50,15 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _getElementHtml(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')) ||
-            !$this->checkIfV2ExtendEnabled()
-        ) {
+        if (!$this->checkIfV2ExtendEnabled()) {
             $element->setDisabled(true);
             $element->setValue(0);
-            if (
-                $this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')
-            ) {
-                $element->setComment(
-                    __(
-                        'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is completely disabled on all stores.'
-                    )
-                );
-            }
         }
         return parent::_getElementHtml($element);
     }
 
     /**
-     * This will disable the inherit checkbox if the old Product Protection module is enabled, or if the Extend module is disabled.
+     * This will disable the inherit checkbox if the Extend module is disabled
      *
      * @param AbstractElement $element
      * @return string
@@ -80,43 +66,13 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _renderInheritCheckbox(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
-                $this->manager->isEnabled('Extend_Warranty')) ||
-            !$this->checkIfV2ExtendEnabled()
-        ) {
+        if (!$this->checkIfV2ExtendEnabled()) {
             $element->setIsDisableInheritance(true);
         }
 
         return parent::_renderInheritCheckbox($element);
     }
 
-    /**
-     * Check if the old product protection is enabled on any store
-     *
-     * @return bool
-     */
-    private function checkIfV1PPEnabledInAnyStores()
-    {
-        $values = [];
-        $stores = $this->storeManager->getStores();
-
-        foreach ($stores as $store) {
-            $values[] = $this->scopeConfig->getValue(
-                'warranty/enableExtend/enable',
-                'stores',
-                $store->getId()
-            );
-        }
-
-        return in_array(1, $values);
-    }
-
-    /**
-     * Check if the new Product Protection is enabled
-     *
-     * @return mixed
-     */
     private function checkIfV2ExtendEnabled()
     {
         return $this->scopeConfig->getValue(Extend::ENABLE_EXTEND);

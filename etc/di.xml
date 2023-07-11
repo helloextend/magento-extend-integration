@@ -48,6 +48,9 @@
     <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
         <plugin sortOrder="1" name="extendIntegrationOrderItemRepository" type="Extend\Integration\Plugin\Model\OrderItemRepositoryPlugin" />
     </type>
+    <type name="Magento\Framework\Event\Config">
+        <plugin sortOrder="1" name="extendIntegrationConfig" type="Extend\Integration\Plugin\Event\ConfigPlugin" />
+    </type>
     <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
         <plugin name="extendIntegrationToOrderItem" type="Extend\Integration\Plugin\Model\Quote\Item\ToOrderItemPlugin" />
     </type>

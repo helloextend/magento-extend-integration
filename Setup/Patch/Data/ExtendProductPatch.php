@@ -201,20 +201,6 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
 
                 if (
                     $installer->tableExists(
-                        \Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE
-                    )
-                ) {
-                    $installer
-                        ->getConnection()
-                        ->dropTable(
-                            $installer->getTable(
-                                \Extend\Integration\Model\ResourceModel\ShippingProtectionTotal::EXTEND_SHIPPING_PROTECTION_TABLE
-                            )
-                        );
-                }
-
-                if (
-                    $installer->tableExists(
                         \Extend\Integration\Model\ResourceModel\StoreIntegration::EXTEND_STORE_INTEGRATION_TABLE
                     )
                 ) {
