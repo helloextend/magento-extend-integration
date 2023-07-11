@@ -11,9 +11,6 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 
 class EnableProductProtectionCartOffer extends Value
 {
-    private WriterInterface $writer;
-    private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig;
-
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
@@ -31,7 +28,5 @@ class EnableProductProtectionCartOffer extends Value
             $resource,
             $resourceCollection
         );
-        $this->writer = $writer;
-        $this->scopeConfig = $config;
     }
 }

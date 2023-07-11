@@ -6,10 +6,8 @@
 
 namespace Extend\Integration\Model\Config\Frontend;
 
-use Extend\Integration\Service\Extend;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
 class EnableProductProtectionCartOffer extends \Magento\Config\Block\System\Config\Form\Field
@@ -26,6 +24,5 @@ class EnableProductProtectionCartOffer extends \Magento\Config\Block\System\Conf
         SecureHtmlRenderer $secureRenderer = null
     ) {
         parent::__construct($context, $data, $secureRenderer);
-        $this->scopeConfig = $scopeConfig;
     }
 }
