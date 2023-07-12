@@ -68,7 +68,6 @@
                         <depends>
                             <field id="extend_plans/product_protection/enable">1</field>
                         </depends>
-                        <backend_model>Extend\Integration\Model\Config\Backend\EnableProductProtectionProductDisplayPageOffer</backend_model>
                         <comment>Display Extend Product Protection offers on on the product display page for each warrantable item.</comment>
                     </field>
                 </group>
