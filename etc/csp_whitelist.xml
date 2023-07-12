@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" ?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
@@ -23,7 +23,9 @@
                 <value id="extend-prod-images" type="host">shipping-offers-static-images-bucket-prod.s3.amazonaws.com</value>
                 <value id="extend-dev-images" type="host">shipping-offers-static-images-bucket-dev.s3.amazonaws.com</value>
                 <value id="extend-demo-images" type="host">shipping-offers-static-images-bucket-demo.s3.amazonaws.com</value>
+                <value id="extend-static-assets" type="host">helloextend-static-assets.s3.amazonaws.com</value>
+                <value id="fallback-image" type="host">s3.amazonaws.com</value>
             </values>
         </policy>
     </policies>
-</csp_whitelist> 
+</csp_whitelist>
