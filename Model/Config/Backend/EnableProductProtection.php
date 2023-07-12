@@ -58,6 +58,10 @@ class EnableProductProtection extends Value
                 \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
                 0
             );
+            $this->writer->save(
+                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER,
+                0
+            );
         }
         return parent::afterSave();
     }
