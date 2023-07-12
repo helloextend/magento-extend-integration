@@ -60,8 +60,6 @@
                         <depends>
                             <field id="extend_plans/product_protection/enable">1</field>
                         </depends>
-                        <frontend_model>Extend\Integration\Model\Config\Frontend\EnableProductProtectionCartOffer</frontend_model>
-                        <backend_model>Extend\Integration\Model\Config\Backend\EnableProductProtectionCartOffer</backend_model>
                         <comment>Display Extend Product Protection offers on each individual warrantable item in the customer's cart.</comment>
                     </field>
                     <field id="enable_pdp_offer" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
@@ -70,7 +68,6 @@
                         <depends>
                             <field id="extend_plans/product_protection/enable">1</field>
                         </depends>
-                        <frontend_model>Extend\Integration\Model\Config\Frontend\EnableProductProtectionProductDisplayPageOffer</frontend_model>
                         <backend_model>Extend\Integration\Model\Config\Backend\EnableProductProtectionProductDisplayPageOffer</backend_model>
                         <comment>Display Extend Product Protection offers on on the product display page for each warrantable item.</comment>
                     </field>

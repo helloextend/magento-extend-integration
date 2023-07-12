@@ -37,7 +37,6 @@ class EnableProductProtectionProductDisplayPageOffer extends Value
     {
         // need to clean these cache types in order to immediately propagate the new setting to the storefront
         // and eliminate the need for the admin to flush the cache manually in order to see the change in the UI.
-        $this->cacheTypeList->cleanType('config');
         $this->cacheTypeList->cleanType('full_page');
         return parent::afterSave();
     }
