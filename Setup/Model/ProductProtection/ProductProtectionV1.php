@@ -19,7 +19,7 @@ use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Magento\Store\Model\StoreManagerInterface;
 
 // NOTE: make sure to update ProductInstaller's use statement with this class if it is the current version
-class ProductProtectionV1
+class ProductProtectionV1 implements ProductProtectionInterface
 {
     const VERSION = 'V1';
 
@@ -43,7 +43,6 @@ class ProductProtectionV1
     /**
      * Create the protection plan product
      *
-     * @param AttributeSetInterface $attributeSet
      * @return \Magento\Catalog\Model\Product
      */
     public function createProduct()

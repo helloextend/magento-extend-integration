@@ -10,6 +10,7 @@ use Exception;
 use Extend\Integration\Service\Extend;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
+use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionInterface;
 use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1 as ProductProtection;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -77,6 +78,12 @@ class ProductInstaller
         $this->galleryManagement = $galleryManagement;
     }
 
+    /**
+     * Adds either the current version of the protection plan product
+     * or the specified version (if provided) to the catalog
+     *
+     * @param ProductProtectionInterface|null $productProtection
+     */
     public function createProduct($productProtection = null)
     {
         if ($productProtection === null) {
@@ -94,6 +101,9 @@ class ProductInstaller
         }
     }
 
+    /**
+     * Deletes the protection plan product from the catalog
+     */
     public function deleteProduct()
     {
         try {

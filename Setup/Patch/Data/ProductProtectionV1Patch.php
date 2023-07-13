@@ -61,26 +61,25 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
 
     /**
      * @inheritDoc
-     * @throws SetupException
      */
     public function apply()
     {
-        if (ProductInstaller::CURRENT_VERSION !== ProductProtectionV1::VERSION) {
+        $isPPV2Enabled = (int) $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION);
+        if (
+            ProductInstaller::CURRENT_VERSION !== ProductProtectionV1::VERSION ||
+            isPPV2Enabled !== 1
+        ) {
             return;
         }
 
-        $isPPV2Enabled = (int) $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION);
-        if ($isPPV2Enabled === 1) {
-            $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
-                $this->productInstaller->deleteProduct();
-                $this->productInstaller->createProduct($this->productProtectionV1);
-            });
-        }
+        $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
+            $this->productInstaller->deleteProduct();
+            $this->productInstaller->createProduct($this->productProtectionV1);
+        });
     }
 
     /**
      * @inheritDoc
-     * @throws FileSystemException|SetupException
      */
     public function revert()
     {
