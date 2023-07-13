@@ -70,7 +70,15 @@
                         </depends>
                         <comment>Display Extend Product Protection offers on the product display page for each warrantable item.</comment>
                     </field>
-                    <field id="enable_post_purchase_lead_modal_offer" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                    <field id="enable_product_catalog_page_modal_offer" translate="label" type="select" sortOrder="30" showInDefault="1" canRestore="1">
+                        <label>Display Product Protection Offers on Product Catalog Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="extend_plans/product_protection/enable">1</field>
+                        </depends>
+                        <comment>Display the Extend Product Protection offer modal on the product catalog page after clicking “Add to cart“ for each warrantable item.</comment>
+                    </field>
+                    <field id="enable_post_purchase_lead_modal_offer" translate="label" type="select" sortOrder="40" showInDefault="1" canRestore="1">
                         <label>Display Post-Purchase Product Protection Offers</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <depends>
