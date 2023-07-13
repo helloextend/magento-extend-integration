@@ -16,10 +16,21 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\StateException;
+use Magento\Framework\Phrase;
+use Magento\Inventory\Model\SourceItemFactory;
+use Magento\Catalog\Model\Product\Gallery\EntryFactory;
+use Magento\InventoryApi\Api\SourceItemsSaveInterface;
+use Magento\Framework\Setup\Exception as SetupException;
+use Magento\Framework\Api\ImageContentFactory;
+use Magento\Framework\Module\Dir\Reader;
+use Magento\Catalog\Model\Product\Gallery\GalleryManagement;
 
 class ProductInstaller
 {
-    // NOTE: update use statement, const value and type hint when adding a new version
+    // NOTE: when adding a new version update the use statement, const value and dependency injection
     const CURRENT_VERSION = 'V1';
 
     private ProductFactory $productFactory;
@@ -29,6 +40,12 @@ class ProductInstaller
     private File $file;
     private DirectoryList $directoryList;
     private ProductProtectionV1 $productProtection;
+    private SourceItemFactory $sourceItemFactory;
+    private EntryFactory $entryFactory;
+    private SourceItemsSaveInterface $sourceItemsSave;
+    private ImageContentFactory $imageContentFactory;
+    private Reader $reader;
+    private GalleryManagement $galleryManagement;
 
     public function __construct(
         ProductFactory $productFactory,
@@ -37,7 +54,13 @@ class ProductInstaller
         Registry $registry,
         File $file,
         DirectoryList $directoryList,
-        ProductProtectionV1 $productProtection
+        ProductProtectionV1 $productProtection,
+        SourceItemFactory $sourceItemFactory,
+        EntryFactory $entryFactory,
+        SourceItemsSaveInterface $sourceItemsSave,
+        ImageContentFactory $imageContentFactory,
+        Reader $reader,
+        GalleryManagement $galleryManagement
     ) {
         $this->productFactory = $productFactory;
         $this->productResource = $productResource;
@@ -46,11 +69,29 @@ class ProductInstaller
         $this->file = $file;
         $this->directoryList = $directoryList;
         $this->productProtection = $productProtection;
+        $this->sourceItemFactory = $sourceItemFactory;
+        $this->entryFactory = $entryFactory;
+        $this->sourceItemsSave = $sourceItemsSave;
+        $this->imageContentFactory = $imageContentFactory;
+        $this->reader = $reader;
+        $this->galleryManagement = $galleryManagement;
     }
 
-    public function createProduct($attributeSet)
+    public function createProduct($productProtection = null)
     {
-        $this->productProtection->createProduct($attributeSet);
+        if ($productProtection === null) {
+            // Use the current version
+            $product = $this->productProtection->createProduct();
+        } else {
+            // Use the specified version
+            $product = $productProtection->createProduct();
+        }
+
+        if ($product) {
+            $this->addImageToPubMedia();
+            $this->processMediaGalleryEntry($product->getSku());
+            $this->createSourceItem();
+        }
     }
 
     public function deleteProduct()
@@ -73,15 +114,75 @@ class ProductInstaller
     }
 
     /**
-     * Delete image from pub/media
+     * Create inventory source item for PP
      *
      * @return void
+     * @throws SetupException
+     */
+    private function createSourceItem()
+    {
+        try {
+            $sourceItem = $this->sourceItemFactory->create();
+            $sourceItem->setSourceCode('default');
+            $sourceItem->setSku(Extend::WARRANTY_PRODUCT_SKU);
+            $sourceItem->setQuantity(1);
+            $sourceItem->setStatus(1);
+            $this->sourceItemsSave->execute([$sourceItem]);
+        } catch (Exception $exception) {
+            throw new SetupException(
+                new Phrase('There was a problem creating the source item: ', [
+                    $exception->getMessage(),
+                ])
+            );
+        }
+    }
+    /**
+     * Get image to pub media
+     *
+     * @return void
+     *
      * @throws FileSystemException
      */
-    private function deleteImageFromPubMedia()
+    private function addImageToPubMedia()
     {
-        $imageWarranty = $this->getMediaImagePath();
-        $this->file->rm($imageWarranty);
+        $imagePath = $this->reader->getModuleDir('', 'Extend_Integration');
+        $imagePath .= '/Setup/Resource/Extend_icon.png';
+
+        $media = $this->getMediaImagePath();
+
+        $this->file->cp($imagePath, $media);
+    }
+
+    /**
+     * Process media gallery entry
+     *
+     * @param string $sku
+     *
+     * @return void
+     *
+     * @throws NoSuchEntityException
+     * @throws StateException
+     * @throws InputException
+     */
+    private function processMediaGalleryEntry(string $sku)
+    {
+        $filePath = $this->getMediaImagePath();
+
+        $entry = $this->entryFactory->create();
+        $entry->setFile($filePath);
+        $entry->setMediaType('image');
+        $entry->setDisabled(false);
+        $entry->setTypes(['thumbnail', 'image', 'small_image']);
+
+        $imageContent = $this->imageContentFactory->create();
+        $imageContent
+            ->setType(mime_content_type($filePath))
+            ->setName('Extend Protection Plan')
+            ->setBase64EncodedData(base64_encode($this->file->read($filePath)));
+
+        $entry->setContent($imageContent);
+
+        $this->galleryManagement->create($sku, $entry);
     }
 
     /**
@@ -97,5 +198,17 @@ class ProductInstaller
         $path .= '/Extend_icon.png';
 
         return $path;
+    }
+
+    /**
+     * Delete image from pub/media
+     *
+     * @return void
+     * @throws FileSystemException
+     */
+    private function deleteImageFromPubMedia()
+    {
+        $imageWarranty = $this->getMediaImagePath();
+        $this->file->rm($imageWarranty);
     }
 }

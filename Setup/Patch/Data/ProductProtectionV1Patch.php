@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Setup\Patch\Data;
 
+use Extend\Integration\Service\Extend;
 use Extend\Integration\Setup\Model\ProductInstaller;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1;
@@ -15,6 +16,7 @@ use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Setup\Exception as SetupException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInterface
 {
@@ -22,23 +24,27 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
     private AttributeSetInstaller $attributeSetInstaller;
     private ProductProtectionV1 $productProtectionV1;
     private ProductInstaller $productInstaller;
+    private ScopeConfigInterface $scopeConfig;
 
     public function __construct(
         State $state,
         AttributeSetInstaller $attributeSetInstaller,
         ProductProtectionV1 $productProtectionV1,
-        ProductInstaller $productInstaller
+        ProductInstaller $productInstaller,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->state = $state;
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->productProtectionV1 = $productProtectionV1;
         $this->productInstaller = $productInstaller;
+        $this->scopeConfig = $scopeConfig;
     }
     /**
      * @inheritDoc
      */
     public static function getDependencies()
     {
+        // NOTE: This should include any previous Product Protection patches
         return [];
     }
 
@@ -60,12 +66,13 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
             return;
         }
 
-        // TODO if PP is enabled
-        $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
-            $this->productInstaller->deleteProduct();
-            $attributeSet = $this->attributeSetInstaller->createAttributeSet();
-            $this->productProtectionV1->createProduct($attributeSet);
-        });
+        $isPPV2Enabled = (int) $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION);
+        if ($isPPV2Enabled === 1) {
+            $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
+                $this->productInstaller->deleteProduct();
+                $this->productInstaller->createProduct($this->productProtectionV1);
+            });
+        }
     }
 
     /**
@@ -74,5 +81,6 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
      */
     public function revert()
     {
+        $this->productInstaller->deleteProduct();
     }
 }
