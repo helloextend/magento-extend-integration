@@ -18,8 +18,11 @@ use Magento\Eav\Api\Data\AttributeSetInterface;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Magento\Store\Model\StoreManagerInterface;
 
+// NOTE: make sure to update ProductInstaller's use statement with this class if it is the current version
 class ProductProtectionV1
 {
+    const VERSION = 'V1';
+
     private ProductFactory $productFactory;
     private ProductRepositoryInterface $productRepository;
     private AttributeSetInstaller $attributeSetInstaller;

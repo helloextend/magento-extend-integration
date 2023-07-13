@@ -10,7 +10,7 @@ use Exception;
 use Extend\Integration\Service\Extend;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
-use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1;
+use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1 as ProductProtection;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Registry;
@@ -30,8 +30,8 @@ use Magento\Catalog\Model\Product\Gallery\GalleryManagement;
 
 class ProductInstaller
 {
-    // NOTE: when adding a new version update the use statement, const value and dependency injection
-    const CURRENT_VERSION = 'V1';
+    // NOTE: when updating to a new version, make sure to update the use statement above
+    const CURRENT_VERSION = ProductProtection::VERSION;
 
     private ProductFactory $productFactory;
     private ProductResource $productResource;
@@ -39,7 +39,7 @@ class ProductInstaller
     private Registry $registry;
     private File $file;
     private DirectoryList $directoryList;
-    private ProductProtectionV1 $productProtection;
+    private ProductProtection $productProtection;
     private SourceItemFactory $sourceItemFactory;
     private EntryFactory $entryFactory;
     private SourceItemsSaveInterface $sourceItemsSave;
@@ -54,7 +54,7 @@ class ProductInstaller
         Registry $registry,
         File $file,
         DirectoryList $directoryList,
-        ProductProtectionV1 $productProtection,
+        ProductProtection $productProtection,
         SourceItemFactory $sourceItemFactory,
         EntryFactory $entryFactory,
         SourceItemsSaveInterface $sourceItemsSave,

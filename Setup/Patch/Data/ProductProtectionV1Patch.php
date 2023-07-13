@@ -44,8 +44,11 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
      */
     public static function getDependencies()
     {
-        // NOTE: This should include any previous Product Protection patches
-        return [];
+        return [
+                // NOTE: This should include the previous Product Protection patch's class
+                // to maintain the order of patches being applied, for example:
+                // \Extend\Integration\Setup\Patch\Data\ProductProtectionV0Patch::class
+            ];
     }
 
     /**
@@ -62,7 +65,7 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
      */
     public function apply()
     {
-        if (ProductInstaller::CURRENT_VERSION !== 'V1') {
+        if (ProductInstaller::CURRENT_VERSION !== ProductProtectionV1::VERSION) {
             return;
         }
 
