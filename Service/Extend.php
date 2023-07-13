@@ -38,6 +38,7 @@ class Extend
 
     public const ENABLE_PRODUCT_PROTECTION_CART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_cart_offer';
     public const ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_pdp_offer';
+    public const ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_post_purchase_lead_modal_offer';
 
     /**
      * Lead token url param
