@@ -53,6 +53,37 @@
                     <button_url>extend_integration/productprotection/create</button_url>
                     <frontend_model>Extend\Integration\Model\Config\Frontend\RecreatePPProduct</frontend_model>
                 </field>
+                <group id="offer_display_settings" translate="label" type="text" sortOrder="20" showInDefault="1">
+                    <depends>
+                        <field id="extend_plans/product_protection/enable">1</field>
+                    </depends>
+                    <attribute type="expanded">1</attribute>
+                    <label>Offer Display Settings</label>
+                    <field id="enable_cart_offer" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                        <label>Display Product Protection Offers in Cart</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="extend_plans/product_protection/enable">1</field>
+                        </depends>
+                        <comment>Display Extend Product Protection offers on each individual warrantable item in the customer's cart.</comment>
+                    </field>
+                    <field id="enable_pdp_offer" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                        <label>Display Product Protection Offers on Product Display Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="extend_plans/product_protection/enable">1</field>
+                        </depends>
+                        <comment>Display Extend Product Protection offers on the product display page for each warrantable item.</comment>
+                    </field>
+                    <field id="enable_post_purchase_lead_modal_offer" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                        <label>Display Post-Purchase Product Protection Offers</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="extend_plans/product_protection/enable">1</field>
+                        </depends>
+                        <comment>Display Post-Purchase Extend Product Protection offers.</comment>
+                    </field>
+                </group>
             </group>
         </section>
         <section id="warranty">
