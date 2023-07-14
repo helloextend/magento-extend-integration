@@ -9,11 +9,13 @@ namespace Extend\Integration\Model\Config\Backend;
 use Magento\Framework\App\Config\Value;
 use Extend\Integration\Setup\Model\ProductInstaller;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Extend\Integration\Setup\Model\AttributeSetInstaller;
 
 class EnableProductProtection extends Value
 {
     private ProductInstaller $productInstaller;
     private WriterInterface $writer;
+    private AttributeSetInstaller $attributeSetInstaller;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -23,7 +25,8 @@ class EnableProductProtection extends Value
         ProductInstaller $productInstaller,
         WriterInterface $writer,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        AttributeSetInstaller $attributeSetInstaller
     ) {
         parent::__construct(
             $context,
@@ -35,6 +38,7 @@ class EnableProductProtection extends Value
         );
         $this->productInstaller = $productInstaller;
         $this->writer = $writer;
+        $this->attributeSetInstaller = $attributeSetInstaller;
     }
 
     /**
@@ -47,7 +51,8 @@ class EnableProductProtection extends Value
     {
         $isPPV2Enabled = (int) $this->getValue();
         if ($isPPV2Enabled === 1) {
-            $this->productInstaller->createProduct();
+            $attributeSet = $this->attributeSetInstaller->createAttributeSet();
+            $this->productInstaller->createProduct($attributeSet);
         } else {
             $this->productInstaller->deleteProduct();
             $this->writer->save(

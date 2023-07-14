@@ -8,7 +8,6 @@ namespace Extend\Integration\Setup\Patch\Data;
 
 use Extend\Integration\Service\Extend;
 use Extend\Integration\Setup\Model\ProductInstaller;
-use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductProtection\ProtectionPlanProduct20230714;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
@@ -17,27 +16,28 @@ use Magento\Framework\Setup\Exception as SetupException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Extend\Integration\Setup\Model\AttributeSetInstaller;
 
 class ProtectionPlanProduct20230714Patch implements DataPatchInterface, PatchRevertableInterface
 {
     private State $state;
-    private AttributeSetInstaller $attributeSetInstaller;
     private ProtectionPlanProduct20230714 $protectionPlanProduct;
     private ProductInstaller $productInstaller;
     private ScopeConfigInterface $scopeConfig;
+    private AttributeSetInstaller $attributeSetInstaller;
 
     public function __construct(
         State $state,
-        AttributeSetInstaller $attributeSetInstaller,
         ProtectionPlanProduct20230714 $protectionPlanProduct,
         ProductInstaller $productInstaller,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        AttributeSetInstaller $attributeSetInstaller
     ) {
         $this->state = $state;
-        $this->attributeSetInstaller = $attributeSetInstaller;
         $this->protectionPlanProduct = $protectionPlanProduct;
         $this->productInstaller = $productInstaller;
         $this->scopeConfig = $scopeConfig;
+        $this->attributeSetInstaller = $attributeSetInstaller;
     }
     /**
      * @inheritDoc
@@ -74,7 +74,8 @@ class ProtectionPlanProduct20230714Patch implements DataPatchInterface, PatchRev
 
         $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
             $this->productInstaller->deleteProduct();
-            $this->productInstaller->createProduct($this->protectionPlanProduct);
+            $attributeSet = $this->attributeSetInstaller->createAttributeSet();
+            $this->productInstaller->createProduct($attributeSet, $this->protectionPlanProduct);
         });
     }
 

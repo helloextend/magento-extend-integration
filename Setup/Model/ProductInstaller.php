@@ -28,6 +28,7 @@ use Magento\Framework\Setup\Exception as SetupException;
 use Magento\Framework\Api\ImageContentFactory;
 use Magento\Framework\Module\Dir\Reader;
 use Magento\Catalog\Model\Product\Gallery\GalleryManagement;
+use Magento\Eav\Api\Data\AttributeSetInterface;
 
 class ProductInstaller
 {
@@ -82,17 +83,18 @@ class ProductInstaller
      * Adds either the current version of the protection plan product
      * or the specified version (if provided) to the catalog
      *
+     * @param AttributeSetInterface $attributeSet
      * @param ProtectionPlanProductInterface|null $protectionPlanProduct
      */
-    public function createProduct($protectionPlanProduct = null)
+    public function createProduct($attributeSet, $protectionPlanProduct = null)
     {
         try {
             if ($protectionPlanProduct === null) {
                 // Use the current version
-                $product = $this->protectionPlanProduct->createProduct();
+                $product = $this->protectionPlanProduct->createProduct($attributeSet);
             } else {
                 // Use the specified version
-                $product = $protectionPlanProduct->createProduct();
+                $product = $protectionPlanProduct->createProduct($attributeSet);
             }
 
             if ($product) {

@@ -43,12 +43,12 @@ class ProtectionPlanProduct20230714 implements ProtectionPlanProductInterface
     /**
      * Create the protection plan product
      *
-     * @return \Magento\Catalog\Model\Product
+     * @param AttributeSetInterface $attributeSet
+     * @return Magento\Catalog\Model\Product;
      */
-    public function createProduct()
+    public function createProduct($attributeSet)
     {
         $product = $this->productFactory->create();
-        $attributeSet = $this->attributeSetInstaller->createAttributeSet();
 
         $product
             ->setSku(Extend::WARRANTY_PRODUCT_SKU)
