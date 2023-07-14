@@ -6,16 +6,28 @@
 
 namespace Extend\Integration\Controller\Adminhtml\Productprotection;
 
+use Extend\Integration\Setup\Model\AttributeSetInstaller;
+use Extend\Integration\Setup\Model\ProductInstaller;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Message\ManagerInterface;
 
 class Create extends \Magento\Backend\App\Action
 {
+    /**
+     * @var AttributeSetInstaller
+     */
     private \Extend\Integration\Setup\Model\AttributeSetInstaller $attributeSetInstaller;
+
+    /**
+     * @var ProductInstaller
+     */
     private \Extend\Integration\Setup\Model\ProductInstaller $productInstaller;
 
     /**
      * @param Context $context
+     * @param AttributeSetInstaller $attributeSetInstaller
+     * @param ProductInstaller $productInstaller
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Context $context,
@@ -29,6 +41,11 @@ class Create extends \Magento\Backend\App\Action
         $this->messageManager = $messageManager;
     }
 
+    /**
+     * Delete the PP product and Extend attribute set and recreate them
+     *
+     * @return void
+     */
     public function execute()
     {
         try {
