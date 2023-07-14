@@ -8,7 +8,7 @@ namespace Extend\Integration\Setup\Model\ProductProtection;
 
 use Magento\Catalog\Model\Product;
 
-interface ProductProtectionInterface
+interface ProtectionPlanProductInterface
 {
     /**
      * Create the protection plan product

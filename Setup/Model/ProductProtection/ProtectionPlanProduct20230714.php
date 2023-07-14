@@ -19,9 +19,9 @@ use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Magento\Store\Model\StoreManagerInterface;
 
 // NOTE: make sure to update ProductInstaller's use statement with this class if it is the current version
-class ProductProtectionV1 implements ProductProtectionInterface
+class ProtectionPlanProduct20230714 implements ProtectionPlanProductInterface
 {
-    const VERSION = 'V1';
+    const VERSION = '2023-07-14';
 
     private ProductFactory $productFactory;
     private ProductRepositoryInterface $productRepository;

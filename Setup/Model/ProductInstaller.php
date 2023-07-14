@@ -10,8 +10,8 @@ use Exception;
 use Extend\Integration\Service\Extend;
 use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResource;
-use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionInterface;
-use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1 as ProductProtection;
+use Extend\Integration\Setup\Model\ProductProtection\ProtectionPlanProductInterface;
+use Extend\Integration\Setup\Model\ProductProtection\ProtectionPlanProduct20230714 as ProtectionPlanProduct;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Registry;
@@ -32,7 +32,7 @@ use Magento\Catalog\Model\Product\Gallery\GalleryManagement;
 class ProductInstaller
 {
     // NOTE: when updating to a new version, make sure to update the use statement above
-    const CURRENT_VERSION = ProductProtection::VERSION;
+    const CURRENT_VERSION = ProtectionPlanProduct::VERSION;
 
     private ProductFactory $productFactory;
     private ProductResource $productResource;
@@ -40,7 +40,7 @@ class ProductInstaller
     private Registry $registry;
     private File $file;
     private DirectoryList $directoryList;
-    private ProductProtection $productProtection;
+    private ProtectionPlanProduct $protectionPlanProduct;
     private SourceItemFactory $sourceItemFactory;
     private EntryFactory $entryFactory;
     private SourceItemsSaveInterface $sourceItemsSave;
@@ -55,7 +55,7 @@ class ProductInstaller
         Registry $registry,
         File $file,
         DirectoryList $directoryList,
-        ProductProtection $productProtection,
+        ProtectionPlanProduct $protectionPlanProduct,
         SourceItemFactory $sourceItemFactory,
         EntryFactory $entryFactory,
         SourceItemsSaveInterface $sourceItemsSave,
@@ -69,7 +69,7 @@ class ProductInstaller
         $this->registry = $registry;
         $this->file = $file;
         $this->directoryList = $directoryList;
-        $this->productProtection = $productProtection;
+        $this->protectionPlanProduct = $protectionPlanProduct;
         $this->sourceItemFactory = $sourceItemFactory;
         $this->entryFactory = $entryFactory;
         $this->sourceItemsSave = $sourceItemsSave;
@@ -82,17 +82,17 @@ class ProductInstaller
      * Adds either the current version of the protection plan product
      * or the specified version (if provided) to the catalog
      *
-     * @param ProductProtectionInterface|null $productProtection
+     * @param ProtectionPlanProductInterface|null $protectionPlanProduct
      */
-    public function createProduct($productProtection = null)
+    public function createProduct($protectionPlanProduct = null)
     {
         try {
-            if ($productProtection === null) {
+            if ($protectionPlanProduct === null) {
                 // Use the current version
-                $product = $this->productProtection->createProduct();
+                $product = $this->protectionPlanProduct->createProduct();
             } else {
                 // Use the specified version
-                $product = $productProtection->createProduct();
+                $product = $protectionPlanProduct->createProduct();
             }
 
             if ($product) {

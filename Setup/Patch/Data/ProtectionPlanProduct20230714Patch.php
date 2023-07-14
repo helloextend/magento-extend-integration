@@ -9,7 +9,7 @@ namespace Extend\Integration\Setup\Patch\Data;
 use Extend\Integration\Service\Extend;
 use Extend\Integration\Setup\Model\ProductInstaller;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
-use Extend\Integration\Setup\Model\ProductProtection\ProductProtectionV1;
+use Extend\Integration\Setup\Model\ProductProtection\ProtectionPlanProduct20230714;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\FileSystemException;
@@ -18,24 +18,24 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
-class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInterface
+class ProtectionPlanProduct20230714Patch implements DataPatchInterface, PatchRevertableInterface
 {
     private State $state;
     private AttributeSetInstaller $attributeSetInstaller;
-    private ProductProtectionV1 $productProtectionV1;
+    private ProtectionPlanProduct20230714 $protectionPlanProduct;
     private ProductInstaller $productInstaller;
     private ScopeConfigInterface $scopeConfig;
 
     public function __construct(
         State $state,
         AttributeSetInstaller $attributeSetInstaller,
-        ProductProtectionV1 $productProtectionV1,
+        ProtectionPlanProduct20230714 $protectionPlanProduct,
         ProductInstaller $productInstaller,
         ScopeConfigInterface $scopeConfig
     ) {
         $this->state = $state;
         $this->attributeSetInstaller = $attributeSetInstaller;
-        $this->productProtectionV1 = $productProtectionV1;
+        $this->protectionPlanProduct = $protectionPlanProduct;
         $this->productInstaller = $productInstaller;
         $this->scopeConfig = $scopeConfig;
     }
@@ -66,15 +66,15 @@ class ProductProtectionV1Patch implements DataPatchInterface, PatchRevertableInt
     {
         $isPPV2Enabled = (int) $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION);
         if (
-            ProductInstaller::CURRENT_VERSION !== ProductProtectionV1::VERSION ||
-            isPPV2Enabled !== 1
+            ProductInstaller::CURRENT_VERSION !== ProtectionPlanProduct20230714::VERSION ||
+            $isPPV2Enabled !== 1
         ) {
             return;
         }
 
         $this->state->emulateAreaCode(Area::AREA_ADMINHTML, function () {
             $this->productInstaller->deleteProduct();
-            $this->productInstaller->createProduct($this->productProtectionV1);
+            $this->productInstaller->createProduct($this->protectionPlanProduct);
         });
     }
 
