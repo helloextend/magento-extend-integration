@@ -86,18 +86,24 @@ class ProductInstaller
      */
     public function createProduct($productProtection = null)
     {
-        if ($productProtection === null) {
-            // Use the current version
-            $product = $this->productProtection->createProduct();
-        } else {
-            // Use the specified version
-            $product = $productProtection->createProduct();
-        }
+        try {
+            if ($productProtection === null) {
+                // Use the current version
+                $product = $this->productProtection->createProduct();
+            } else {
+                // Use the specified version
+                $product = $productProtection->createProduct();
+            }
 
-        if ($product) {
-            $this->addImageToPubMedia();
-            $this->processMediaGalleryEntry($product->getSku());
-            $this->createSourceItem();
+            if ($product) {
+                $this->addImageToPubMedia();
+                $this->processMediaGalleryEntry($product->getSku());
+                $this->createSourceItem();
+            }
+        } catch (Exception $exception) {
+            throw new Exception(
+                'There was an error creating the Extend Protection Plan Product' . $exception
+            );
         }
     }
 

@@ -47,36 +47,30 @@ class ProductProtectionV1 implements ProductProtectionInterface
      */
     public function createProduct()
     {
-        try {
-            $product = $this->productFactory->create();
-            $attributeSet = $this->attributeSetInstaller->createAttributeSet();
+        $product = $this->productFactory->create();
+        $attributeSet = $this->attributeSetInstaller->createAttributeSet();
 
-            $product
-                ->setSku(Extend::WARRANTY_PRODUCT_SKU)
-                ->setName(Extend::WARRANTY_PRODUCT_NAME)
-                ->setWebsiteIds(array_keys($this->storeManager->getWebsites()))
-                ->setAttributeSetId($attributeSet->getAttributeSetId())
-                ->setStatus(Status::STATUS_ENABLED)
-                ->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE)
-                ->setTypeId(Type::TYPE_VIRTUAL)
-                ->setPrice(0.0)
-                ->setTaxClassId(0) //None
-                ->setCreatedAt(strtotime('now'))
-                ->setStockData([
-                    'use_config_manage_stock' => 0,
-                    'is_in_stock' => 1,
-                    'qty' => 1,
-                    'manage_stock' => 0,
-                    'use_config_notify_stock_qty' => 0,
-                ]);
+        $product
+            ->setSku(Extend::WARRANTY_PRODUCT_SKU)
+            ->setName(Extend::WARRANTY_PRODUCT_NAME)
+            ->setWebsiteIds(array_keys($this->storeManager->getWebsites()))
+            ->setAttributeSetId($attributeSet->getAttributeSetId())
+            ->setStatus(Status::STATUS_ENABLED)
+            ->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE)
+            ->setTypeId(Type::TYPE_VIRTUAL)
+            ->setPrice(0.0)
+            ->setTaxClassId(0) //None
+            ->setCreatedAt(strtotime('now'))
+            ->setStockData([
+                'use_config_manage_stock' => 0,
+                'is_in_stock' => 1,
+                'qty' => 1,
+                'manage_stock' => 0,
+                'use_config_notify_stock_qty' => 0,
+            ]);
 
-            $this->productRepository->save($product);
+        $this->productRepository->save($product);
 
-            return $product;
-        } catch (Exception $exception) {
-            throw new Exception(
-                'There was an error creating the Extend Protection Plan Product' . $exception
-            );
-        }
+        return $product;
     }
 }
