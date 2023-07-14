@@ -17,6 +17,6 @@
 <?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#validation_result {margin-bottom: 10px;}', false); ?>
 <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
     'onclick',
-    'window.location.href='.$buttonUrl.';event.preventDefault();',
+    'window.location.href="'.$buttonUrl.'";',
     '#' . /* @noEscape */ $block->getHtmlId()
 ); ?>

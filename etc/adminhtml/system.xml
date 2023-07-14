@@ -50,7 +50,7 @@
                 </field>
                 <field id="recreate_pp_product" type="button" sortOrder="20" showInDefault="1">
                     <button_label>Recreate Product Protection Product</button_label>
-                    <button_url>extend/product_protection/create</button_url>
+                    <button_url>extend_integration/productprotection/create</button_url>
                     <frontend_model>Extend\Integration\Model\Config\Frontend\RecreatePPProduct</frontend_model>
                 </field>
             </group>
