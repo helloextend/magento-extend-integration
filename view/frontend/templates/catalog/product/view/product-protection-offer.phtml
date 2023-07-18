@@ -9,24 +9,29 @@
 $categoryName = '';
 
 if ($category = $block->getProduct()->getCategory()) {
-    $categoryName = $category->getName();
+  $categoryName = $category->getName();
 }
 
+$viewModel = $block->getData('viewModel');
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductDisplayPageOfferEnabled();
 ?>
 
-<div class="product-protection-offer" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>"></div>
-<script type="text/x-magento-init">
+<?php if ($shouldRender) : ?>
+  <div class="product-protection-offer" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>"></div>
+  <script type="text/x-magento-init">
     {
-        "#product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>": {
-            "productProtectionOffer": [
-                {
-                    "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
-                    "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                    "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
-                    "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
-                    "productCategory": "<?= $categoryName; ?>"
-                }
-            ]
-        }
-    }
-</script>
+          "#product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>": {
+              "productProtectionOffer": [
+                  {
+                      "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
+                      "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
+                      "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
+                      "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
+                      "productCategory": "<?= $categoryName; ?>"
+                  }
+              ]
+          }
+      }
+  </script>
+<?php endif; ?>

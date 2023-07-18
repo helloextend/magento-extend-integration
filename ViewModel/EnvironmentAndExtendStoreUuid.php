@@ -86,6 +86,37 @@ class EnvironmentAndExtendStoreUuid implements
         }
     }
 
+    public function isExtendProductProtectionEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
+    }
+
+    public function isProductProtectionProductDisplayPageOfferEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(
+            Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER
+        ) === '1';
+    }
+
+    public function isProductProtectionCartOfferEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER) === '1';
+    }
+
+    public function isProductProtectionPostPurchaseLeadModalOfferEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(
+            Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER
+        ) === '1';
+    }
+
+    public function isProductProtectionProductCatalogPageModalOfferEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(
+            Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER
+        ) === '1';
+    }
+
     /**
      * Get Lead Token From Url
      *

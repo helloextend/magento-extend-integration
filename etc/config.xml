@@ -8,6 +8,8 @@
             <integration>
                 <enable>1</enable>
             </integration>
+        </extend>
+        <extend_plans>
             <shipping_protection>
                 <enable>1</enable>
             </shipping_protection>
@@ -20,6 +22,6 @@
                     <enable_post_purchase_lead_modal_offer>1</enable_post_purchase_lead_modal_offer>
                 </offer_display_settings>
             </product_protection>
-        </extend>
+        </extend_plans>
     </default>
 </config>
