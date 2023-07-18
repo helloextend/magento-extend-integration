@@ -1,0 +1,22 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+
+/** @var \Extend\Integration\Block\Adminhtml\System\Config\RecreatePPProduct $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<?php $buttonUrl = $block->escapeJs($block->getButtonUrl()); ?>
+<div class="actions actions-recreate-pp-product">
+    <p class="admin__field-error hidden" id="validation_result"></p>
+    <button class="action-recreate-pp-product" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#validation_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+    'onclick',
+    'window.location.href="'.$buttonUrl.'";',
+    '#' . /* @noEscape */ $block->getHtmlId()
+); ?>
