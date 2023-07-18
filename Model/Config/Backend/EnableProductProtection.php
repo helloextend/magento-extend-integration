@@ -54,6 +54,7 @@ class EnableProductProtection extends Value
             $attributeSet = $this->attributeSetInstaller->createAttributeSet();
             $this->productInstaller->createProduct($attributeSet);
         } else {
+            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_CART_BALANCING, 0);
             $this->writer->save(
                 \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
                 0
