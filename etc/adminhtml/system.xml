@@ -57,7 +57,6 @@
                     <label>Enable Cart Balancing</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <frontend_model>Extend\Integration\Model\Config\Frontend\EnableCartBalancing</frontend_model>
-                    <backend_model>Extend\Integration\Model\Config\Backend\Enable</backend_model>
                     <comment>Enable Cart Balancing to ensure correct number of product protection plans vs their respective products.</comment>
                 </field>
                 <group id="offer_display_settings" translate="label" type="text" sortOrder="30" showInDefault="1">
