@@ -38,7 +38,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         if (selectedId && selectedId !== '') {
           selectedPrice =
             swatchRenderer.options.jsonConfig.optionPrices[selectedId].finalPrice.amount
-          selectedProductSku = swatchRenderer.options.jsonConfig.skus[selectedId]
+          selectedProductSku = swatchRenderer.options.jsonConfig.sku[selectedId]
         }
       }
     } else {
