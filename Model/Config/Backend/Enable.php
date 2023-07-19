@@ -52,6 +52,7 @@ class Enable extends Value
         if ($isV2Enabled === 0) {
             $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION, 0);
             $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION, 0);
+            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_CART_BALANCING, 1);
             $this->writer->save(
                 \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
                 0
