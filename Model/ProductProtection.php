@@ -408,9 +408,12 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             $options = $this->createOptions($product, $item, $optionValues);
-            $item->setOptions($options);
-
-            $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
+            if (isset($options)) {
+                $item->setOptions($options);
+            }
+            if ((isset($leadToken) && isset($leadQuantity)) || isset($term) || isset($productId)) {
+                $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
+            }
 
             // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);

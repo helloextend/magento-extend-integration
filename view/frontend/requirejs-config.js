@@ -14,6 +14,7 @@ var config = {
       simpleProductProtectionOffer:
         'Extend_Integration/js/view/cart/product-protection-simple-offer',
       minicartSimpleOffer: 'Extend_Integration/js/view/cart/minicart-updates',
+      normalizeCart: 'Extend_Integration/js/view/cart/normalize-cart',
       cartUtils: 'Extend_Integration/js/utils/cart-utils',
     },
   },
