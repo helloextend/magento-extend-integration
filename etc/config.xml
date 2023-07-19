@@ -8,17 +8,20 @@
             <integration>
                 <enable>1</enable>
             </integration>
+        </extend>
+        <extend_plans>
             <shipping_protection>
                 <enable>1</enable>
             </shipping_protection>
             <product_protection>
                 <enable>0</enable>
                 <offer_display_settings>
-                    <enable_cart_offer>0</enable_cart_offer>
-                    <enable_pdp_offer>0</enable_pdp_offer>
-                    <enable_post_purchase_lead_modal_offer>0</enable_post_purchase_lead_modal_offer>
+                    <enable_cart_offer>1</enable_cart_offer>
+                    <enable_pdp_offer>1</enable_pdp_offer>
+                    <enable_product_catalog_page_modal_offer>1</enable_product_catalog_page_modal_offer>
+                    <enable_post_purchase_lead_modal_offer>1</enable_post_purchase_lead_modal_offer>
                 </offer_display_settings>
             </product_protection>
-        </extend>
+        </extend_plans>
     </default>
 </config>

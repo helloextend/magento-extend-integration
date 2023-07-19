@@ -1,4 +1,5 @@
 <?php
+
 /** @var \Magento\Quote\Model\Quote\Item $_item */
 $item = $block->getItem();
 
@@ -13,23 +14,29 @@ $productType = $product->getTypeId();
 $categoryName = '';
 
 if ($category = $product->getCategory()) {
-    $categoryName = $category->getName();
+  $categoryName = $category->getName();
 }
+
+$viewModel = $block->getData('viewModel');
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionCartOfferEnabled();
 ?>
-<div>
+
+<?php if ($shouldRender) : ?>
+  <div>
     <div class="product-protection-offer" id="product_protection_offer_<?= $product->getSku() ?>"></div>
-</div>
-<script type="text/x-magento-init">
+  </div>
+  <script type="text/x-magento-init">
     {
         "#product_protection_offer_<?= $product->getSku() ?>": {
             "simpleProductProtectionOffer": [
                {
                         "extendStoreUuid": "<?= $block
-                            ->getData('viewModel')
-                            ->getExtendStoreUuid() ?>",
+                                              ->getData('viewModel')
+                                              ->getExtendStoreUuid() ?>",
                         "activeEnvironment": "<?= $block
-                            ->getData('viewModel')
-                            ->getActiveEnvironment() ?>",
+                                                ->getData('viewModel')
+                                                ->getActiveEnvironment() ?>",
                         "selectedProductSku": "<?= $product->getSku() ?>",
                         "selectedProductPrice": "<?= $product->getPrice() ?>",
                         "productCategory": "<?= $categoryName ?>"
@@ -38,3 +45,4 @@ if ($category = $product->getCategory()) {
         }
     }
 </script>
+<?php endif; ?>

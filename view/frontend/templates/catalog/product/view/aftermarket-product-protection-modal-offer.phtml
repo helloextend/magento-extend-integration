@@ -5,17 +5,23 @@ $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
 
 $leadToken = $escaper->escapeHtml($escaper->escapeJs($viewModel->getLeadTokenFromUrl()));
+$viewModel = $block->getData('viewModel');
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionPostPurchaseLeadModalOfferEnabled();
 ?>
-<script type="text/x-magento-init">
-  {
-        "*": {
-            "aftermarketProductProtectionModalOffer": [
-                {
-                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                    "activeEnvironment": "<?= $activeEnvironment ?>",
-                    "leadToken": "<?= /* @noEscape */ $leadToken ?>"
-                }
-            ]
-        }
-    }
-</script>
+
+<?php if ($shouldRender) : ?>
+  <script type="text/x-magento-init">
+    {
+          "*": {
+              "aftermarketProductProtectionModalOffer": [
+                  {
+                      "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                      "activeEnvironment": "<?= $activeEnvironment ?>",
+                      "leadToken": "<?= /* @noEscape */ $leadToken ?>"
+                  }
+              ]
+          }
+      }
+  </script>
+<?php endif; ?>

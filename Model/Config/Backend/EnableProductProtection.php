@@ -66,6 +66,10 @@ class EnableProductProtection extends Value
                 \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER,
                 0
             );
+            $this->writer->save(
+                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER,
+                0
+            );
         }
         return parent::afterSave();
     }
