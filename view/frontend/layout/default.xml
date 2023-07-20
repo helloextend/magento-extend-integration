@@ -16,6 +16,7 @@
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
                 </arguments>
             </block>
+            <block name="extend.cart.normalized" template="Extend_Integration::cart/cart-normalization.phtml" />
         </referenceContainer>
     </body>
 </page>
