@@ -6,8 +6,21 @@
 
 namespace Extend\Integration\Controller\Adminhtml\Extend;
 
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Message\ManagerInterface;
+
 class About extends \Magento\Backend\App\Action
 {
+    /**
+     * @param Context $context
+     * @param ManagerInterface $messageManager
+     */
+    public function __construct(Context $context, ManagerInterface $messageManager)
+    {
+        parent::__construct($context);
+        $this->messageManager = $messageManager;
+    }
+
     /**
      * Redirects to Extend.com
      *
