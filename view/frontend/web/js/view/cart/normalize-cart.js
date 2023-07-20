@@ -3,13 +3,10 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define([
-  'uiComponent',
-  'ko',
-  'Magento_Customer/js/customer-data',
-  'Magento_Checkout/js/action/get-totals',
-  'ExtendMagento',
-], function (Component, ko, customerData, getTotalsAction, ExtendMagento) {
+define(['Magento_Customer/js/customer-data', 'ExtendMagento'], function (
+  customerData,
+  ExtendMagento,
+) {
   'use strict'
 
   function normalize() {
@@ -35,7 +32,7 @@ define([
     }
   }
 
-  return function (config) {
+  return function () {
     try {
       // Normalize on cart changes
       customerData.get('cart').subscribe(function () {
