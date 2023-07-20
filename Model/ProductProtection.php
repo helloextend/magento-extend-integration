@@ -408,9 +408,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             $options = $this->createOptions($product, $item, $optionValues);
-            if (isset($options)) {
-                $item->setOptions($options);
-            }
+
+            $item->setOptions($options);
+
             if ((isset($leadToken) && isset($leadQuantity)) || isset($term) || isset($productId)) {
                 $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
             }
