@@ -37,6 +37,7 @@ define(['Magento_Customer/js/customer-data', 'ExtendMagento', 'cartUtils'], func
     try {
       // Normalize on cart changes
       customerData.get('cart').subscribe(function () {
+        console.log('cart changed')
         normalize()
       })
     } catch (error) {

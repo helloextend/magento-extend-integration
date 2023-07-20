@@ -14,23 +14,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   const itemDetailsSelector = 'div.product-item-details'
   const simpleOfferClass = 'extend-minicart-simple-offer'
 
-  const normalizeCart = function () {
-    const cartItems = cartUtils.getCartItems()
-    if (cartItems.length > 0) {
-      ExtendMagento.normalizeCart({
-        cartItems,
-        callback: function (err, updates) {
-          if (err) {
-            return
-          }
-          if (Object.values(updates).length > 0) {
-            cartUtils.refreshMiniCart()
-          }
-        },
-      })
-    }
-  }
-
   const handleUpdate = function () {
     const cartItems = cartUtils.getCartItems()
 
@@ -71,7 +54,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         }
       }
     })
-    normalizeCart()
   }
 
   const getProductQuantity = function (cartItems, product) {
