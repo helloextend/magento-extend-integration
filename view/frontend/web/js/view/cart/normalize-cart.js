@@ -3,11 +3,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['Magento_Customer/js/customer-data', 'ExtendMagento', 'cartUtils'], function (
-  customerData,
-  ExtendMagento,
-  cartUtils,
-) {
+define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
   'use strict'
 
   function normalize() {
@@ -37,7 +33,7 @@ define(['Magento_Customer/js/customer-data', 'ExtendMagento', 'cartUtils'], func
   return function () {
     try {
       // Normalize on cart changes
-      customerData.get('cart').subscribe(function () {
+      cartUtils.getCartData().subscribe(function () {
         normalize()
       })
     } catch (error) {
