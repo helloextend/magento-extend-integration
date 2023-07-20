@@ -3,15 +3,16 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['Magento_Customer/js/customer-data', 'ExtendMagento'], function (
+define(['Magento_Customer/js/customer-data', 'ExtendMagento', 'cartUtils'], function (
   customerData,
   ExtendMagento,
+  cartUtils,
 ) {
   'use strict'
 
   function normalize() {
     try {
-      const cartItems = customerData.get('cart')().items
+      const cartItems = cartUtils.getCartItems()
       if (cartItems.length > 0) {
         ExtendMagento.normalizeCart({
           cartItems,
