@@ -13,24 +13,30 @@ $productPrice = $product->getPrice();
 
 $categoryName = '';
 if ($category = $product->getCategory()) {
-    $categoryName = $category->getName();
+  $categoryName = $category->getName();
 }
+
+$viewModel = $block->getData('viewModel');
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled();
 ?>
 
-<div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $encodedProductSku ?>"></div>
+<?php if ($shouldRender) : ?>
+  <div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $encodedProductSku ?>"></div>
 
-<script type="text/x-magento-init">
+  <script type="text/x-magento-init">
     {
-        "#product_protection_modal_offer_<?= $encodedProductSku ?>": {
-            "productProtectionModalOffer": [
-                {
-                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                    "activeEnvironment": "<?= $activeEnvironment ?>",
-                    "productSku": "<?= $productSku ?>",
-                    "productPrice": "<?= $productPrice ?>",
-                    "productCategory": "<?= $categoryName ?>"
-                }
-            ]
-        }
-    }
-</script>
+          "#product_protection_modal_offer_<?= $encodedProductSku ?>": {
+              "productProtectionModalOffer": [
+                  {
+                      "extendStoreUuid": "<?= $extendStoreUuid ?>",
+                      "activeEnvironment": "<?= $activeEnvironment ?>",
+                      "productSku": "<?= $productSku ?>",
+                      "productPrice": "<?= $productPrice ?>",
+                      "productCategory": "<?= $categoryName ?>"
+                  }
+              ]
+          }
+      }
+  </script>
+<?php endif; ?>
