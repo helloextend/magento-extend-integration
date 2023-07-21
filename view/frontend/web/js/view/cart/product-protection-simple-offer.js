@@ -38,7 +38,14 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
         listPrice,
         offerId,
         quantity: quantity ?? getProductQuantity(cartItems, product),
-      }).then(cartUtils.refreshMiniCart)
+      }).then(function () {
+        // The underlying code in the refreshMiniCart function forces a cart
+        // invalidation that effects more than just the mini cart. We rely on this
+        // to happen before refreshing so that we never get a stale state where the
+        // refreshed page cart is missing the virtual product and thus tries to show offers.
+        cartUtils.refreshMiniCart()
+        window.location.reload()
+      })
     }
   }
 
