@@ -3,12 +3,7 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento', 'Magento_Customer/js/customer-data'], function (
-  cartUtils,
-  Extend,
-  ExtendMagento,
-  customerData,
-) {
+define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
   'use strict'
 
   const getProductQuantity = function (cartItems, product) {
@@ -44,19 +39,12 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'Magento_Customer/js/customer
         offerId,
         quantity: quantity ?? getProductQuantity(cartItems, product),
       }).then(function () {
-        const cartData = cartUtils.getCartData()
-
-        cartData.subscribe(function (_updatedCartData) {
-          window.location.reload()
-        })
-
-        // This will trigger the above subscribe function. When we simply
-        // tried to call window.location.reload() here the result would be
-        // that we'd see an updated cart but the offer would still show because
-        // the underlying cart values would be missing the newly added virtual item
-        const sectionsToUpdate = ['cart']
-        customerData.invalidate(sectionsToUpdate)
-        customerData.reload(sectionsToUpdate, true)
+        // The underlying code in the refreshMiniCart function forces a cart
+        // invalidation that effects more than just the mini cart. We rely on this
+        // to happen before refreshing so that we never get a stale state where the
+        // refreshed page cart is missing the virtual product and thus tries to show offers.
+        cartUtils.refreshMiniCart()
+        window.location.reload()
       })
     }
   }
