@@ -85,7 +85,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     })
 
     // Listen for the add to cart button to be clicked.  Show modal offer on qualifying simple and configurable products if no offer was chosen by the customer.
-    document.getElementById('product-addtocart-button').addEventListener('click', function () {
+    document.getElementById('product-addtocart-button').addEventListener('click', function (event) {
       const buttonInstance = Extend.buttons.instance(
         '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       )
@@ -128,6 +128,9 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
             }).then(cartUtils.refreshMiniCart)
             // If no plan is selected, open the offer modal
           } else {
+            event.preventDefault()
+            event.stopPropagation()
+            const eventObj = event
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
               price: selectedProduct.selectedProductPrice * 100,
@@ -153,6 +156,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
                     quantity,
                   }).then(cartUtils.refreshMiniCart)
                 }
+                $(eventObj.target.parentElement).trigger('submit')
               },
             })
           }
