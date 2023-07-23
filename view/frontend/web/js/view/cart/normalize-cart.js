@@ -6,12 +6,13 @@
 define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
   'use strict'
 
-  function normalize() {
+  function normalize(balanceCart = false) {
     try {
       const cartItems = cartUtils.getCartItems()
       if (cartItems.length > 0) {
         ExtendMagento.normalizeCart({
           cartItems,
+          balanceCart,
           callback: function (err, updates) {
             if (err) {
               return
