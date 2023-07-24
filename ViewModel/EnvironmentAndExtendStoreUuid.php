@@ -12,6 +12,7 @@ use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Request\Http;
 
@@ -93,7 +94,14 @@ class EnvironmentAndExtendStoreUuid implements
 
     public function isCartBalancingEnabled(): bool
     {
-        return $this->scopeConfig->getValue(Extend::ENABLE_CART_BALANCING) === '1';
+        $storeId = $this->storeManager->getStore()->getId();
+        // Determine the scope based on the provided store code or use the default scope if storeCode is null
+        $scopeType = $storeId ? ScopeInterface::SCOPE_STORES : ScopeInterface::SCOPE_TYPE_DEFAULT;
+        return $this->scopeConfig->getValue(
+            Extend::ENABLE_CART_BALANCING,
+            ScopeInterface::SCOPE_STORE,
+            $storeId
+        ) === '1';
     }
 
     public function isProductProtectionProductDisplayPageOfferEnabled(): bool

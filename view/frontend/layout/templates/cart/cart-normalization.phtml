@@ -1,0 +1,19 @@
+<?php
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+$viewModel = $this->getData('viewModel');
+$shouldBalanceCart = $viewModel->isCartBalancingEnabled();
+?>
+
+<script type="text/x-magento-init">
+    {
+        "*":{
+            "normalizeCart":
+              {
+                "balanceCart": "<?= json_encode($shouldBalanceCart) ?>"
+              }
+        }
+    }
+</script>
