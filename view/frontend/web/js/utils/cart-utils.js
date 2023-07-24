@@ -9,6 +9,9 @@ define(['Magento_Customer/js/customer-data'], function (customerData) {
     return customerData.get('cart')().items ?? []
   }
 
+  const getCartData = function () {
+    return customerData.get('cart')
+  }
   const refreshMiniCart = function () {
     const sectionsToUpdate = ['cart']
     customerData.invalidate(sectionsToUpdate)
@@ -30,5 +33,6 @@ define(['Magento_Customer/js/customer-data'], function (customerData) {
     getCartItems,
     refreshMiniCart,
     mapToExtendCartItem,
+    getCartData,
   }
 })

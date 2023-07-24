@@ -38,12 +38,18 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
         listPrice,
         offerId,
         quantity: quantity ?? getProductQuantity(cartItems, product),
-      }).then(cartUtils.refreshMiniCart)
+      }).then(function () {
+        // The underlying code in the refreshMiniCart function forces a cart
+        // invalidation that effects more than just the mini cart. We rely on this
+        // to happen before refreshing so that we never get a stale state where the
+        // refreshed page cart is missing the virtual product and thus tries to show offers.
+        cartUtils.refreshMiniCart()
+        window.location.reload()
+      })
     }
   }
 
-  return function (config) {
-    const cartItems = cartUtils.getCartItems()
+  const renderSimpleOffer = function (cartItems, config) {
     const sku = config[0].selectedProductSku
     const isWarrantyInCart = ExtendMagento.warrantyInCart({
       lineItemSku: sku,
@@ -56,11 +62,26 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
       price: config[0].selectedProductPrice * 100,
       onAddToCart: handleAddToCartClick,
     }
-    Extend.config({ storeId: config[0].extendStoreUuid, environment: config[0].activeEnvironment })
+    Extend.config({
+      storeId: config[0].extendStoreUuid,
+      environment: config[0].activeEnvironment,
+    })
 
     Extend.buttons.renderSimpleOffer(
       '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
       activeProductData,
     )
+  }
+
+  return function (config) {
+    const cartData = cartUtils.getCartData()
+    const cartItems = cartUtils.getCartItems()
+    if (cartItems.length > 0) {
+      renderSimpleOffer(cartItems, config)
+    }
+    cartData.subscribe(function (updatedCartData) {
+      const cartItems = updatedCartData.items
+      renderSimpleOffer(cartItems, config)
+    })
   }
 })
