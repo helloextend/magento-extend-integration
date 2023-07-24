@@ -130,7 +130,6 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
           } else {
             event.preventDefault()
             event.stopPropagation()
-            const eventObj = event
             Extend.modal.open({
               referenceId: selectedProduct.selectedProductSku,
               price: selectedProduct.selectedProductPrice * 100,
@@ -156,7 +155,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
                     quantity,
                   }).then(cartUtils.refreshMiniCart)
                 }
-                $(eventObj.target.parentElement).trigger('submit')
+                $('#product-addtocart-button').trigger('submit')
               },
             })
           }
