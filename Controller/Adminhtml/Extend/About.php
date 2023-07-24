@@ -11,6 +11,9 @@ use Magento\Framework\Message\ManagerInterface;
 
 class About extends \Magento\Backend\App\Action
 {
+    const EXTEND_ABOUT_URL = 'https://www.extend.com';
+    const FALLBACK_URL = '/admin/dashboard/index';
+
     /**
      * @param Context $context
      * @param ManagerInterface $messageManager
@@ -29,14 +32,12 @@ class About extends \Magento\Backend\App\Action
     public function execute()
     {
         try {
-            $this->getResponse()->setRedirect(
-                $this->_redirect->getRedirectUrl($this->getUrl('https://www.extend.com/'))
-            );
+            $this->getResponse()
+                ->setRedirect(self::EXTEND_ABOUT_URL)
+                ->sendResponse();
         } catch (\Exception $exception) {
-            $this->messageManager->addErrorMessage(
-                'Could not redirect to Extend.' . $exception->getMessage()
-            );
-            $this->getResponse()->setRedirect($this->_redirect->getRedirectUrl($this->getUrl('*')));
+            $this->messageManager->addErrorMessage('Could not redirect to Extend.com.');
+            $this->getResponse()->setRedirect($this->_redirect->getRedirectUrl(self::FALLBACK_URL));
         }
     }
 }
