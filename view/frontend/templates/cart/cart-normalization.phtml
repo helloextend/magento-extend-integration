@@ -3,16 +3,16 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-$viewModel = $block->getData('viewModel');
-$shouldBalanceCart = $viewModel->isCartBalancingEnabled();
 ?>
 
 <script type="text/x-magento-init">
     {
         "*":{
-            "normalizeCart": {
-                balanceCart: $shouldBalanceCart
-            }
+            "normalizeCart": [
+              {
+                "balanceCart": "<?= $block->getData('viewModel')->isCartBalancingEnabled() ?>"
+              }
+            ]
         }
     }
 </script>
