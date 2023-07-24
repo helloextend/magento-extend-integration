@@ -9,5 +9,6 @@
         <add id="Extend_Integration::integration" title="Integration" translate="title" module="Extend_Integration" sortOrder="10" parent="Extend_Integration::extend" action="admin/integration" resource="Extend_Integration::integration" />
         <add id="Extend_Integration::store_configuration" title="Settings" translate="title" module="Extend_Integration" sortOrder="20" parent="Extend_Integration::extend" action="admin/system_config/edit/section/extend" resource="Extend_Integration::integration" />
         <add id="Extend_Integration::about_extend" title="About" translate="title" module="Extend_Integration" sortOrder="30" parent="Extend_Integration::extend" action="extend_integration/extend/about" resource="Extend_Integration::integration" target="_blank" />
+        <add id="Extend_Integration::request_support" title="Request Support" translate="title" module="Extend_Integration" sortOrder="40" parent="Extend_Integration::extend" action="extend_integration/extend/requestsupport" resource="Extend_Integration::integration" target="_blank" />
     </menu>
 </config>
