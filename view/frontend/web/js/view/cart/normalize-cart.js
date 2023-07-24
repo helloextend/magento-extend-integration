@@ -31,11 +31,11 @@ define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
     }
   }
 
-  return function () {
+  return function (balanceCart = false) {
     try {
       // Normalize on cart changes
       cartUtils.getCartData().subscribe(function () {
-        normalize()
+        normalize(balanceCart)
       })
     } catch (error) {
       // Swallow error to avoid impacting customer checkout experience
