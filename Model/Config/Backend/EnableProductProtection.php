@@ -10,19 +10,17 @@ use Magento\Framework\App\Config\Value;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductInstaller;
 use Magento\Framework\App\Config\Storage\WriterInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class EnableProductProtection extends Value
 {
     private AttributeSetInstaller $attributeSetInstaller;
     private ProductInstaller $productInstaller;
     private WriterInterface $writer;
-    private ScopeConfigInterface $config;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        ScopeConfigInterface $config,
+        \Magento\Framework\App\Config\ScopeConfigInterface $config,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
@@ -41,7 +39,6 @@ class EnableProductProtection extends Value
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->productInstaller = $productInstaller;
         $this->writer = $writer;
-        $this->config = $config;
     }
 
     /**
