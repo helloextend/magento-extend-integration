@@ -10,17 +10,19 @@ use Magento\Framework\App\Config\Value;
 use Extend\Integration\Setup\Model\AttributeSetInstaller;
 use Extend\Integration\Setup\Model\ProductInstaller;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class EnableProductProtection extends Value
 {
     private AttributeSetInstaller $attributeSetInstaller;
     private ProductInstaller $productInstaller;
     private WriterInterface $writer;
+    private ScopeConfigInterface $config;
 
     public function __construct(
         \Magento\Framework\Model\Context $context,
         \Magento\Framework\Registry $registry,
-        \Magento\Framework\App\Config\ScopeConfigInterface $config,
+        ScopeConfigInterface $config,
         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
@@ -39,6 +41,7 @@ class EnableProductProtection extends Value
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->productInstaller = $productInstaller;
         $this->writer = $writer;
+        $this->config = $config;
     }
 
     /**
@@ -53,23 +56,6 @@ class EnableProductProtection extends Value
         if ($isPPV2Enabled === 1) {
             $attributeSet = $this->attributeSetInstaller->createAttributeSet();
             $this->productInstaller->createProduct($attributeSet);
-        } else {
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER,
-                0
-            );
         }
         return parent::afterSave();
     }
