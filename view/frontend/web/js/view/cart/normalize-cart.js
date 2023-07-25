@@ -31,7 +31,7 @@ define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
     }
   }
 
-  return function (balanceCart = false) {
+  return function (balanceCart) {
     try {
       // Normalize on cart changes
       cartUtils.getCartData().subscribe(function () {
