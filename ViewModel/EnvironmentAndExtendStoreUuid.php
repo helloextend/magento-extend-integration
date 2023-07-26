@@ -94,7 +94,7 @@ class EnvironmentAndExtendStoreUuid implements
 
     public function isCartBalancingEnabled(): bool
     {
-        return $this->scopeConfig->getValue(Extend::ENABLE_CART_BALANCING) === '1';
+        return $this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING) === '1';
     }
 
     public function isProductProtectionProductDisplayPageOfferEnabled(): bool

@@ -4,11 +4,11 @@
  * See Extend-COPYING.txt for license details.
  */
 $viewModel = $this->getData('viewModel');
-$shouldBalanceCart = $viewModel->isCartBalancingEnabled();
+$shouldBalanceCart = $viewModel->isCartBalancingEnabled() && $viewModel->isExtendProductProtectionEnabled();
 ?>
 
 <script type="text/x-magento-init">
-    {
+  {
         "*":{
             "normalizeCart":
               {
