@@ -6,12 +6,13 @@
 define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
   'use strict'
 
-  function normalize() {
+  function normalize({ balanceCart }) {
     try {
       const cartItems = cartUtils.getCartItems()
       if (cartItems.length > 0) {
         ExtendMagento.normalizeCart({
           cartItems,
+          balanceCart,
           callback: function (err, updates) {
             if (err) {
               return
@@ -30,11 +31,11 @@ define(['ExtendMagento', 'cartUtils'], function (ExtendMagento, cartUtils) {
     }
   }
 
-  return function () {
+  return function (balanceCart) {
     try {
       // Normalize on cart changes
       cartUtils.getCartData().subscribe(function () {
-        normalize()
+        normalize(balanceCart)
       })
     } catch (error) {
       // Swallow error to avoid impacting customer checkout experience
