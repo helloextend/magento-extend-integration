@@ -14,7 +14,6 @@ use Magento\Store\Model\Store;
 
 class ShippingProtection extends \Magento\Framework\View\Element\Template
 {
-
     /**
      * @var Order
      */
@@ -98,17 +97,17 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     {
         $parentType = $parent->getType();
 
-        if ($parentType === \Magento\Sales\Block\Order\Totals::class) {
+        if (is_a($parentType, \Magento\Sales\Block\Order\Totals::class, true)) {
             $extensionAttributes = $parent->getOrder()->getExtensionAttributes();
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->orderExtensionFactory->create();
             }
-        } elseif ($parentType === \Magento\Sales\Block\Order\Invoice\Totals::class) {
+        } elseif (is_a($parentType, \Magento\Sales\Block\Order\Invoice\Totals::class, true)) {
             $extensionAttributes = $parent->getInvoice()->getExtensionAttributes();
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->invoiceExtensionFactory->create();
             }
-        } elseif ($parentType === \Magento\Sales\Block\Order\Creditmemo\Totals::class) {
+        } elseif (is_a($parentType, \Magento\Sales\Block\Order\Creditmemo\Totals::class, true)) {
             $extensionAttributes = $parent->getCreditmemo()->getExtensionAttributes();
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->creditmemoExtensionFactory->create();
@@ -120,7 +119,7 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        return (float)$shippingProtection->getPrice();
+        return (float) $shippingProtection->getPrice();
     }
 
     /**
@@ -136,14 +135,12 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
         $this->_source = $parent->getSource();
 
         if ($this->getShippingProtection($parent) > 0) {
-            $total = new \Magento\Framework\DataObject(
-                [
-                    'code' => 'shipping_protection',
-                    'strong' => false,
-                    'value' => $this->getShippingProtection($parent),
-                    'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
-                ]
-            );
+            $total = new \Magento\Framework\DataObject([
+                'code' => 'shipping_protection',
+                'strong' => false,
+                'value' => $this->getShippingProtection($parent),
+                'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
+            ]);
 
             $parent->addTotal($total, 'shipping');
         }
