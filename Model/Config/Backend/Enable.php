@@ -53,6 +53,7 @@ class Enable extends Value
             $dependentConfigPaths = [
                 \Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION,
                 \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION,
+                \Extend\Integration\Service\Extend::ENABLE_CART_BALANCING,
             ];
 
             foreach ($dependentConfigPaths as $path) {

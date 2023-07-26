@@ -15,6 +15,7 @@
             </shipping_protection>
             <product_protection>
                 <enable>0</enable>
+                <enable_cart_balancing>1</enable_cart_balancing>
                 <offer_display_settings>
                     <enable_cart_offer>1</enable_cart_offer>
                     <enable_minicart_offer>1</enable_minicart_offer>

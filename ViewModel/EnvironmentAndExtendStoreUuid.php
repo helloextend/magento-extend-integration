@@ -92,6 +92,11 @@ class EnvironmentAndExtendStoreUuid implements
         return $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
     }
 
+    public function isCartBalancingEnabled(): bool
+    {
+        return $this->scopeConfig->getValue(Extend::ENABLE_CART_BALANCING) === '1';
+    }
+
     public function isProductProtectionProductDisplayPageOfferEnabled(): bool
     {
         return $this->getScopedConfigValue(
