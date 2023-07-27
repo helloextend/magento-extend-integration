@@ -94,7 +94,7 @@ class EnvironmentAndExtendStoreUuid implements
 
     public function isCartBalancingEnabled(): bool
     {
-        return $this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING) === '1';
+        return boolval($this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING));
     }
 
     public function isProductProtectionProductDisplayPageOfferEnabled(): bool
@@ -138,7 +138,7 @@ class EnvironmentAndExtendStoreUuid implements
     {
         $scopeCode = $this->storeManager->getStore()->getCode();
         $scopeType = ScopeInterface::SCOPE_STORES;
-        return $this->scopeConfig->getValue($configPath, $scopeType, $scopeCode);
+        return $this->scopeConfig->getValue($configPath, $scopeType, $scopeCode) ?: '';
     }
 
     /**
