@@ -50,25 +50,15 @@ class Enable extends Value
     {
         $isV2Enabled = (int) $this->getValue();
         if ($isV2Enabled === 0) {
-            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION, 0);
-            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION, 0);
-            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_CART_BALANCING, 0);
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER,
-                0
-            );
+            $dependentConfigPaths = [
+                \Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION,
+                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION,
+                \Extend\Integration\Service\Extend::ENABLE_CART_BALANCING,
+            ];
+
+            foreach ($dependentConfigPaths as $path) {
+                $this->writer->save($path, 0);
+            }
         }
         return parent::afterSave();
     }

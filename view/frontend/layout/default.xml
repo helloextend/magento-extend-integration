@@ -6,17 +6,17 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block name="extend.minicart" ifconfig="extend_plans/product_protection/enable" template="Extend_Integration::cart/minicart-simple-offer.phtml">
+            <block name="extend.minicart" ifconfig="extend/integration/enable" template="Extend_Integration::cart/minicart-simple-offer.phtml">
                 <arguments>
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
                 </arguments>
             </block>
-            <block name="extend.aftermarket-product-protection-modal-offer" ifconfig="extend_plans/product_protection/enable" template="Extend_Integration::catalog/product/view/aftermarket-product-protection-modal-offer.phtml">
+            <block name="extend.aftermarket-product-protection-modal-offer" ifconfig="extend/integration/enable" template="Extend_Integration::catalog/product/view/aftermarket-product-protection-modal-offer.phtml">
                 <arguments>
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
                 </arguments>
             </block>
-            <block name="extend.cart.normalized" template="Extend_Integration::cart/cart-normalization.phtml">
+            <block name="extend.cart.normalized" ifconfig="extend/integration/enable" template="Extend_Integration::cart/cart-normalization.phtml">
                 <arguments>
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
                 </arguments>
