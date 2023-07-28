@@ -12,7 +12,7 @@ $shouldBalanceCart = $viewModel->isCartBalancingEnabled() && $viewModel->isExten
         "*":{
             "normalizeCart":
               {
-                "balanceCart": "<?= json_encode($shouldBalanceCart) ?>"
+                "balanceCart": <?= json_encode($shouldBalanceCart) ?>
               }
         }
     }

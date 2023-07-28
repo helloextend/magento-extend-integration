@@ -36,7 +36,7 @@ class Extend
 
     public const ENABLE_EXTEND = 'extend/integration/enable';
 
-    public const ENABLE_CART_BALANCING = 'extend/product_protection/enable_cart_balancing';
+    public const ENABLE_CART_BALANCING = 'extend_plans/product_protection/enable_cart_balancing';
 
     public const ENABLE_PRODUCT_PROTECTION_CART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_cart_offer';
     public const ENABLE_PRODUCT_PROTECTION_MINICART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_minicart_offer';

@@ -138,7 +138,7 @@ class EnvironmentAndExtendStoreUuid implements
     {
         $scopeCode = $this->storeManager->getStore()->getCode();
         $scopeType = ScopeInterface::SCOPE_STORES;
-        return $this->scopeConfig->getValue($configPath, $scopeType, $scopeCode);
+        return $this->scopeConfig->getValue($configPath, $scopeType, $scopeCode) ?: '';
     }
 
     /**
