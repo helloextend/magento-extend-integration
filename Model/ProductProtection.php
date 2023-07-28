@@ -358,6 +358,20 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 return;
             }
 
+            foreach ($quote->getItems() as $quoteItem) {
+                if (
+                    $quoteItem->getSku(Extend::WARRANTY_PRODUCT_SKU) &&
+                    $quoteItem->getOptionByCode('plan_id') &&
+                    $quoteItem->getOptionByCode('plan_id')->getValue() == $planId &&
+                    $quoteItem->getOptionByCode('associated_product_sku') &&
+                    $quoteItem->getOptionByCode('associated_product_sku')->getValue() == $productId
+                ) {
+                    $quoteItem->setQty($quoteItem->getQty() + $quantity);
+                    $item = $quoteItem;
+                    break;
+                }
+            }
+
             // if we are adding pp, or we didn't find an existing item, create a new one
             if (!isset($item) || $item === false) {
                 // ensure that we have the required properties to create the protection plan
