@@ -35,14 +35,16 @@ class ConfigPlugin
             foreach ($result as $resultItemKey => $resultItem) {
                 $thisClassPath = get_class($this);
                 $thisExplodedClass = explode('\\', (string) $thisClassPath);
-                $resultNameExplodedClass = explode('\\', $resultItem['instance']);
-                if (
-                    $thisExplodedClass[0] == $resultNameExplodedClass[0] &&
-                    $thisExplodedClass[1] == $resultNameExplodedClass[1] &&
-                    $this->scopeConfig->getValue(Extend::ENABLE_EXTEND) === '0'
-                ) {
-                    $resultItem['disabled'] = true;
-                    $result[$resultItemKey] = $resultItem;
+                if (isset($resultItem['instance'])) {
+                    $resultNameExplodedClass = explode('\\', $resultItem['instance']);
+                    if (
+                        $thisExplodedClass[0] == $resultNameExplodedClass[0] &&
+                        $thisExplodedClass[1] == $resultNameExplodedClass[1] &&
+                        $this->scopeConfig->getValue(Extend::ENABLE_EXTEND) === '0'
+                    ) {
+                        $resultItem['disabled'] = true;
+                        $result[$resultItemKey] = $resultItem;
+                    }
                 }
             }
         }
