@@ -12,6 +12,7 @@ use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Request\Http;
 
@@ -88,38 +89,56 @@ class EnvironmentAndExtendStoreUuid implements
 
     public function isExtendProductProtectionEnabled(): bool
     {
-        return $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
+        return $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
     }
 
     public function isCartBalancingEnabled(): bool
     {
-        return $this->scopeConfig->getValue(Extend::ENABLE_CART_BALANCING) === '1';
+        return $this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING) === '1';
     }
 
     public function isProductProtectionProductDisplayPageOfferEnabled(): bool
     {
-        return $this->scopeConfig->getValue(
+        return $this->getScopedConfigValue(
             Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER
         ) === '1';
     }
 
     public function isProductProtectionCartOfferEnabled(): bool
     {
-        return $this->scopeConfig->getValue(Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER) === '1';
+        return $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER) === '1';
+    }
+    public function isProductProtectionMinicartOfferEnabled(): bool
+    {
+        return $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION_MINICART_OFFER) ===
+            '1';
     }
 
     public function isProductProtectionPostPurchaseLeadModalOfferEnabled(): bool
     {
-        return $this->scopeConfig->getValue(
+        return $this->getScopedConfigValue(
             Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER
         ) === '1';
     }
 
     public function isProductProtectionProductCatalogPageModalOfferEnabled(): bool
     {
-        return $this->scopeConfig->getValue(
+        return $this->getScopedConfigValue(
             Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER
         ) === '1';
+    }
+
+    /**
+     * Get Scoped Config Value
+     *
+     * @param string $configPath
+     * @return string
+     */
+    private function getScopedConfigValue(string $configPath): string
+    {
+        $scopeCode = $this->storeManager->getStore()->getCode();
+        $scopeType = ScopeInterface::SCOPE_STORES;
+        return $this->scopeConfig->getValue($configPath, $scopeType, $scopeCode) ?: '';
     }
 
     /**

@@ -6,18 +6,21 @@
 $viewModel = $block->getData('viewModel');
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionMinicartOfferEnabled();
 ?>
 
-<div id="extendMinicartSimpleOffer"></div>
-<script type="text/x-magento-init">
+<?php if ($shouldRender) : ?>
+  <div id="extendMinicartSimpleOffer"></div>
+  <script type="text/x-magento-init">
     {
         "#extendMinicartSimpleOffer": {
             "minicartSimpleOffer": [
-               {
+                {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",
                     "activeEnvironment": "<?= $activeEnvironment ?>"
                 }
             ]
         }
     }
-</script>
+  </script>
+<?php endif; ?>

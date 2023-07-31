@@ -36,9 +36,10 @@ class Extend
 
     public const ENABLE_EXTEND = 'extend/integration/enable';
 
-    public const ENABLE_CART_BALANCING = 'extend/product_protection/enable_cart_balancing';
+    public const ENABLE_CART_BALANCING = 'extend_plans/product_protection/enable_cart_balancing';
 
     public const ENABLE_PRODUCT_PROTECTION_CART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_cart_offer';
+    public const ENABLE_PRODUCT_PROTECTION_MINICART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_minicart_offer';
     public const ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_pdp_offer';
     public const ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_post_purchase_lead_modal_offer';
     public const ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_product_catalog_page_modal_offer';

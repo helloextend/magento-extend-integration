@@ -53,24 +53,6 @@ class EnableProductProtection extends Value
         if ($isPPV2Enabled === 1) {
             $attributeSet = $this->attributeSetInstaller->createAttributeSet();
             $this->productInstaller->createProduct($attributeSet);
-        } else {
-            $this->writer->save(\Extend\Integration\Service\Extend::ENABLE_CART_BALANCING, 0);
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_CART_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER,
-                0
-            );
-            $this->writer->save(
-                \Extend\Integration\Service\Extend::ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER,
-                0
-            );
         }
         return parent::afterSave();
     }
