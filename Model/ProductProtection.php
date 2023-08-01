@@ -364,6 +364,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 );
             }
 
+            // Check whether a product protection item already exists in the cart
             if (!isset($item) || $item === false) {
                 foreach ($quote->getItems() as $quoteItem) {
                     if (
@@ -416,31 +417,19 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     ->setIsSuperMode(true);
             }
 
-            $optionValues = [
-                self::PLAN_TYPE_CODE => $coverageType,
-                self::TERM_CODE => $term,
-                self::LIST_PRICE_CODE => $listPrice,
-                self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
-                self::LEAD_TOKEN => $leadToken,
-                self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
-                self::PLAN_ID_CODE => $planId,
-            ];
-
-            if ($leadToken) {
-                $this->setLeadTokenData(
-                    $optionValues,
-                    $quantity,
-                    $product,
-                    $item,
-                    $leadToken,
-                    $cartItemId,
-                    $term,
-                    $productId
-                );
-            } else {
-                $options = $this->createOptions($product, $item, $optionValues);
-                $item->setOptions($options);
-            }
+            $this->processOptions(
+                $cartItemId,
+                $leadToken,
+                $quantity,
+                $product,
+                $item,
+                $term,
+                $productId,
+                $planId,
+                $coverageType,
+                $listPrice,
+                $orderOfferPlanId
+            );
 
             // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);
@@ -660,29 +649,45 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
     }
 
     /**
-     * This sets leadToken data on the quote item, if the leadToken is provided
+     * This function adds options unique to the Product Protection product as well as additional options customary to Magento
      *
-     * @param $optionValues
+     * @param $cartItemId
+     * @param $leadToken
      * @param $quantity
      * @param $product
      * @param $item
-     * @param $leadToken
-     * @param $cartItemId
      * @param $term
      * @param $productId
+     * @param $planId
+     * @param $listPrice
+     * @param $orderOfferPlanId
+     * @param $coverageType
      * @return void
      * @throws LocalizedException
      */
-    private function setLeadTokenData(
-        $optionValues,
+    private function processOptions(
+        $cartItemId,
+        $leadToken,
         $quantity,
         $product,
         $item,
-        $leadToken,
-        $cartItemId,
         $term,
-        $productId
+        $productId,
+        $planId,
+        $listPrice,
+        $orderOfferPlanId,
+        $coverageType
     ) {
+        $optionValues = [
+            self::PLAN_TYPE_CODE => $coverageType,
+            self::TERM_CODE => $term,
+            self::LIST_PRICE_CODE => $listPrice,
+            self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
+            self::LEAD_TOKEN => $leadToken,
+            self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
+            self::PLAN_ID_CODE => $planId,
+        ];
+
         $leadQuantity = null;
 
         if (isset($leadToken) && !isset($cartItemId)) {
