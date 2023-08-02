@@ -325,6 +325,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             $unmaskedCartId = null;
+
             if ($cartId) {
                 try {
                     $unmaskedCartId = $this->maskedQuoteIdToQuoteId->execute($cartId);
@@ -337,8 +338,20 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             if (isset($cartItemId)) {
+                // if quantity is 0, remove the item from the quote
+                if ($quantity === 0) {
+                    $quote->removeItem($cartItemId);
+                    $this->quoteRepository->save($quote->collectTotals());
+                    return;
+                }
+
                 $item = $quote->getItemById($cartItemId);
-                if ($item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU) {
+
+                if (
+                    $item &&
+                    $item->getProduct() &&
+                    $item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU
+                ) {
                     throw new LocalizedException(
                         new Phrase('Cannot update non product-protection item')
                     );
@@ -351,11 +364,24 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 );
             }
 
-            // if quantity is 0, remove the item from the quote
-            if ($quantity === 0 && isset($cartItemId)) {
-                $quote->removeItem($cartItemId);
-                $this->quoteRepository->save($quote->collectTotals());
-                return;
+            // Check whether a product protection item already exists in the cart
+            if (!isset($item) || $item === false) {
+                foreach ($quote->getItems() as $quoteItem) {
+                    if (
+                        $quoteItem->getSku(Extend::WARRANTY_PRODUCT_SKU) &&
+                        $quoteItem->getOptionByCode('plan_id') &&
+                        $quoteItem->getOptionByCode('plan_id')->getValue() == $planId &&
+                        $quoteItem->getOptionByCode('associated_product_sku') &&
+                        $quoteItem->getOptionByCode('associated_product_sku')->getValue() ==
+                            $productId
+                    ) {
+                        if (isset($quantity)) {
+                            $quoteItem->setQty($quoteItem->getQty() + $quantity);
+                        }
+                        $item = $quoteItem;
+                        break;
+                    }
+                }
             }
 
             // if we are adding pp, or we didn't find an existing item, create a new one
@@ -374,14 +400,11 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     );
                 }
                 $item = $this->itemFactory->create();
+                $item->setQty($quantity);
             }
 
             $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             $item->setProduct($product);
-
-            if (isset($quantity)) {
-                $item->setQty($quantity);
-            }
 
             if (isset($price)) {
                 $item
@@ -391,29 +414,19 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     ->setIsSuperMode(true);
             }
 
-            $optionValues = [
-                self::PLAN_TYPE_CODE => $coverageType,
-                self::TERM_CODE => $term,
-                self::LIST_PRICE_CODE => $listPrice,
-                self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
-                self::LEAD_TOKEN => $leadToken,
-                self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
-                self::PLAN_ID_CODE => $planId,
-            ];
-
-            $leadQuantity = null;
-            if (isset($leadToken) && !isset($cartItemId)) {
-                $optionValues[self::LEAD_QUANTITY_CODE] = $quantity;
-                $leadQuantity = $quantity;
-            }
-
-            $options = $this->createOptions($product, $item, $optionValues);
-
-            $item->setOptions($options);
-
-            if ((isset($leadToken) && isset($leadQuantity)) || isset($term) || isset($productId)) {
-                $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
-            }
+            $this->processOptions(
+                $cartItemId,
+                $leadToken,
+                $quantity,
+                $product,
+                $item,
+                $term,
+                $productId,
+                $planId,
+                $coverageType,
+                $listPrice,
+                $orderOfferPlanId
+            );
 
             // add the item to the quote and persist the quote so that the item <-> quote relationship is created
             $quote->addItem($item);
@@ -630,5 +643,60 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             'code' => 'additional_options',
             'value' => $this->serializer->serialize($additionalOptions),
         ]);
+    }
+
+    /**
+     * This function adds options unique to the Product Protection product as well as additional options customary to Magento
+     *
+     * @param $cartItemId
+     * @param $leadToken
+     * @param $quantity
+     * @param $product
+     * @param $item
+     * @param $term
+     * @param $productId
+     * @param $planId
+     * @param $listPrice
+     * @param $orderOfferPlanId
+     * @param $coverageType
+     * @return void
+     * @throws LocalizedException
+     */
+    private function processOptions(
+        $cartItemId,
+        $leadToken,
+        $quantity,
+        $product,
+        $item,
+        $term,
+        $productId,
+        $planId,
+        $listPrice,
+        $orderOfferPlanId,
+        $coverageType
+    ) {
+        $optionValues = [
+            self::PLAN_TYPE_CODE => $coverageType,
+            self::TERM_CODE => $term,
+            self::LIST_PRICE_CODE => $listPrice,
+            self::OFFER_PLAN_ID_CODE => $orderOfferPlanId,
+            self::LEAD_TOKEN => $leadToken,
+            self::ASSOCIATED_PRODUCT_SKU_CODE => $productId,
+            self::PLAN_ID_CODE => $planId,
+        ];
+
+        $leadQuantity = null;
+
+        if (isset($leadToken) && !isset($cartItemId)) {
+            $optionValues[self::LEAD_QUANTITY_CODE] = $quantity;
+            $leadQuantity = $quantity;
+        }
+
+        $options = $this->createOptions($product, $item, $optionValues);
+        $item->setOptions($options);
+
+        if ((isset($leadToken) && isset($leadQuantity)) || isset($term) || isset($productId)) {
+            $this->addAdditionalOptions($item, $productId, $term, $leadToken, $leadQuantity);
+        }
     }
 }
