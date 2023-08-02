@@ -32,9 +32,6 @@ use Magento\Framework\Module\Dir\Reader;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Framework\Setup\Exception as SetupException;
-use Magento\Inventory\Model\SourceItemFactory;
-use Magento\InventoryApi\Api\SourceItemRepositoryInterface;
-use Magento\InventoryApi\Api\SourceItemsSaveInterface;
 use Magento\Store\Model\StoreManagerInterface;
 
 class ProductInstaller
@@ -54,8 +51,6 @@ class ProductInstaller
     private Reader $reader;
     private StoreManagerInterface $storeManager;
     private Registry $registry;
-    private SourceItemFactory $sourceItemFactory;
-    private SourceItemsSaveInterface $sourceItemsSave;
 
     public function __construct(
         DirectoryList $directoryList,
@@ -72,9 +67,7 @@ class ProductInstaller
         ProductResource $productResource,
         Reader $reader,
         StoreManagerInterface $storeManager,
-        Registry $registry,
-        SourceItemsSaveInterface $sourceItemsSave,
-        SourceItemFactory $sourceItemFactory
+        Registry $registry
     ) {
         $this->directoryList = $directoryList;
         $this->entryFactory = $entryFactory;
@@ -91,8 +84,6 @@ class ProductInstaller
         $this->productRepository = $productRepository;
         $this->reader = $reader;
         $this->registry = $registry;
-        $this->sourceItemsSave = $sourceItemsSave;
-        $this->sourceItemFactory = $sourceItemFactory;
     }
 
     public function createProduct($attributeSet)
@@ -101,7 +92,6 @@ class ProductInstaller
             if ($product = $this->createProtectionPlanProduct($attributeSet)) {
                 $this->addImageToPubMedia();
                 $this->processMediaGalleryEntry($this->getMediaImagePath(), $product->getSku());
-                $this->createSourceItem();
             }
         } catch (Exception $exception) {
             throw new Exception(
@@ -180,29 +170,6 @@ class ProductInstaller
         }
     }
 
-    /**
-     * Create inventory source item for PP
-     *
-     * @return void
-     * @throws SetupException
-     */
-    private function createSourceItem()
-    {
-        try {
-            $sourceItem = $this->sourceItemFactory->create();
-            $sourceItem->setSourceCode('default');
-            $sourceItem->setSku(Extend::WARRANTY_PRODUCT_SKU);
-            $sourceItem->setQuantity(1);
-            $sourceItem->setStatus(1);
-            $this->sourceItemsSave->execute([$sourceItem]);
-        } catch (Exception $exception) {
-            throw new SetupException(
-                new Phrase('There was a problem creating the source item: ', [
-                    $exception->getMessage(),
-                ])
-            );
-        }
-    }
     /**
      * Get image to pub media
      *
