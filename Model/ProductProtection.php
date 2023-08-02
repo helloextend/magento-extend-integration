@@ -400,10 +400,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     );
                 }
                 $item = $this->itemFactory->create();
-
-                if (isset($quantity)) {
-                    $item->setQty($quantity);
-                }
+                $item->setQty($quantity);
             }
 
             $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
