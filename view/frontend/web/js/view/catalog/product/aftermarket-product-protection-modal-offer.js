@@ -3,7 +3,11 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
+define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
+  cartUtils,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
 
   return function openModal(config) {
@@ -27,7 +31,8 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
               coverageType,
               token: leadToken,
             }
-            const cartItems = cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
+            const cartItems =
+              cartUtils.getCartItems()?.map(cartUtils.mapToExtendCartItem) || []
 
             ExtendMagento.upsertProductProtection({
               plan: planToUpsert,

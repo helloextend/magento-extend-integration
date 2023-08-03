@@ -11,7 +11,15 @@ define([
   'Magento_Checkout/js/action/get-totals',
   'extendSdk',
   'ExtendMagento',
-], function (Component, ko, customerData, magentoQuote, getTotalsAction, Extend, ExtendMagento) {
+], function (
+  Component,
+  ko,
+  customerData,
+  magentoQuote,
+  getTotalsAction,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
   return Component.extend({
     defaults: {
@@ -29,13 +37,17 @@ define([
     },
     renderSP: function () {
       try {
-        const items = ExtendMagento.formatCartItemsForSp(customerData.get('cart')().items)
+        const items = ExtendMagento.formatCartItemsForSp(
+          customerData.get('cart')().items,
+        )
         const totals = magentoQuote.getTotals()
 
         Extend.shippingProtection.render({
           selector: '#extend-shipping-protection',
           items,
-          isShippingProtectionInCart: ExtendMagento.isShippingProtectionInOrder(totals()),
+          isShippingProtectionInCart: ExtendMagento.isShippingProtectionInOrder(
+            totals(),
+          ),
           onEnable: function (quote) {
             ExtendMagento.addSpPlanToOrder({
               quote,

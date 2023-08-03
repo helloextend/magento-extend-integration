@@ -3,13 +3,19 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend, ExtendMagento) {
+define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
+  cartUtils,
+  Extend,
+  ExtendMagento,
+) {
   'use strict'
 
   const getProductQuantity = function (cartItems, product) {
     let quantity = 1
 
-    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    const matchedCartItem = cartItems.find(
+      cartItem => cartItem.sku === product.id,
+    )
     if (matchedCartItem) quantity = matchedCartItem.qty
 
     return quantity
@@ -29,7 +35,9 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
         title,
         coverageType,
       }
-      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
+      const cartItems = cartUtils
+        .getCartItems()
+        .map(cartUtils.mapToExtendCartItem)
 
       ExtendMagento.upsertProductProtection({
         plan: planToUpsert,
@@ -68,7 +76,8 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (cartUtils, Extend,
     })
 
     Extend.buttons.renderSimpleOffer(
-      '#product_protection_offer_' + encodeURIComponent(config[0].selectedProductSku),
+      '#product_protection_offer_' +
+        encodeURIComponent(config[0].selectedProductSku),
       activeProductData,
     )
   }

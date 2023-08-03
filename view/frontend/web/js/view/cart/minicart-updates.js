@@ -22,13 +22,18 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         lineItemSku: cartItem.product_sku,
         lineItems: cartItems,
       })
-      if (cartItem.product_sku === 'extend-protection-plan' || isWarrantyInCart) return
-      const qtyElem = document.getElementById(`cart-item-${cartItem.item_id}-qty`)
+      if (cartItem.product_sku === 'extend-protection-plan' || isWarrantyInCart)
+        return
+      const qtyElem = document.getElementById(
+        `cart-item-${cartItem.item_id}-qty`,
+      )
       if (qtyElem) {
         const itemContainerElem = qtyElem.closest(productItemSelector)
         if (itemContainerElem) {
           const simpleOfferElemId = `extend-minicart-simple-offer-${cartItem.item_id}`
-          let simpleOfferElem = itemContainerElem.querySelector(`#${simpleOfferElemId}`)
+          let simpleOfferElem = itemContainerElem.querySelector(
+            `#${simpleOfferElemId}`,
+          )
 
           if (simpleOfferElem) {
             // TODO: If warranty already in cart, remove element
@@ -38,7 +43,8 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
             simpleOfferElem = document.createElement('div')
             simpleOfferElem.setAttribute('id', simpleOfferElemId)
             simpleOfferElem.setAttribute('class', simpleOfferClass)
-            const itemDetailsElem = itemContainerElem.querySelector(itemDetailsSelector)
+            const itemDetailsElem =
+              itemContainerElem.querySelector(itemDetailsSelector)
 
             if (itemDetailsElem) {
               itemDetailsElem.append(simpleOfferElem)
@@ -59,7 +65,9 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
   const getProductQuantity = function (cartItems, product) {
     let quantity = 1
 
-    const matchedCartItem = cartItems.find(cartItem => cartItem.sku === product.id)
+    const matchedCartItem = cartItems.find(
+      cartItem => cartItem.sku === product.id,
+    )
     if (matchedCartItem) quantity = matchedCartItem.qty
 
     return quantity
@@ -79,7 +87,9 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         title,
         coverageType,
       }
-      const cartItems = cartUtils.getCartItems().map(cartUtils.mapToExtendCartItem)
+      const cartItems = cartUtils
+        .getCartItems()
+        .map(cartUtils.mapToExtendCartItem)
 
       ExtendMagento.upsertProductProtection({
         plan: planToUpsert,
