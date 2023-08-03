@@ -1,40 +1,40 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
     <extension_attributes for="Magento\Quote\Api\Data\CartInterface">
-        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface" />
+        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface"/>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
-        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface" />
+        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface"/>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceInterface">
-        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface" />
+        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface"/>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\CreditmemoInterface">
-        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface" />
+        <attribute code="shipping_protection" type="Extend\Integration\Api\Data\ShippingProtectionInterface"/>
     </extension_attributes>
     <extension_attributes for="Magento\Quote\Api\Data\TotalSegmentInterface">
-        <attribute code="sp_quote_id" type="string" />
+        <attribute code="sp_quote_id" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Store\Api\Data\StoreInterface">
-        <attribute code="uuid" type="string" />
+        <attribute code="uuid" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_parent_id" type="string" />
+        <attribute code="extend_parent_id" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_parent_sku" type="string" />
+        <attribute code="extend_parent_sku" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_manufacturer" type="string" />
+        <attribute code="extend_manufacturer" type="string"/>
     </extension_attributes>
     <extension_attributes for="Magento\Catalog\Api\Data\ProductInterface">
-        <attribute code="extend_categories" type="array" />
+        <attribute code="extend_categories" type="array"/>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
-        <attribute code="product_protection" type="Extend\Integration\Api\ProductProtectionInterface" />
+        <attribute code="product_protection" type="Extend\Integration\Api\ProductProtectionInterface"/>
     </extension_attributes>
 </config>

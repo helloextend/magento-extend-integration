@@ -1,9 +1,9 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2023. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
   -->
-<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="product.info.options.wrapper">
             <block class="Magento\Catalog\Block\Product\View" ifconfig="extend/integration/enable" after="-" name="extend.product.view.type.configurable.product-protection-offer" template="Extend_Integration::catalog/product/view/product-protection-offer.phtml">

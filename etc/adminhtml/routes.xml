@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2023. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
@@ -6,7 +6,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="admin">
         <route id="extend_integration" frontName="extend_integration">
-            <module name="Extend_Integration" />
+            <module name="Extend_Integration"/>
         </route>
     </router>
 </config>

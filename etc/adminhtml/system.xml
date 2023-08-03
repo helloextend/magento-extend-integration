@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0"?>
 <!--
   ~ Copyright Extend (c) 2022. All rights reserved.
   ~ See Extend-COPYING.txt for license details.
@@ -95,7 +95,7 @@
                         <depends>
                             <field id="extend_plans/product_protection/enable">1</field>
                         </depends>
-                        <comment>Display the Extend Product Protection offer modal on the product catalog page after clicking “Add to cart“ for each warrantable item.</comment>
+                        <comment>Display the Extend Product Protection offer modal on the product catalog page after clicking &#x201C;Add to cart&#x201C; for each warrantable item.</comment>
                     </field>
                     <field id="enable_post_purchase_lead_modal_offer" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                         <label>Display Post-Purchase Product Protection Offers</label>
