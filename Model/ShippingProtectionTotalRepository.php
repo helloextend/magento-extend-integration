@@ -206,8 +206,7 @@ class ShippingProtectionTotalRepository implements
     ): void {
         $shippingProtectionTotal = $this->get($entityId, $entityTypeId);
 
-        if (
-            !$shippingProtectionTotal->getData() ||
+        if (!$shippingProtectionTotal->getData() ||
             sizeof($shippingProtectionTotal->getData()) === 0
         ) {
             return;
@@ -244,8 +243,7 @@ class ShippingProtectionTotalRepository implements
         ExtensibleDataInterface $result,
         int $entityTypeId
     ): void {
-        if (
-            $shippingProtectionExtensionAttribute->getBase() &&
+        if ($shippingProtectionExtensionAttribute->getBase() &&
             $shippingProtectionExtensionAttribute->getBaseCurrency() &&
             $shippingProtectionExtensionAttribute->getPrice() &&
             $shippingProtectionExtensionAttribute->getCurrency() &&

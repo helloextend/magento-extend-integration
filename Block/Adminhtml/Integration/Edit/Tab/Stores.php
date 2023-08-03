@@ -122,8 +122,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
             Integration::REGISTRY_KEY_CURRENT_INTEGRATION
         );
 
-        if (
-            isset($integrationData['integration_id']) &&
+        if (isset($integrationData['integration_id']) &&
             isset($integrationData['endpoint']) &&
             (str_contains($integrationData['endpoint'], 'extend.com') &&
                 str_contains($integrationData['endpoint'], 'integ-mage'))
@@ -170,10 +169,9 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
             'values' => $this->getStores(),
             'disabled' => array_values($integrationStores),
         ]);
-        if (
-            $this->integrationHelper->isConfigType(
-                $this->registry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION)
-            )
+        if ($this->integrationHelper->isConfigType(
+            $this->registry->registry(Integration::REGISTRY_KEY_CURRENT_INTEGRATION)
+        )
         ) {
             $fieldset->addField('button', 'submit', [
                 'value' => __('Save Stores For Extend Integration'),

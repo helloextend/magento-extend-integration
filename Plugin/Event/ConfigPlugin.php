@@ -37,8 +37,7 @@ class ConfigPlugin
                 $thisExplodedClass = explode('\\', (string) $thisClassPath);
                 if (isset($resultItem['instance'])) {
                     $resultNameExplodedClass = explode('\\', $resultItem['instance']);
-                    if (
-                        $thisExplodedClass[0] == $resultNameExplodedClass[0] &&
+                    if ($thisExplodedClass[0] == $resultNameExplodedClass[0] &&
                         $thisExplodedClass[1] == $resultNameExplodedClass[1] &&
                         $this->scopeConfig->getValue(Extend::ENABLE_EXTEND) === '0'
                     ) {

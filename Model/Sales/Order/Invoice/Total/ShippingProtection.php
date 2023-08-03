@@ -42,22 +42,18 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
      */
     public function collect(Invoice $invoice): ShippingProtection
     {
-        if (
-            ($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()) &&
+        if (($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()) &&
             $invoice->getOrderId()
         ) {
-            foreach (
-                $invoice
+            foreach ($invoice
                     ->getOrder()
                     ->getInvoiceCollection()
                     ->getAllIds()
-                as $invoiceId
-            ) {
-                if (
-                    $this->shippingProtectionTotalRepository->get(
-                        $invoiceId,
-                        ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
-                    ) &&
+            as $invoiceId) {
+                if ($this->shippingProtectionTotalRepository->get(
+                    $invoiceId,
+                    ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
+                ) &&
                     $this->shippingProtectionTotalRepository
                         ->get($invoiceId, ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID)
                         ->getShippingProtectionBasePrice() > 0
@@ -86,8 +82,7 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
             }
 
             $this->zeroOutShippingProtection($invoice, $shippingProtection);
-        } elseif (
-            $shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()
+        } elseif ($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()
         ) {
             foreach ($invoice->getAllItems() as $item) {
                 if ($item->getOrderItem()->getIsVirtual() == '0') {

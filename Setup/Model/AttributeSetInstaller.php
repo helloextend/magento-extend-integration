@@ -46,12 +46,11 @@ class AttributeSetInstaller
         try {
             // If the Extend products attribute set already exists, don't recreate it.
             $existingExtendAttributeSet = $this->attributeSetFactory->create();
-            if (
-                $this->attributeSetResource->load(
-                    $existingExtendAttributeSet,
-                    Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME,
-                    'attribute_set_name'
-                ) &&
+            if ($this->attributeSetResource->load(
+                $existingExtendAttributeSet,
+                Extend::WARRANTY_PRODUCT_ATTRIBUTE_SET_NAME,
+                'attribute_set_name'
+            ) &&
                 $existingExtendAttributeSet->getAttributeSetId()
             ) {
                 return $existingExtendAttributeSet;

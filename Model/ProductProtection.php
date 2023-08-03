@@ -347,8 +347,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
                 $item = $quote->getItemById($cartItemId);
 
-                if (
-                    $item &&
+                if ($item &&
                     $item->getProduct() &&
                     $item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU
                 ) {
@@ -367,8 +366,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             // Check whether a product protection item already exists in the cart
             if (!isset($item) || $item === false) {
                 foreach ($quote->getItems() as $quoteItem) {
-                    if (
-                        $quoteItem->getSku(Extend::WARRANTY_PRODUCT_SKU) &&
+                    if ($quoteItem->getSku(Extend::WARRANTY_PRODUCT_SKU) &&
                         $quoteItem->getOptionByCode('plan_id') &&
                         $quoteItem->getOptionByCode('plan_id')->getValue() == $planId &&
                         $quoteItem->getOptionByCode('associated_product_sku') &&
@@ -387,8 +385,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             // if we are adding pp, or we didn't find an existing item, create a new one
             if (!isset($item) || $item === false) {
                 // ensure that we have the required properties to create the protection plan
-                if (
-                    !isset($quantity) ||
+                if (!isset($quantity) ||
                     !isset($productId) ||
                     !isset($planId) ||
                     !isset($price) ||

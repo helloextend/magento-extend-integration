@@ -137,8 +137,7 @@ class ProductRepositoryPlugin
         $productExtension->setExtendParentSku($parentProductSku);
 
         $manufacturerOptionId = $product->getManufacturer();
-        if (
-            $manufacturerOptionId &&
+        if ($manufacturerOptionId &&
             ($optionText = $this->getAttributeOptionText('manufacturer', $manufacturerOptionId))
         ) {
             $productExtension->setExtendManufacturer($optionText);

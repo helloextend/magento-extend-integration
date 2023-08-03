@@ -50,15 +50,13 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _getElementHtml(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
+        if (($this->checkIfV1PPEnabledInAnyStores() &&
                 $this->manager->isEnabled('Extend_Warranty')) ||
             !$this->checkIfV2ExtendEnabled()
         ) {
             $element->setDisabled(true);
             $element->setValue(0);
-            if (
-                $this->checkIfV1PPEnabledInAnyStores() &&
+            if ($this->checkIfV1PPEnabledInAnyStores() &&
                 $this->manager->isEnabled('Extend_Warranty')
             ) {
                 $element->setComment(
@@ -80,8 +78,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
     protected function _renderInheritCheckbox(
         \Magento\Framework\Data\Form\Element\AbstractElement $element
     ) {
-        if (
-            ($this->checkIfV1PPEnabledInAnyStores() &&
+        if (($this->checkIfV1PPEnabledInAnyStores() &&
                 $this->manager->isEnabled('Extend_Warranty')) ||
             !$this->checkIfV2ExtendEnabled()
         ) {
