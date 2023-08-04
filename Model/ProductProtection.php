@@ -402,8 +402,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             $item->setProduct($product);
 
-            // Handle setting of quantity when the plan already exists in the cart
-            // and we need to add the quantity to the existing plan item quantity
+            // When adding plans to the cart (i.e. not normalization)
+            // handle setting of quantity if the plan already exists in the cart
+            // and we need to add the additional quantity to the existing plan item quantity
             if (!$cartItemId && $item->getQty() > 0) {
                 $quantity = $item->getQty() + $quantity;
             }
