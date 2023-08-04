@@ -8,12 +8,6 @@
     <preference for="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" type="Extend\Integration\Model\ShippingProtectionTotalRepository" />
     <preference for="Extend\Integration\Api\ProductProtectionInterface" type="Extend\Integration\Model\ProductProtection" />
     <preference for="Extend\Integration\Api\StoreIntegrationRepositoryInterface" type="Extend\Integration\Model\StoreIntegrationRepository" />
-    <type name="Magento\Sales\Model\OrderRepository">
-        <plugin sortOrder="1" name="extendIntegrationOrderRepository" type="Extend\Integration\Plugin\Model\OrderRepositoryPlugin" />
-    </type>
-    <type name="Magento\Sales\Model\Order\InvoiceRepository">
-        <plugin sortOrder="1" name="extendIntegrationInvoiceRepository" type="Extend\Integration\Plugin\Model\Order\InvoiceRepositoryPlugin" />
-    </type>
     <type name="Magento\Sales\Model\Convert\Order">
         <plugin sortOrder="1" name="extendIntegrationOrder" type="Extend\Integration\Plugin\Model\Convert\OrderPlugin" />
     </type>
@@ -31,9 +25,6 @@
     </type>
     <type name="Magento\Sales\Controller\Adminhtml\Order\Invoice\Save">
         <plugin sortOrder="1" name="extendIntegrationSave" type="Extend\Integration\Plugin\Controller\Adminhtml\Order\Invoice\SavePlugin" />
-    </type>
-    <type name="Magento\Sales\Model\Order\CreditmemoRepository">
-        <plugin sortOrder="1" name="extendIntegrationCreditmemoRepository" type="Extend\Integration\Plugin\Model\Order\CreditmemoRepositoryPlugin" />
     </type>
     <type name="Magento\Catalog\Model\ProductRepository">
         <plugin name="extendProductExtensionAttributes" type="Extend\Integration\Plugin\Catalog\Model\ProductRepositoryPlugin" />
@@ -53,5 +44,8 @@
     </type>
     <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
         <plugin name="extendIntegrationToOrderItem" type="Extend\Integration\Plugin\Model\Quote\Item\ToOrderItemPlugin" />
+    </type>
+    <type name="Magento\Framework\Model\ResourceModel\Db\AbstractDb">
+        <plugin sortOrder="1" name="extendIntegrationAbstractDb" type="Extend\Integration\Plugin\Model\ResourceModel\Db\AbstractDbPlugin" />
     </type>
 </config>

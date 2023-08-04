@@ -49,7 +49,7 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Check if we nedd display full shipping protection total info
+     * Check if we need display full shipping protection total info
      *
      * @return bool
      */
@@ -97,12 +97,7 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     {
         $parentType = $parent->getType();
 
-        if (is_a($parentType, \Magento\Sales\Block\Order\Totals::class, true)) {
-            $extensionAttributes = $parent->getOrder()->getExtensionAttributes();
-            if ($extensionAttributes === null) {
-                $extensionAttributes = $this->orderExtensionFactory->create();
-            }
-        } elseif (is_a($parentType, \Magento\Sales\Block\Order\Invoice\Totals::class, true)) {
+        if (is_a($parentType, \Magento\Sales\Block\Order\Invoice\Totals::class, true)) {
             $extensionAttributes = $parent->getInvoice()->getExtensionAttributes();
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->invoiceExtensionFactory->create();
@@ -111,6 +106,11 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
             $extensionAttributes = $parent->getCreditmemo()->getExtensionAttributes();
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->creditmemoExtensionFactory->create();
+            }
+        } elseif (is_a($parentType, \Magento\Sales\Block\Order\Totals::class, true)) {
+            $extensionAttributes = $parent->getOrder()->getExtensionAttributes();
+            if ($extensionAttributes === null) {
+                $extensionAttributes = $this->orderExtensionFactory->create();
             }
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();

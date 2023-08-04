@@ -5,8 +5,8 @@
   -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceContainer name="invoice_totals">
+        <referenceBlock name="invoice_totals">
             <block class="Extend\Integration\Block\Adminhtml\Sales\Totals" name="shipping_protection" ifconfig="extend_plans/shipping_protection/enable" />
-        </referenceContainer>
+        </referenceBlock>
     </body>
 </page>

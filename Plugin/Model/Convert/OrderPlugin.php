@@ -169,6 +169,7 @@ class OrderPlugin
             $order->setExtensionAttributes($orderExtensionAttributes);
             if ($post = $this->http->getPost('creditmemo')) {
                 if (isset($post['shipping_protection'])) {
+                    $shippingProtectionTotalData = $orderExtensionAttributes->getShippingProtection();
                     $creditMemoExtensionAttributes = $result->getExtensionAttributes();
                     if ($creditMemoExtensionAttributes === null) {
                         $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
@@ -176,12 +177,10 @@ class OrderPlugin
                     $shippingProtection = $this->shippingProtectionFactory->create();
                     $shippingProtection->setBase($post['shipping_protection']);
                     $shippingProtection->setBaseCurrency(
-                        $shippingProtectionTotalData->getShippingProtectionBaseCurrency()
+                        $shippingProtectionTotalData['base_currency']
                     );
                     $shippingProtection->setPrice($post['shipping_protection']);
-                    $shippingProtection->setCurrency(
-                        $shippingProtectionTotalData->getShippingProtectionCurrency()
-                    );
+                    $shippingProtection->setCurrency($shippingProtectionTotalData['currency']);
                     $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                     $creditMemoExtensionAttributes->setShippingProtection($shippingProtection);
                     $result->setExtensionAttributes($creditMemoExtensionAttributes);

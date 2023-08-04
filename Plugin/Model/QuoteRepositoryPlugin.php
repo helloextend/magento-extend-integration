@@ -53,30 +53,4 @@ class QuoteRepositoryPlugin
 
         return $result;
     }
-
-    /**
-     * This save the Shipping Protection data from the quote's extension attributes into the Shipping Protection totals table, saving the entity type and quote ID as well
-     *
-     * @param QuoteRepository $subject
-     * @param $result
-     * @param $quote
-     * @return mixed
-     */
-    public function afterSave(\Magento\Quote\Model\QuoteRepository $subject, $result, $quote)
-    {
-        $extensionAttributes = $quote->getExtensionAttributes();
-        if ($extensionAttributes === null) {
-            $extensionAttributes = $this->cartExtensionFactory->create();
-        }
-        $shippingProtection = $extensionAttributes->getShippingProtection();
-
-        if ($result && $shippingProtection) {
-            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
-                $shippingProtection,
-                $result,
-                ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
-            );
-        }
-        return $result;
-    }
 }
