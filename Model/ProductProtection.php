@@ -373,9 +373,6 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                         $quoteItem->getOptionByCode('associated_product_sku')->getValue() ==
                             $productId
                     ) {
-                        if (isset($quantity)) {
-                            $quoteItem->setQty($quoteItem->getQty() + $quantity);
-                        }
                         $item = $quoteItem;
                         break;
                     }
@@ -397,11 +394,18 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                     );
                 }
                 $item = $this->itemFactory->create();
-                $item->setQty($quantity);
             }
 
             $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             $item->setProduct($product);
+
+            // When adding plans to the cart (i.e. not normalization)
+            // handle setting of quantity if the plan already exists in the cart
+            // and we need to add the additional quantity to the existing plan item quantity
+            if (!$cartItemId && $item->getQty() > 0) {
+                $quantity = $item->getQty() + $quantity;
+            }
+            $item->setQty($quantity);
 
             if (isset($price)) {
                 $item
