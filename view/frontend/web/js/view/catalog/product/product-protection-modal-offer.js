@@ -51,7 +51,6 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
     const productSku = config[0].productSku
     const productPrice = config[0].productPrice * 100
-    const productCategory = config[0].productCategory
 
     const addToCartButton = document
       .querySelector(
