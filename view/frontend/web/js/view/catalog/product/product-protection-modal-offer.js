@@ -3,10 +3,11 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
+define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
   cartUtils,
   Extend,
   ExtendMagento,
+  stringUtils,
 ) {
   'use strict'
 
@@ -54,7 +55,8 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
     const addToCartButton = document
       .querySelector(
-        '#product_protection_modal_offer_' + encodeURIComponent(productSku),
+        '#product_protection_modal_offer_' +
+          stringUtils.sanitizeForEmementId(productSku),
       )
       ?.closest('.product.actions.product-item-actions')
       ?.querySelector('.actions-primary')

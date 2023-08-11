@@ -3,12 +3,13 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
-  $,
-  cartUtils,
-  Extend,
-  ExtendMagento,
-) {
+define([
+  'jquery',
+  'cartUtils',
+  'extendSdk',
+  'ExtendMagento',
+  'stringUtils',
+], function ($, cartUtils, Extend, ExtendMagento, stringUtils) {
   'use strict'
 
   const getProductQuantity = function () {
@@ -69,7 +70,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     for (let key in config) {
       Extend.buttons.render(
         '#product_protection_offer_' +
-          encodeURIComponent(config[key].selectedProductSku),
+          stringUtils.sanitizeForEmementId(config[key].selectedProductSku),
         {
           referenceId: config[key].selectedProductSku,
           price: config[key].selectedProductPrice * 100,
@@ -84,7 +85,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         const selectedProduct = getActiveProductConfig()
         const buttonInstance = Extend.buttons.instance(
           '#product_protection_offer_' +
-            encodeURIComponent(config[0].selectedProductSku),
+            stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
         )
         const activeProductData = {
           referenceId: selectedProduct.selectedProductSku,
@@ -95,7 +96,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         } else {
           Extend.buttons.render(
             '#product_protection_offer_' +
-              encodeURIComponent(config[0].selectedProductSku),
+              stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
             activeProductData,
           )
         }
@@ -108,7 +109,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
       .addEventListener('click', function (event) {
         const buttonInstance = Extend.buttons.instance(
           '#product_protection_offer_' +
-            encodeURIComponent(config[0].selectedProductSku),
+            stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
         )
 
         if (buttonInstance) {

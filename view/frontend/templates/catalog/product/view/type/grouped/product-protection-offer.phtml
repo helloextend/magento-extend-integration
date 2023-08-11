@@ -21,7 +21,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
   <table id="product_protection_offers">
     <?php foreach ($block->getAssociatedProducts() as $product) : ?>
       <tr>
-        <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= rawurlencode($product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
+        <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= preg_replace('/[^a-zA-Z0-9-_|]/', '',  $product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
       </tr>
     <?php endforeach; ?>
   </table>

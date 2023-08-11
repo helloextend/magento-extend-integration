@@ -3,10 +3,11 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
+define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
   cartUtils,
   Extend,
   ExtendMagento,
+  stringUtils,
 ) {
   'use strict'
 
@@ -77,7 +78,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
     Extend.buttons.renderSimpleOffer(
       '#product_protection_offer_' +
-        encodeURIComponent(config[0].selectedProductSku),
+        stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
       activeProductData,
     )
   }

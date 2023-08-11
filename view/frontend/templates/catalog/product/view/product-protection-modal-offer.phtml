@@ -7,8 +7,8 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
 /** @var \Magento\Catalog\Model\Product $product */
 $product = $block->getProduct();
 $productSku = $product->getSku();
-/** encoding to prevent whitespace and other abnormal characters from being used in a div id */
-$encodedProductSku = rawurlencode($productSku);
+/** sanitizing to prevent whitespace and other abnormal characters from being used in a div id */
+$sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
 $productPrice = $product->getPrice();
 
 $categoryName = '';
@@ -16,17 +16,15 @@ if ($category = $product->getCategory()) {
   $categoryName = $category->getName();
 }
 
-$viewModel = $block->getData('viewModel');
-
 $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled();
 ?>
 
 <?php if ($shouldRender) : ?>
-  <div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $encodedProductSku ?>"></div>
+  <div class="product_protection_modal_offer" id="product_protection_modal_offer_<?= $sanitizedProductSku ?>"></div>
 
   <script type="text/x-magento-init">
     {
-          "#product_protection_modal_offer_<?= $encodedProductSku ?>": {
+          "#product_protection_modal_offer_<?= $sanitizedProductSku ?>": {
               "productProtectionModalOffer": [
                   {
                       "extendStoreUuid": "<?= $extendStoreUuid ?>",

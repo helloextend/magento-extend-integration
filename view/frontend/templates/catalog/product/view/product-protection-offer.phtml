@@ -14,14 +14,20 @@ if ($category = $block->getProduct()->getCategory()) {
 
 $viewModel = $block->getData('viewModel');
 
+$product = $block->getProduct();
+$productSku = $product->getSku();
+
+/** sanitizing to prevent whitespace and other abnormal characters from being used in a div id */
+$sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
+
 $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductDisplayPageOfferEnabled();
 ?>
 
 <?php if ($shouldRender) : ?>
-  <div class="product-protection-offer" id="product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>"></div>
+  <div class="product-protection-offer" id="product_protection_offer_<?= $sanitizedProductSku ?>"></div>
   <script type="text/x-magento-init">
     {
-          "#product_protection_offer_<?= rawurlencode($block->getProduct()->getSku()); ?>": {
+          "#product_protection_offer_<?= $sanitizedProductSku ?>": {
               "productProtectionOffer": [
                   {
                       "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
