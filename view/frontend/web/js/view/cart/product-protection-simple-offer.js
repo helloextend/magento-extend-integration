@@ -78,7 +78,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 
     Extend.buttons.renderSimpleOffer(
       '#product_protection_offer_' +
-        stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
+        stringUtils.sanitizeForElementId(config[0].selectedProductSku),
       activeProductData,
     )
   }

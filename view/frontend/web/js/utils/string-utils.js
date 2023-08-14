@@ -5,11 +5,11 @@
 define([], function () {
   'use strict'
 
-  const sanitizeForEmementId = function (str) {
+  const sanitizeForElementId = function (str) {
     return str.replace(/[^a-zA-Z0-9-_|]/g, '')
   }
 
   return {
-    sanitizeForEmementId,
+    sanitizeForElementId,
   }
 })

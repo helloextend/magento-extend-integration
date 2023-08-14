@@ -70,7 +70,7 @@ define([
     for (let key in config) {
       Extend.buttons.render(
         '#product_protection_offer_' +
-          stringUtils.sanitizeForEmementId(config[key].selectedProductSku),
+          stringUtils.sanitizeForElementId(config[key].selectedProductSku),
         {
           referenceId: config[key].selectedProductSku,
           price: config[key].selectedProductPrice * 100,
@@ -85,7 +85,7 @@ define([
         const selectedProduct = getActiveProductConfig()
         const buttonInstance = Extend.buttons.instance(
           '#product_protection_offer_' +
-            stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
+            stringUtils.sanitizeForElementId(config[0].selectedProductSku),
         )
         const activeProductData = {
           referenceId: selectedProduct.selectedProductSku,
@@ -96,7 +96,7 @@ define([
         } else {
           Extend.buttons.render(
             '#product_protection_offer_' +
-              stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
+              stringUtils.sanitizeForElementId(config[0].selectedProductSku),
             activeProductData,
           )
         }
@@ -109,7 +109,7 @@ define([
       .addEventListener('click', function (event) {
         const buttonInstance = Extend.buttons.instance(
           '#product_protection_offer_' +
-            stringUtils.sanitizeForEmementId(config[0].selectedProductSku),
+            stringUtils.sanitizeForElementId(config[0].selectedProductSku),
         )
 
         if (buttonInstance) {

@@ -56,7 +56,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
     const addToCartButton = document
       .querySelector(
         '#product_protection_modal_offer_' +
-          stringUtils.sanitizeForEmementId(productSku),
+          stringUtils.sanitizeForElementId(productSku),
       )
       ?.closest('.product.actions.product-item-actions')
       ?.querySelector('.actions-primary')
