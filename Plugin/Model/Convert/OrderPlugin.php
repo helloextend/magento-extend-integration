@@ -39,8 +39,9 @@ class OrderPlugin
     private ShippingProtectionTotalRepository $shippingProtectionTotalRepository;
     private Http $http;
     private ShippingProtectionFactory $shippingProtectionFactory;
+  private CreditmemoExtensionFactory $creditmemoExtensionFactory;
 
-    /**
+  /**
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
      * @param OrderExtensionFactory $orderExtensionFactory
      * @param Copy $objectCopyService
@@ -52,7 +53,8 @@ class OrderPlugin
         Copy $objectCopyService,
         ShippingProtectionTotalRepository $shippingProtectionTotalRepository,
         Http $http,
-        ShippingProtectionFactory $shippingProtectionFactory
+        ShippingProtectionFactory $shippingProtectionFactory,
+        CreditmemoExtensionFactory $creditmemoExtensionFactory
     ) {
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->objectCopyService = $objectCopyService;
@@ -60,6 +62,7 @@ class OrderPlugin
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->http = $http;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
+      $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
     }
 
     /**
@@ -159,17 +162,17 @@ class OrderPlugin
                 );
                 $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                 $orderExtensionAttributes->setShippingProtection($shippingProtection);
-                $result->setData(
-                    'original_shipping_protection',
-                    $shippingProtectionTotalData->getShippingProtectionPrice()
-                );
             }
         }
         if ($orderExtensionAttributes->getShippingProtection() !== null) {
             $order->setExtensionAttributes($orderExtensionAttributes);
+            $shippingProtectionTotalData = $orderExtensionAttributes->getShippingProtection();
+            $result->setData(
+              'original_shipping_protection',
+              $shippingProtectionTotalData['base']
+            );
             if ($post = $this->http->getPost('creditmemo')) {
                 if (isset($post['shipping_protection'])) {
-                    $shippingProtectionTotalData = $orderExtensionAttributes->getShippingProtection();
                     $creditMemoExtensionAttributes = $result->getExtensionAttributes();
                     if ($creditMemoExtensionAttributes === null) {
                         $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
