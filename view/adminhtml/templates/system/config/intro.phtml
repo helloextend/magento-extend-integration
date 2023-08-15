@@ -1,0 +1,27 @@
+<?php
+
+/*
+ * Copyright Extend (c) 2023. All rights reserved.
+ * See Extend-COPYING.txt for license details.
+ */
+
+/** @var Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\Intro $block */
+$moduleVersion = $block->getVersionTag();
+?>
+
+<div id="extend-header">
+  <div id="extend-info">
+    <img id="extend-full-logo" src="<?= /* @noEscape */ $block->getViewFileUrl('Extend_Integration::images/extend_header_logo.svg'); ?>" alt="Logo Image">
+    <p id="extend-summary">
+      Extend pays merchants to protect customers<br />through tech-first Product and Shipping Protection.
+    </p>
+    <p id="extend-contact-support">For more information or help, contact <a id="extend-contact-support-link" href="mailto:support@extend.com">support@extend.com</a>.</p>
+    <div id="extend-header-sub-section">
+      <a id="extend-merchant-portal-button" href="https://merchants.extend.com" target="_blank">Go To Merchant Portal</a>
+      <?php if (isset($moduleVersion)) : ?>
+        <p id="extend-module-version-tag">Ver. <?= /* @noEscape */ $moduleVersion ?></p>
+      <?php endif; ?>
+    </div>
+  </div>
+  <img id="extend-x-logo" src="<?= /* @noEscape */ $block->getViewFileUrl('Extend_Integration::images/extend_x.svg'); ?>" alt="Logo Image">
+</div>

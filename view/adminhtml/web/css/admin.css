@@ -3,22 +3,110 @@
  * See Extend-COPYING.txt for license details.
  */
 
-li[id="menu-extend-integration-extend"] a::before {
-    background-image: url("../images/shield-white.png");
-    text-align: center;
-    background-size: cover;
-    content: '' !important;
-    width: 80%;
-    height: 55px !important;
-    z-index: 100;
-    background-repeat: no-repeat;
-    background-position: top center;
-    margin: 0 auto 0 !important;
+li[id='menu-extend-integration-extend'] a::before {
+  background-image: url('../images/shield-white.png');
+  text-align: center;
+  background-size: cover;
+  content: '' !important;
+  width: 80%;
+  height: 55px !important;
+  z-index: 100;
+  background-repeat: no-repeat;
+  background-position: top center;
+  margin: 0 auto 0 !important;
 }
-div[id="integration_edit_tabs_integration_stores_content"] .save-integration-stores {
-    background-color: #eb5202;
-    border: 0;
-    color: #FFF;
-    font-size: 1.3em;
-    padding: 0.7875em 0;
+div[id='integration_edit_tabs_integration_stores_content']
+  .save-integration-stores {
+  background-color: #eb5202;
+  border: 0;
+  color: #fff;
+  font-size: 1.2em;
+  padding: 0.7875em 0;
+}
+
+/* styles for the Extend header in the admin settings panel */
+
+div[id='extend-header'] {
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 0px 18px 14px;
+}
+
+div[id='extend-info'] {
+  max-width: 66%;
+}
+
+img[id='extend-full-logo'] {
+  height: 22px;
+  margin-bottom: 12px;
+}
+
+p[id='extend-summary'] {
+  font-family: Nunito Sans;
+  font-size: 1.4em;
+  font-weight: 500;
+  line-height: 1.3em;
+  letter-spacing: 0em;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+p[id='extend-contact-support'] {
+  font-family: Nunito Sans;
+  font-size: 1.4em;
+  font-weight: 300;
+  line-height: 19px;
+  letter-spacing: 0em;
+  text-align: left;
+  margin-bottom: 18px;
+}
+a[id='extend-contact-support-link'] {
+  font-family: Nunito Sans;
+  color: white;
+  text-decoration: underline;
+}
+
+div[id='extend-header-sub-section'] {
+  display: flex;
+  align-items: center;
+}
+
+a[id='extend-merchant-portal-button'] {
+  font-family: Nunito Sans;
+  font-size: 1em;
+  font-weight: 700;
+  color: white;
+  padding: 8px 22px 8px 22px;
+  border-radius: 100px;
+  background-color: rgb(0, 51, 204);
+  margin-right: 26px;
+  transition: background-color 120ms ease 0s;
+}
+
+a[id='extend-merchant-portal-button']:hover {
+  color: white;
+  text-decoration: none;
+  background-color: rgb(16, 31, 124);
+}
+
+a[id='extend-contact-support-link']:hover {
+  color: white;
+}
+
+p[id='extend-module-version-tag'] {
+  font-family: Nunito Sans;
+  font-size: 1em;
+  font-weight: 300;
+  letter-spacing: 0.8em;
+  line-height: 14px;
+  letter-spacing: 0em;
+  text-align: left;
+  margin: 0;
+}
+
+img[id='extend-x-logo'] {
+  margin: auto 0;
+  height: 160px;
 }

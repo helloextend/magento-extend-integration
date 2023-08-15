@@ -13,6 +13,9 @@
             <label>Integration</label>
             <tab>extend</tab>
             <resource>Magento_Catalog::config_catalog</resource>
+            <group id="extend_info" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="0">
+                <frontend_model>Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\Intro</frontend_model>
+            </group>
             <group id="integration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Integration</label>
                 <field id="environment" translate="label" type="select" sortOrder="10" showInDefault="1" canRestore="1">
