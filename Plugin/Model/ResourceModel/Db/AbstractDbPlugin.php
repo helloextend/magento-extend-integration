@@ -59,7 +59,8 @@ class AbstractDbPlugin
         if (!$object instanceof \Magento\Quote\Model\Quote &&
             !$object instanceof \Magento\Sales\Model\Order &&
             !$object instanceof \Magento\Sales\Model\Order\Invoice &&
-            !$object instanceof \Magento\Sales\Model\Order\Creditmemo
+            !$object instanceof \Magento\Sales\Model\Order\Creditmemo ||
+            !$value
         ) {
             return $result;
         }
