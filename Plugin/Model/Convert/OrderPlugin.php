@@ -9,6 +9,7 @@ namespace Extend\Integration\Plugin\Model\Convert;
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Model\ShippingProtectionTotalRepository;
 use Extend\Integration\Model\ShippingProtectionFactory;
+use Extend\Integration\Service\Extend;
 use Magento\Framework\App\Request\Http;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
@@ -40,8 +41,9 @@ class OrderPlugin
     private Http $http;
     private ShippingProtectionFactory $shippingProtectionFactory;
   private CreditmemoExtensionFactory $creditmemoExtensionFactory;
+    private Extend $extend;
 
-  /**
+    /**
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
      * @param OrderExtensionFactory $orderExtensionFactory
      * @param Copy $objectCopyService
@@ -54,7 +56,8 @@ class OrderPlugin
         ShippingProtectionTotalRepository $shippingProtectionTotalRepository,
         Http $http,
         ShippingProtectionFactory $shippingProtectionFactory,
-        CreditmemoExtensionFactory $creditmemoExtensionFactory
+        CreditmemoExtensionFactory $creditmemoExtensionFactory,
+        Extend $extend
     ) {
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->objectCopyService = $objectCopyService;
@@ -62,7 +65,8 @@ class OrderPlugin
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->http = $http;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
-      $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
+        $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
+        $this->extend = $extend;
     }
 
     /**
@@ -78,6 +82,9 @@ class OrderPlugin
         $result,
         \Magento\Sales\Model\Order $order
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {
             $orderExtensionAttributes = $this->orderExtensionFactory->create();
@@ -137,6 +144,9 @@ class OrderPlugin
         $result,
         \Magento\Sales\Model\Order $order
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {
             $orderExtensionAttributes = $this->orderExtensionFactory->create();

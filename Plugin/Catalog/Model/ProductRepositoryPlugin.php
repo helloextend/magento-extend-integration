@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Plugin\Catalog\Model;
 
+use Extend\Integration\Service\Extend;
 use Magento\Catalog\Api\Data\ProductExtensionFactory;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -43,19 +44,26 @@ class ProductRepositoryPlugin
      */
     private $logger;
 
-    public function __construct(
+    /**
+     * @var Extend
+     */
+    private Extend $extend;
+
+  public function __construct(
         ProductExtensionFactory $productExtensionFactory,
         Config $eavConfig,
         Configurable $configurable,
         CategoryRepositoryInterface $categoryRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Extend $extend
     ) {
         $this->productExtensionFactory = $productExtensionFactory;
         $this->eavConfig = $eavConfig;
         $this->configurable = $configurable;
         $this->categoryRepository = $categoryRepository;
         $this->logger = $logger;
-    }
+    $this->extend = $extend;
+  }
 
     /**
      * This plugin injects Extend specific extension attributes when retrieving a single product
@@ -67,6 +75,9 @@ class ProductRepositoryPlugin
     public function afterGet(ProductRepositoryInterface $subject, ProductInterface $result)
     {
         try {
+            if (!$this->extend->isEnabled())
+                return $result;
+
             $this->addProductExtensions($subject, $result);
         } catch (Exception $e) {
             // Ignore any errors that get thrown so that merchant site can continue functioning
@@ -88,6 +99,9 @@ class ProductRepositoryPlugin
         ProductSearchResultsInterface $result
     ) {
         try {
+            if (!$this->extend->isEnabled())
+                return $result;
+
             $items = $result->getItems();
 
             if (count($items)) {

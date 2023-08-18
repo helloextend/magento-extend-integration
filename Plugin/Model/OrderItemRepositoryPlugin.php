@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Model;
 
 use Extend\Integration\Model\ProductProtection;
 use Extend\Integration\Model\ProductProtectionFactory;
+use Extend\Integration\Service\Extend;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Magento\Sales\Api\Data\OrderItemSearchResultInterface;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
@@ -29,15 +30,18 @@ class OrderItemRepositoryPlugin
      * @var ProductProtectionFactory
      */
     private ProductProtectionFactory $productProtectionFactory;
+    private Extend $extend;
 
     public function __construct(
         OrderItemExtensionFactory $orderItemExtensionFactory,
         CollectionFactory $quoteItemCollectionFactory,
-        ProductProtectionFactory $productProtectionFactory
+        ProductProtectionFactory $productProtectionFactory,
+        Extend $extend
     ) {
         $this->orderItemExtensionFactory = $orderItemExtensionFactory;
         $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
         $this->productProtectionFactory = $productProtectionFactory;
+        $this->extend = $extend;
     }
 
     /**
@@ -51,6 +55,9 @@ class OrderItemRepositoryPlugin
         OrderItemRepositoryInterface $subject,
         OrderItemSearchResultInterface $searchResult
     ): OrderItemSearchResultInterface {
+        if (!$this->extend->isEnabled())
+            return $searchResult;
+
         $orderItems = $searchResult->getItems();
 
         // if order items exist and are an array

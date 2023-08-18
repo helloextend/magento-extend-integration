@@ -17,8 +17,9 @@ class ConfigPlugin
     /**
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
+    public function __construct(
+        ScopeConfigInterface $scopeConfig
+    ) {
         $this->scopeConfig = $scopeConfig;
     }
 
@@ -31,6 +32,7 @@ class ConfigPlugin
      */
     public function afterGetObservers(\Magento\Framework\Event\Config $subject, $result)
     {
+
         if ($result) {
             foreach ($result as $resultItemKey => $resultItem) {
                 $thisClassPath = get_class($this);

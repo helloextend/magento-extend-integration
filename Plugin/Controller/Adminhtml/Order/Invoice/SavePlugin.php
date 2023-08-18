@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Controller\Adminhtml\Order\Invoice;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Extend;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use Magento\Sales\Controller\Adminhtml\Order\Invoice\Save;
@@ -28,20 +29,24 @@ class SavePlugin
      * @var ShippingProtectionTotalRepositoryInterface
      */
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
+    private Extend $extend;
 
     /**
      * @param Registry $registry
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
      * @param ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+     * @param Extend $extend
      */
     public function __construct(
         Registry $registry,
         InvoiceExtensionFactory $invoiceExtensionFactory,
-        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
+        Extend $extend
     ) {
         $this->registry = $registry;
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->extend = $extend;
     }
 
     /**
@@ -55,6 +60,9 @@ class SavePlugin
         \Magento\Sales\Controller\Adminhtml\Order\Invoice\Save $subject,
         $result
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $invoice = $this->registry->registry('current_invoice');
         if ($invoice) {
             $invoiceExtensionAttributes = $invoice->getExtensionAttributes();

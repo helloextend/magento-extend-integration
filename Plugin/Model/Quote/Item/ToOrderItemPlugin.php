@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Plugin\Model\Quote\Item;
 
+use Extend\Integration\Service\Extend;
 use Magento\Quote\Model\Quote\Item\ToOrderItem as QuoteToOrderItem;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Model\Order\Item as OrderItem;
@@ -17,10 +18,14 @@ class ToOrderItemPlugin
      * @var SerializerInterface
      */
     private SerializerInterface $serializer;
+    private Extend $extend;
 
-    public function __construct(SerializerInterface $serializer)
-    {
+    public function __construct(
+        SerializerInterface $serializer,
+        Extend $extend
+    ) {
         $this->serializer = $serializer;
+        $this->extend = $extend;
     }
 
     /**
@@ -38,6 +43,9 @@ class ToOrderItemPlugin
         AbstractItem $quoteItem,
         $data = []
     ) {
+        if (!$this->extend->isEnabled())
+            return $orderItem;
+
         $additionalOptions = $quoteItem->getOptionByCode('additional_options');
         if ($additionalOptions) {
             $options = $orderItem->getProductOptions();

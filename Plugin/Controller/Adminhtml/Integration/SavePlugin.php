@@ -11,6 +11,7 @@ use Extend\Integration\Model\ResourceModel\StoreIntegration;
 use Extend\Integration\Model\ResourceModel\StoreIntegration\CollectionFactory;
 use Extend\Integration\Service\Api\Integration as IntegrationService;
 use Extend\Integration\Service\Api\MetadataBuilder;
+use Extend\Integration\Service\Extend;
 use Magento\Directory\Helper\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -48,15 +49,37 @@ class SavePlugin
      * @var ManagerInterface
      */
     private ManagerInterface $messageManager;
-    private MetadataBuilder $metadataBuilder;
-    private IntegrationService $integration;
-    private OauthServiceInterface $oauthService;
-    private IntegrationServiceInterface $integrationService;
-    private ScopeConfigInterface $scopeConfig;
-    private StoreManagerInterface $storeManager;
-    private EncryptorInterface $encryptor;
+  /**
+   * @var MetadataBuilder
+   */
+  private MetadataBuilder $metadataBuilder;
+  /**
+   * @var IntegrationService
+   */
+  private IntegrationService $integration;
+  /**
+   * @var OauthServiceInterface
+   */
+  private OauthServiceInterface $oauthService;
+  /**
+   * @var IntegrationServiceInterface
+   */
+  private IntegrationServiceInterface $integrationService;
+  /**
+   * @var ScopeConfigInterface
+   */
+  private ScopeConfigInterface $scopeConfig;
+  /**
+   * @var StoreManagerInterface
+   */
+  private StoreManagerInterface $storeManager;
+  /**
+   * @var EncryptorInterface
+   */
+  private EncryptorInterface $encryptor;
+  private Extend $extend;
 
-    /**
+  /**
      * @param StoreIntegrationRepositoryInterface $integrationStoresRepository
      * @param StoreIntegration $storeIntegrationResource
      * @param CollectionFactory $storeIntegrationCollection
@@ -73,7 +96,8 @@ class SavePlugin
         IntegrationServiceInterface $integrationService,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        Extend $extend
     ) {
         $this->integrationStoresRepository = $integrationStoresRepository;
         $this->storeIntegrationResource = $storeIntegrationResource;
@@ -86,6 +110,7 @@ class SavePlugin
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->encryptor = $encryptor;
+        $this->extend = $extend;
     }
 
     /**
@@ -98,6 +123,9 @@ class SavePlugin
      */
     public function aroundExecute(Save $subject, callable $proceed)
     {
+        if (!$this->extend->isEnabled())
+          return $proceed();
+
         $postData = $subject->getRequest()->getPostValue();
         if ($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)) {
             $integration = $this->integrationService->get(

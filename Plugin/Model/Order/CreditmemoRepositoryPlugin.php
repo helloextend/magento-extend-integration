@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Model\Order;
 
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\OrderObserverHandler;
+use Extend\Integration\Service\Extend;
 use Magento\Sales\Model\Order\CreditmemoRepository;
 
 class CreditmemoRepositoryPlugin
@@ -16,10 +17,14 @@ class CreditmemoRepositoryPlugin
      * @var OrderObserverHandler
      */
     private OrderObserverHandler $orderObserverHandler;
+    private Extend $extend;
 
-    public function __construct(OrderObserverHandler $orderObserverHandler)
-    {
+    public function __construct(
+        OrderObserverHandler $orderObserverHandler,
+        Extend $extend
+    ) {
         $this->orderObserverHandler = $orderObserverHandler;
+        $this->extend = $extend;
     }
 
     /**
@@ -35,6 +40,9 @@ class CreditmemoRepositoryPlugin
         $result,
         $creditMemo
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $this->orderObserverHandler->execute(
             [
                 'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_cancel'],

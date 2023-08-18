@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Model\ResourceModel\Db;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Extend;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Quote\Api\Data\CartExtensionFactory;
@@ -22,19 +23,22 @@ class AbstractDbPlugin
     private OrderExtensionFactory $orderExtensionFactory;
     private InvoiceExtensionFactory $invoiceExtensionFactory;
     private CreditmemoExtensionFactory $creditmemoExtensionFactory;
+    private Extend $extend;
 
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
         CartExtensionFactory $cartExtensionFactory,
         OrderExtensionFactory $orderExtensionFactory,
         InvoiceExtensionFactory $invoiceExtensionFactory,
-        CreditmemoExtensionFactory $creditmemoExtensionFactory
+        CreditmemoExtensionFactory $creditmemoExtensionFactory,
+        Extend $extend
     ) {
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->cartExtensionFactory = $cartExtensionFactory;
         $this->orderExtensionFactory = $orderExtensionFactory;
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
+        $this->extend = $extend;
     }
 
     /**
@@ -56,6 +60,9 @@ class AbstractDbPlugin
         $value,
         $field = null
     ) {
+      if (!$this->extend->isEnabled())
+        return $result;
+
         if (!$object instanceof \Magento\Quote\Model\Quote &&
             !$object instanceof \Magento\Sales\Model\Order &&
             !$object instanceof \Magento\Sales\Model\Order\Invoice &&
@@ -89,6 +96,9 @@ class AbstractDbPlugin
         $result,
         \Magento\Framework\Model\AbstractModel $object
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         if (!$object instanceof \Magento\Quote\Model\Quote &&
             !$object instanceof \Magento\Sales\Model\Order &&
             !$object instanceof \Magento\Sales\Model\Order\Invoice &&

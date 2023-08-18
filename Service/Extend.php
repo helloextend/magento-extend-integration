@@ -48,4 +48,17 @@ class Extend
      * Lead token url param
      */
     public const LEAD_TOKEN_URL_PARAM = 'leadToken';
+    private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig;
+
+    public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    )
+    {
+        $this->scopeConfig = $scopeConfig;
+    }
+
+    public function isEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->getValue(self::ENABLE_EXTEND);
+    }
 }

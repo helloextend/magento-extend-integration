@@ -7,6 +7,7 @@
 namespace Extend\Integration\Plugin\Model;
 
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
+use Extend\Integration\Service\Extend;
 use Magento\Store\Api\Data\StoreExtensionFactory;
 use Magento\Store\Model\StoreRepository;
 
@@ -17,16 +18,19 @@ class StoreRepositoryPlugin
      */
     private StoreExtensionFactory $storeExtensionFactory;
     private StoreIntegrationRepositoryInterface $integrationStoresRepository;
+    private Extend $extend;
 
     /**
      * @param StoreExtensionFactory $storeExtensionFactory
      */
     public function __construct(
         StoreExtensionFactory $storeExtensionFactory,
-        StoreIntegrationRepositoryInterface $integrationStoresRepository
+        StoreIntegrationRepositoryInterface $integrationStoresRepository,
+        Extend $extend
     ) {
         $this->storeExtensionFactory = $storeExtensionFactory;
         $this->integrationStoresRepository = $integrationStoresRepository;
+        $this->extend = $extend;
     }
 
     /**
@@ -38,6 +42,9 @@ class StoreRepositoryPlugin
      */
     public function afterGet(\Magento\Store\Model\StoreRepository $subject, $result, $code)
     {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $integrationStores = $this->integrationStoresRepository->get($code);
 
         if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0) {
@@ -64,6 +71,9 @@ class StoreRepositoryPlugin
      */
     public function afterGetById(\Magento\Store\Model\StoreRepository $subject, $result, $storeId)
     {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         $integrationStores = $this->integrationStoresRepository->getById($storeId);
 
         if (!$integrationStores->getData() || sizeof($integrationStores->getData()) === 0) {

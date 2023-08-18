@@ -8,6 +8,7 @@ namespace Extend\Integration\Plugin\Model;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Extend;
 use Magento\Sales\Model\Order;
 
 class OrderPlugin
@@ -16,11 +17,14 @@ class OrderPlugin
      * @var ShippingProtectionTotalRepositoryInterface
      */
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
+    private Extend $extend;
 
     public function __construct(
-        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+        ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
+        Extend $extend
     ) {
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->extend = $extend;
     }
 
     /**
@@ -32,6 +36,9 @@ class OrderPlugin
      */
     public function afterGetInvoiceCollection(\Magento\Sales\Model\Order $subject, $result)
     {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         foreach ($result->getItems() as $invoice) {
             if ($invoice->getId()) {
                 $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
@@ -54,6 +61,9 @@ class OrderPlugin
      */
     public function afterGetCreditmemosCollection(\Magento\Sales\Model\Order $subject, $result)
     {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         foreach ($result->getItems() as $creditmemo) {
             if ($creditmemo->getId()) {
                 $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
@@ -80,6 +90,9 @@ class OrderPlugin
         $result,
         $incrementId
     ) {
+        if (!$this->extend->isEnabled())
+            return $result;
+
         if ($result->getId()) {
             $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
                 $result->getId(),
