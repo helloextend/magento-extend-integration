@@ -82,6 +82,7 @@ class Intro extends Field
     if (!empty($data['helloextend/integration']['version'])) {
       return ($data['helloextend/integration']['version']);
     }
-    return null;
+
+    return '';
   }
 }
