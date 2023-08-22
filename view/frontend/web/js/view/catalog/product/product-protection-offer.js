@@ -31,6 +31,8 @@ define([
     if (swatches.length > 0) {
       const swatchesElem = $('[data-role=swatch-options]', '.product-info-main')
       const swatchRenderer = swatchesElem.data('mageSwatchRenderer')
+        ? swatchesElem.data('mageSwatchRenderer')
+        : swatchesElem.data('mage-SwatchRenderer')
 
       if (swatchRenderer) {
         const selectedProducts = swatchRenderer._CalcProducts()
