@@ -6,6 +6,7 @@
 namespace Extend\Integration\Block\Adminhtml\Integration\Edit\Tab;
 
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
+use Extend\Integration\Service\Extend;
 use Magento\Backend\Block\Template\Context;
 use Magento\Backend\Block\Widget\Container;
 use Magento\Framework\Data\FormFactory;
@@ -45,6 +46,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
     private Data $integrationHelper;
     private Registry $registry;
     private TemplateFactory $templateFactory;
+    private Extend $extend;
 
     public function __construct(
         Context $context,
@@ -55,6 +57,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         Container $container,
         Data $integrationHelper,
         TemplateFactory $templateFactory,
+        Extend $extend,
         array $data = []
     ) {
         parent::__construct($context, $registry, $formFactory);
@@ -64,6 +67,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         $this->integrationHelper = $integrationHelper;
         $this->registry = $registry;
         $this->templateFactory = $templateFactory;
+        $this->extend = $extend;
     }
 
     /**
@@ -73,6 +77,7 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
      */
     protected function _prepareForm()
     {
+
         /** @var \Magento\Framework\Data\Form $form */
         $form = $this->_formFactory->create();
         $form->setHtmlIdPrefix(self::HTML_ID_PREFIX);
@@ -118,6 +123,9 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
      */
     public function canShowTab()
     {
+        if (!$this->extend->isEnabled())
+            return false;
+
         $integrationData = $this->_coreRegistry->registry(
             Integration::REGISTRY_KEY_CURRENT_INTEGRATION
         );
@@ -129,6 +137,8 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         ) {
             return true;
         }
+
+        return false;
     }
 
     /**
@@ -148,13 +158,10 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
      * @param array $integrationData
      * @return void
      */
-    protected function _addGeneralFieldset($form, $integrationData)
+    protected function _addGeneralFieldset($form, array $integrationData)
     {
         $fieldset = $form->addFieldset('base_fieldset', ['legend' => __('Stores')]);
 
-        $integrationData = $this->_coreRegistry->registry(
-            Integration::REGISTRY_KEY_CURRENT_INTEGRATION
-        );
         if (isset($integrationData['integration_id'])) {
             $integrationStores = $this->integrationStoresRepository->getListByIntegration(
                 $integrationData['integration_id']
@@ -183,7 +190,12 @@ class Stores extends \Magento\Backend\Block\Widget\Form\Generic implements
         }
     }
 
-    public function getStores()
+  /**
+   * This gets a list of stores in Magento
+   *
+   * @return array
+   */
+  protected function getStores()
     {
         $options = [];
         $stores = $this->storeRepository->getList();
