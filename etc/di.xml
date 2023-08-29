@@ -56,4 +56,7 @@
             <argument name="shippingProtectionTotalRepository" xsi:type="object">Extend\Integration\Model\ShippingProtectionTotalRepository\Proxy</argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\View\Tab\Info">
+        <plugin sortOrder="1" name="extendIntegrationInfo" type="Extend\Integration\Plugin\Block\Adminhtml\Order\View\Tab\InfoPlugin"/>
+    </type>
 </config>
