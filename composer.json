@@ -1,20 +1,21 @@
 {
-  "name": "helloextend/integration",
-  "description": "",
-  "require": {
-    "php": "^7.4||^8.0",
-    "magento/magento-composer-installer": "*",
-    "magento/module-integration": "*"
-  },
-  "suggest": {},
-  "type": "magento2-module",
-  "license": [],
-  "autoload": {
-    "files": [
-      "registration.php"
-    ],
-    "psr-4": {
-      "Extend\\Integration\\": ""
+    "name": "helloextend/integration",
+    "description": "",
+    "version": "3.1.0",
+    "require": {
+        "php": "^7.4||^8.0",
+        "magento/magento-composer-installer": "*",
+        "magento/module-integration": "*"
+    },
+    "suggest": {},
+    "type": "magento2-module",
+    "license": [],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Extend\\Integration\\": ""
+        }
     }
-  }
 }
