@@ -57,13 +57,13 @@ class EnableCartBalancingTest extends TestCase
    * 1. sets up mock objects which are used as arguments for the constructor of the class under test
    * 2. instantiates the class under test using the mock objects
    * 3. sets up mock objects which are used as arguments for the tested functions
-   * 
+   *
    * this function is called by the framework before each test function.
-   * 
+   *
    * ensure when writing/updating tests that you mock every dependency!
    * and ensure the requisite methods/functions on each mock object **exist** and are
    * well-mocked!
-   * 
+   *
    * @return void
    */
   protected function setUp(): void

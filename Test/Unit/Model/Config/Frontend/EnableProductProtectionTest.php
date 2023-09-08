@@ -65,7 +65,7 @@ class EnableProductProtectionTest extends TestCase
 
   /**
    * setup function
-   * 
+   *
    * @return void
    */
   protected function setUp(): void
@@ -250,7 +250,7 @@ class EnableProductProtectionTest extends TestCase
 
   /**
    * helper function to set up the test conditions for the above tests.
-   * 
+   *
    * @param array $conditions - array of booleans, in the order:
    * 1. isV1Enabled
    * 2. isExtendWarrantyEnabled
