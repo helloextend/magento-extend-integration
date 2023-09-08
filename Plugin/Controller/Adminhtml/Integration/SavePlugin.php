@@ -14,81 +14,101 @@ use Extend\Integration\Service\Api\MetadataBuilder;
 use Extend\Integration\Service\Extend;
 use Magento\Directory\Helper\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Oauth\Exception;
+use Magento\Framework\Oauth\Exception as OauthException;
 use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Controller\Adminhtml\Integration;
 use Magento\Integration\Controller\Adminhtml\Integration\Save;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\log\LoggerInterface;
+use Exception;
 
 class SavePlugin
 {
     /**
      * @var StoreIntegrationRepositoryInterface
      */
-    private StoreIntegrationRepositoryInterface $integrationStoresRepository;
+    private $integrationStoresRepository;
 
     /**
      * @var StoreIntegration
      */
-    private StoreIntegration $storeIntegrationResource;
+    private $storeIntegrationResource;
 
     /**
      * @var CollectionFactory
      */
-    private StoreIntegration\CollectionFactory $storeIntegrationCollection;
+    private $storeIntegrationCollection;
 
     /**
      * @var ManagerInterface
      */
-    private ManagerInterface $messageManager;
-  /**
-   * @var MetadataBuilder
-   */
-  private MetadataBuilder $metadataBuilder;
-  /**
-   * @var IntegrationService
-   */
-  private IntegrationService $integration;
-  /**
-   * @var OauthServiceInterface
-   */
-  private OauthServiceInterface $oauthService;
-  /**
-   * @var IntegrationServiceInterface
-   */
-  private IntegrationServiceInterface $integrationService;
-  /**
-   * @var ScopeConfigInterface
-   */
-  private ScopeConfigInterface $scopeConfig;
-  /**
-   * @var StoreManagerInterface
-   */
-  private StoreManagerInterface $storeManager;
-  /**
-   * @var EncryptorInterface
-   */
-  private EncryptorInterface $encryptor;
-  private Extend $extend;
+    private $messageManager;
 
-  /**
+    /**
+     * @var MetadataBuilder
+     */
+    private $metadataBuilder;
+
+    /**
+     * @var IntegrationService
+     */
+    private $integration;
+
+    /**
+     * @var OauthServiceInterface
+     */
+    private $oauthService;
+
+    /**
+     * @var IntegrationServiceInterface
+     */
+    private $integrationService;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var Extend
+     */
+    private $extend;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param StoreIntegrationRepositoryInterface $integrationStoresRepository
      * @param StoreIntegration $storeIntegrationResource
      * @param CollectionFactory $storeIntegrationCollection
      * @param ManagerInterface $messageManager
+     * @param MetadataBuilder $metadataBuilder
+     * @param IntegrationService $integration
+     * @param OauthServiceInterface $oauthService
+     * @param IntegrationServiceInterface $integrationService
+     * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param Extend $extend
+     * @param LoggerInterface $logger
      */
     public function __construct(
         StoreIntegrationRepositoryInterface $integrationStoresRepository,
         StoreIntegration $storeIntegrationResource,
-        StoreIntegration\CollectionFactory $storeIntegrationCollection,
+        CollectionFactory $storeIntegrationCollection,
         ManagerInterface $messageManager,
         MetadataBuilder $metadataBuilder,
         IntegrationService $integration,
@@ -96,8 +116,8 @@ class SavePlugin
         IntegrationServiceInterface $integrationService,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        EncryptorInterface $encryptor,
-        Extend $extend
+        Extend $extend,
+        LoggerInterface $logger
     ) {
         $this->integrationStoresRepository = $integrationStoresRepository;
         $this->storeIntegrationResource = $storeIntegrationResource;
@@ -109,8 +129,8 @@ class SavePlugin
         $this->integrationService = $integrationService;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
-        $this->encryptor = $encryptor;
         $this->extend = $extend;
+        $this->logger = $logger;
     }
 
     /**
@@ -123,46 +143,66 @@ class SavePlugin
      */
     public function aroundExecute(Save $subject, callable $proceed)
     {
-        if (!$this->extend->isEnabled())
-          return $proceed();
+        try {
+            if (!$this->extend->isEnabled()) {
+              return $proceed();
+            }
 
-        $postData = $subject->getRequest()->getPostValue();
-        if ($subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)) {
-            $integration = $this->integrationService->get(
-                $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
-            );
-            if (isset($postData['integration_stores'])) {
-                $integrationStoresIds = (array) $postData['integration_stores'];
-                $this->disableAllStoreAssociations(
-                    $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID)
+            $request = $subject->getRequest();
+
+            $integrationId = $request->getParam(Integration::PARAM_INTEGRATION_ID);
+
+            if ($integrationId) {
+                $postData = $request->getPostValue();
+
+                $integration = $this->integrationService->get(
+                  $integrationId
                 );
-                foreach ($integrationStoresIds as $integrationStoreId) {
-                    $this->integrationStoresRepository->saveStoreToIntegration(
-                        $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                        $integrationStoreId
+
+                if (isset($postData['integration_stores'])) {
+                    $this->disableAllStoreAssociations($integrationId);
+
+                    $integrationStoresIds = (array) $postData['integration_stores'];
+
+                    $integrationIsActive = $integration->getStatus() !== 0;
+
+                    foreach ($integrationStoresIds as $integrationStoreId) {
+                        $this->integrationStoresRepository->saveStoreToIntegration(
+                            $integrationId,
+                            $integrationStoreId
+                        );
+
+                        if ($integrationIsActive) {
+                            $this->sendIntegrationToExtend(
+                                $integrationId,
+                                $integrationStoreId
+                            );
+                        }
+                    }
+
+                    $this->messageManager->addSuccessMessage(
+                        __('Your selected stores were saved to the Extend Integration.')
                     );
-                    $this->sendIntegrationToExtend(
-                        $subject->getRequest()->getParam(Integration::PARAM_INTEGRATION_ID),
-                        $integrationStoreId
+
+                    if ((int) $integration->getSetupType() === 0) {
+                        $proceed();
+                    } else {
+                        $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
+                    }
+                } elseif ((int) $integration->getSetupType() === 1) {
+                    $this->messageManager->addSuccessMessage(
+                        __('No additional stores were saved to the Extend Integration.')
                     );
-                }
-                $this->messageManager->addSuccessMessage(
-                    __('Your selected stores were saved to the Extend Integration.')
-                );
-                if ((int) $integration->getSetupType() === 0) {
-                    $proceed();
-                } else {
+
                     $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
+                } else {
+                    $proceed();
                 }
-            } elseif ((int) $integration->getSetupType() === 1) {
-                $this->messageManager->addSuccessMessage(
-                    __('No additional stores were saved to the Extend Integration.')
-                );
-                $subject->getResponse()->setRedirect($subject->getUrl('*/*/'));
             } else {
                 $proceed();
             }
-        } else {
+        } catch (Exception $exception) {
+            $this->logger->error('An error occurred while saving an integration: ' . $exception->getMessage());
             $proceed();
         }
     }
@@ -178,14 +218,17 @@ class SavePlugin
     private function disableAllStoreAssociations($integrationId)
     {
         $storeIntegrationCollection = $this->storeIntegrationCollection->create();
+
         $storeIntegrations = $storeIntegrationCollection
             ->addFieldToFilter(
                 \Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID,
                 $integrationId
             )
             ->load();
+
         foreach ($storeIntegrations->getItems() as $storeIntegration) {
             $storeIntegration->setDisabled(1);
+
             $this->storeIntegrationResource->save($storeIntegration);
         }
     }
@@ -199,7 +242,7 @@ class SavePlugin
      * @throws IntegrationException
      * @throws LocalizedException
      * @throws NoSuchEntityException
-     * @throws Exception
+     * @throws OauthException
      */
     private function sendIntegrationToExtend($integrationId, $storeId)
     {
@@ -207,6 +250,7 @@ class SavePlugin
             $storeId,
             $integrationId
         );
+
         $integration = $this->integrationService->get($integrationId);
         $oauth = $this->oauthService->loadConsumer($integration->getConsumerId());
         $store = $this->storeManager->getStore($storeId);
@@ -215,11 +259,14 @@ class SavePlugin
             'path' => IntegrationService::EXTEND_INTEGRATION_ENDPOINTS['webhooks_stores_create'],
             'type' => 'middleware',
         ];
-        if ($oauth->getKey() && $oauth->getSecret()) {
+
+        $oauthKey = $oauth->getKey();
+
+        if ($oauthKey && $oauth->getSecret()) {
             [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
                 'magentoStoreUuid' => $integrationStore->getStoreUuid(),
                 'magentoStoreId' => $storeId,
-                'magentoConsumerKey' => $oauth->getKey(),
+                'magentoConsumerKey' => $oauthKey,
                 'extendStoreId' => $integrationStore->getExtendStoreUuid(),
                 'storeDomain' => rtrim(
                     str_replace(
