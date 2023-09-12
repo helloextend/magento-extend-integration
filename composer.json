@@ -1,6 +1,6 @@
 {
   "name": "helloextend/integration",
-  "description": "Sell product and shipping protection in your store to increase revenues and drive customer loyalty. Get instant revenue from Extend Product Protection and Shipping Protection, which goes straight to your bottom line and costs nothing to implement. Fast and easy claims resolution turns a negative moment into a positive customer experience, boosting brand loyalty and increasing follow-up sales. Buyers get peace of mind to complete their purchase, and replacement orders drive additional sales in your store. Install our app or contact us to get started!",
+  "description": "A Magento module to sell product and shipping protection in your store to increase revenues and drive customer loyalty.",
   "require": {
     "php": "^7.4||^8.0",
     "magento/module-integration": "^100.4.2"
