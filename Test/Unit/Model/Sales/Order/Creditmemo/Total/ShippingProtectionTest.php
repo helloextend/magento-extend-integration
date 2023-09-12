@@ -178,6 +178,10 @@ class ShippingProtectionTest extends TestCase
     $this->preexistingShippingProtectionTotal = $this->createStub(ShippingProtectionTotal::class);
   }
 
+  /* =================================================================================================== */
+  /* ============================================== tests ============================================== */
+  /* =================================================================================================== */
+
   public function testCollectIfNoShippingProtection()
   {
     // shipping protection does not exist
