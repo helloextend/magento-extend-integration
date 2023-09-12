@@ -15,9 +15,9 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Model\ShippingProtection as BaseShippingProtectionModel;
-use Magento\Quote\Api\Data\ShippingInterface;
 use Magento\Quote\Api\Data\CartExtension;
 use Magento\Quote\Model\Quote\Address;
+use Magento\Quote\Api\Data\ShippingInterface;
 
 use Extend\Integration\Model\Quote\Total\ShippingProtection;
 
@@ -54,11 +54,6 @@ class ShippingProtectionTest extends TestCase
   private $shippingAssignmentMock;
 
   /**
-   * @var ShippingInterface|MockObject
-   */
-  private $shippingMock;
-
-  /**
    * @var Total
    */
   private $total;
@@ -85,46 +80,31 @@ class ShippingProtectionTest extends TestCase
 
   protected function setUp(): void
   {
-    $this->serializerMock = $this->createMock(SerializerInterface::class);
-    $this->cartExtensionFactoryMock = $this->getMockBuilder(CartExtensionFactory::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['create'])
-      ->getMock();
-    $this->cartExtensionMock = $this->getMockBuilder(CartExtension::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getShippingProtection'])
-      ->getMock();
-    $this->shippingProtectionTotalRepositoryMock = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
-    $this->quoteMock = $this->getMockBuilder(Quote::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getExtensionAttributes'])
-      ->getMock();
-    $this->shippingAssignmentMock = $this->getMockBuilder(ShippingAssignmentInterface::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getShipping'])
-      ->getMockForAbstractClass();
-    $this->shippingMock = $this->getMockBuilder(ShippingInterface::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getAddress'])
-      ->getMockForAbstractClass();
-    $this->shippingMock
-      ->method('getAddress')
-      ->willReturn($this->createMock(Address::class));
-    $this->shippingAssignmentMock->method('getShipping')
-      ->willReturn($this->shippingMock);
-    $this->total = new Total();
+    // class under test's constructor dependencies
+    $this->shippingProtectionTotalRepositoryMock = $this->createStub(ShippingProtectionTotalRepositoryInterface::class);
+    $this->serializerMock = $this->createStub(SerializerInterface::class);
+    $this->cartExtensionMock = $this->createStub(CartExtension::class);
+    $this->cartExtensionFactoryMock = $this->createConfiguredMock(
+      CartExtensionFactory::class,
+      ['create' => $this->cartExtensionMock]
+    );
 
-    $this->shippingProtectionMock = $this->getMockBuilder(BaseShippingProtectionModel::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getPrice', 'getBase'])
-      ->getMock();
-
+    // instantiate class under test
     $this->testSubject = new ShippingProtection(
       $this->shippingProtectionTotalRepositoryMock,
       $this->serializerMock,
       $this->cartExtensionFactoryMock
     );
 
+    // additional test dependencies
+    $this->shippingAssignmentMock = $this->createConfiguredMock(ShippingAssignmentInterface::class, [
+      'getShipping' => $this->createConfiguredMock(ShippingInterface::class, [
+        'getAddress' => $this->createStub(Address::class)
+      ])
+    ]);
+    $this->total = new Total();
+    $this->shippingProtectionMock = $this->createStub(BaseShippingProtectionModel::class);
+    $this->quoteMock = $this->createStub(Quote::class);
     $this->testSubject->setCode('shipping_protection');
   }
 
@@ -134,10 +114,7 @@ class ShippingProtectionTest extends TestCase
     $this->setTestConditions([
       'extensionAttributesExist' => false
     ]);
-    $this->cartExtensionFactoryMock
-      ->expects($this->once())
-      ->method('create')
-      ->willReturn($this->cartExtensionMock);
+    $this->cartExtensionFactoryMock->expects($this->once())->method('create');
     // test and assert
     $this->runCollect();
     $this->assertEquals(0, $this->total->getBaseTotalAmount('shipping_protection'));
@@ -276,38 +253,27 @@ class ShippingProtectionTest extends TestCase
   private function setTestConditions(
     array $conditions
   ) {
-    if (isset($conditions['extensionAttributesExist']))
-      $conditions['extensionAttributesExist'] ? $this->setExtensionAttributes() : $this->setExtensionAttributesNull();
-    if (isset($conditions['shippingProtectionExists']))
-      $conditions['shippingProtectionExists'] ? $this->setShippingProtection() : $this->setShippingProtectionNull();
-    if (isset($conditions['shippingProtectionHasNonZeroPrice']))
-      $conditions['shippingProtectionHasNonZeroPrice'] ? $this->setShippingProtectionPrice() : $this->setShippingProtectionPriceToZero();
-    if (isset($conditions['shippingProtectionHasNonZeroBasePrice']))
-      $conditions['shippingProtectionHasNonZeroBasePrice'] ? $this->setShippingProtectionBasePrice() : $this->setShippingProtectionBasePriceToZero();
-  }
+    (isset($conditions['extensionAttributesExist']) && $conditions['extensionAttributesExist']) ?
+      $this->setExtensionAttributes() : $this->setExtensionAttributesNull();
 
-  private function setExtensionAttributesNull(): void
-  {
-    $this->quoteMock->expects($this->any())->method('getExtensionAttributes')->willReturn(null);
+    (isset($conditions['shippingProtectionHasNonZeroPrice']) && $conditions['shippingProtectionHasNonZeroPrice']) ?
+      $this->setShippingProtectionPrice() : $this->setShippingProtectionpriceZero();
+
+    (isset($conditions['shippingProtectionHasNonZeroBasePrice']) && $conditions['shippingProtectionHasNonZeroBasePrice']) ?
+      $this->setShippingProtectionBasePrice() : $this->setShippingProtectionBasePriceZero();
+
+    (isset($conditions['shippingProtectionExists']) && $conditions['shippingProtectionExists']) ?
+      $this->setShippingProtection() : $this->setShippingProtectionNull();
   }
 
   private function setExtensionAttributes(): void
   {
-    $this->quoteMock->expects($this->any())->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
+    $this->quoteMock->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
   }
 
-  private function setShippingProtectionNull(): void
+  private function setExtensionAttributesNull(): void
   {
-    $this->cartExtensionMock->expects($this->any())->method('getShippingProtection')->willReturn(null);
-  }
-
-  private function setShippingProtection(): void
-  {
-    $this->cartExtensionMock->expects($this->any())->method('getShippingProtection')->willReturn($this->shippingProtectionMock);
-  }
-  private function setShippingProtectionPriceToZero(): void
-  {
-    $this->shippingProtectionMock->expects($this->any())->method('getPrice')->willReturn(0.0);
+    $this->quoteMock->method('getExtensionAttributes')->willReturn(null);
   }
 
   private function setShippingProtectionPrice(): void
@@ -315,13 +281,29 @@ class ShippingProtectionTest extends TestCase
     $this->shippingProtectionMock->expects($this->any())->method('getPrice')->willReturn($this->shippingProtectionPrice);
   }
 
-  private function setShippingProtectionBasePriceToZero(): void
+  private function setShippingProtectionPriceZero(): void
   {
-    $this->shippingProtectionMock->expects($this->any())->method('getBase')->willReturn(0.0);
+    $this->shippingProtectionMock->expects($this->any())->method('getPrice')->willReturn(0.0);
   }
 
   private function setShippingProtectionBasePrice(): void
   {
     $this->shippingProtectionMock->expects($this->any())->method('getBase')->willReturn($this->shippingProtectionBasePrice);
+  }
+
+  private function setShippingProtectionBasePriceZero(): void
+  {
+    $this->shippingProtectionMock->expects($this->any())->method('getBase')->willReturn(0.0);
+  }
+
+
+  private function setShippingProtection(): void
+  {
+    $this->cartExtensionMock->expects($this->any())->method('getShippingProtection')->willReturn($this->shippingProtectionMock);
+  }
+
+  private function setShippingProtectionNull(): void
+  {
+    $this->cartExtensionMock->expects($this->any())->method('getShippingProtection')->willReturn(null);
   }
 }
