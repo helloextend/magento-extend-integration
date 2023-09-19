@@ -165,17 +165,23 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      *
      * @param string $consumerKey
      * @var Collection $storeIntegrationCollection
-     * @return array|StoreIntegrationInterface
+     * @return array
      */
     public function getListByConsumerKey(string $consumerKey): array
     {
         $consumer = $this->oauthService->loadConsumerByKey($consumerKey);
 
-        if (!$consumer->getId()) {
+        if (!$consumer) {
             return [];
         }
 
-        return $this->getListByIntegration($consumer->getId());
+        $integration = $this->integrationService->findByConsumerId($consumer->getId());
+
+        if (!$integration) {
+            return [];
+        }
+
+        return $this->getListByIntegration($integration->getId());
     }
 
     /**
@@ -261,9 +267,11 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
     {
         $consumer = $this->oauthService->loadConsumerByKey($consumerKey);
 
+        $integration = $this->integrationService->findByConsumerId($consumer->getId());
+
         $storeIntegrationCollection = $this->storeIntegrationCollectionFactory->create();
         $storeIntegrationCollection
-            ->addFieldToFilter(\Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID, $consumer->getId())
+            ->addFieldToFilter(\Extend\Integration\Api\Data\StoreIntegrationInterface::INTEGRATION_ID, $integration->getId())
             ->load();
 
         foreach ($storeIntegrationCollection as $integration) {
