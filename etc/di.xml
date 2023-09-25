@@ -59,4 +59,7 @@
     <type name="Magento\Sales\Block\Adminhtml\Order\View\Tab\Info">
         <plugin sortOrder="1" name="extendIntegrationInfo" type="Extend\Integration\Plugin\Block\Adminhtml\Order\View\Tab\InfoPlugin"/>
     </type>
+    <type name="Magento\Paypal\Model\Api\Nvp">
+        <plugin name="extend_paypal_custom_fee_api_call" type="Extend\Integration\Plugin\Paypal\Model\Nvp"/>
+    </type>
 </config>

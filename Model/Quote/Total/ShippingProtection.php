@@ -59,6 +59,10 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
     ) {
         parent::collect($quote, $shippingAssignment, $total);
 
+        if (!count($shippingAssignment->getItems())) {
+            return $this;
+        }
+
         $extensionAttributes = $quote->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->cartExtensionFactory->create();
