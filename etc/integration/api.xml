@@ -13,6 +13,7 @@
             <resource name="Extend_Integration::manage"/>
             <resource name="Magento_Sales::sales"/>
             <resource name="Magento_Sales::sales_operation"/>
+            <resource name="Magento_Sales::sales_creditmemo"/>
             <resource name="Magento_Sales::actions_view"/>
             <resource name="Magento_Sales::shipment"/>
             <resource name="Magento_Catalog::catalog"/>
@@ -27,6 +28,8 @@
             <resource name="Magento_Backend::store"/>
             <resource name="Extend_Integration::manage"/>
             <resource name="Magento_Sales::sales"/>
+            <resource name="Magento_Sales::sales_operation"/>
+            <resource name="Magento_Sales::sales_creditmemo"/>
             <resource name="Magento_Sales::actions_view"/>
             <resource name="Magento_Sales::shipment"/>
             <resource name="Magento_Catalog::catalog"/>
