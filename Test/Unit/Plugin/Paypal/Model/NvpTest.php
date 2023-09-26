@@ -167,12 +167,12 @@ class NvpTest extends TestCase
         $this->assertEquals(
             $this->nvp->beforeCall($this->subject, $this->title, $this->request),
             [$this->title, [
-                    'AMT' => $this->request['AMT'] + 1.2,
-                    'ITEMAMT' => $this->request['ITEMAMT'],
-                    'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
-                    'TAXAMT' => $this->request['TAXAMT'],
-                    'INSURANCEAMT' => 1.2
-                ]
+                'AMT' => $this->request['AMT'],
+                'ITEMAMT' => $this->request['ITEMAMT'],
+                'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
+                'TAXAMT' => $this->request['TAXAMT'],
+                'INSURANCEAMT' => 1.2
+            ]
             ]
         );
     }
@@ -188,12 +188,12 @@ class NvpTest extends TestCase
         $this->assertEquals(
             $this->nvp->beforeCall($this->subject, $this->title, $this->request),
             [$this->title, [
-                    'AMT' => $this->request['AMT'] + 1.2,
-                    'ITEMAMT' => $this->request['ITEMAMT'],
-                    'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
-                    'TAXAMT' => $this->request['TAXAMT'],
-                    'INSURANCEAMT' => 1.2
-                ]
+                'AMT' => $this->request['AMT'],
+                'ITEMAMT' => $this->request['ITEMAMT'],
+                'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
+                'TAXAMT' => $this->request['TAXAMT'],
+                'INSURANCEAMT' => 1.2
+            ]
             ]
         );
     }
@@ -212,12 +212,12 @@ class NvpTest extends TestCase
         $this->assertEquals(
             $this->nvp->beforeCall($this->subject, $this->title, $this->request),
             [$this->title, [
-                    'AMT' => $this->request['AMT'] + 1.2,
-                    'ITEMAMT' => $this->request['ITEMAMT'],
-                    'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
-                    'TAXAMT' => $this->request['TAXAMT'],
-                    'INSURANCEAMT' => 1.2
-                ]
+                'AMT' => $this->request['AMT'],
+                'ITEMAMT' => $this->request['ITEMAMT'],
+                'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
+                'TAXAMT' => $this->request['TAXAMT'],
+                'INSURANCEAMT' => 1.2
+            ]
             ]
         );
     }
@@ -231,13 +231,13 @@ class NvpTest extends TestCase
         $this->shippingProtection->expects($this->once())->method('getBase')->willReturn(1.2);
         $this->assertEquals(
             $this->nvp->beforeCall($this->subject, $this->title, $this->request),
-                [$this->title, [
-                    'AMT' => $this->request['AMT'] + 1.2,
-                    'ITEMAMT' => $this->request['ITEMAMT'],
-                    'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
-                    'TAXAMT' => $this->request['TAXAMT'],
-                    'INSURANCEAMT' => 1.2
-                ]
+            [$this->title, [
+                'AMT' => $this->request['AMT'],
+                'ITEMAMT' => $this->request['ITEMAMT'],
+                'SHIPPINGAMT' => $this->request['SHIPPINGAMT'],
+                'TAXAMT' => $this->request['TAXAMT'],
+                'INSURANCEAMT' => 1.2
+            ]
             ]
         );
     }
