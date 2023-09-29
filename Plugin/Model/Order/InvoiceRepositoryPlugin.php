@@ -4,16 +4,16 @@
  * See Extend-COPYING.txt for license details.
  */
 
-namespace Extend\Integration\Plugin\Model;
+namespace Extend\Integration\Plugin\Model\Order;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Magento\Sales\Api\Data\InvoiceExtensionFactory;
+use Magento\Sales\Model\Order\InvoiceRepository;
+use Magento\Sales\Model\OrderRepository;
 use Extend\Integration\Service\Extend;
-use Magento\Quote\Api\Data\CartExtensionFactory;
-use Magento\Quote\Model\QuoteRepository;
-use Extend\Integration\Model\ShippingProtectionFactory;
 
-class QuoteRepositoryPlugin
+class InvoiceRepositoryPlugin
 {
     /**
      * @var ShippingProtectionTotalRepositoryInterface
@@ -21,65 +21,67 @@ class QuoteRepositoryPlugin
     private ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository;
 
     /**
-     * @var CartExtensionFactory
+     * @var InvoiceExtensionFactory
      */
-    private CartExtensionFactory $cartExtensionFactory;
-    private ShippingProtectionFactory $shippingProtectionFactory;
+    private InvoiceExtensionFactory $invoiceExtension;
+
     private Extend $extend;
 
+    /**
+     * @param ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+     * @param InvoiceExtensionFactory $invoiceExtension
+     */
     public function __construct(
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        CartExtensionFactory $cartExtensionFactory,
-        ShippingProtectionFactory $shippingProtectionFactory,
+        InvoiceExtensionFactory $invoiceExtension,
         Extend $extend
     ) {
+
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
-        $this->cartExtensionFactory = $cartExtensionFactory;
-        $this->shippingProtectionFactory = $shippingProtectionFactory;
+        $this->invoiceExtension = $invoiceExtension;
         $this->extend = $extend;
     }
 
     /**
-     * This plugin injects the Shipping Protection record into the quote's extension attributes if a matching record is found with a given quote id
+     * This plugin injects the Shipping Protection record into the invoice's extension attributes if a matching record is found with a given invoice ID
      *
-     * @param QuoteRepository $subject
+     * @param InvoiceRepository $subject
      * @param $result
-     * @param $cartId
+     * @param $invoiceId
      * @return mixed
      */
-    public function afterGet(\Magento\Quote\Model\QuoteRepository $subject, $result, $cartId)
+    public function afterGet(\Magento\Sales\Model\Order\InvoiceRepository $subject, $result, $invoiceId)
     {
         if (!$this->extend->isEnabled()) {
             return $result;
         }
 
         $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
-            $cartId,
-            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID,
+            $invoiceId,
+            ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
             $result
         );
 
         return $result;
     }
 
-
     /**
-     * This save the Shipping Protection data from the quote's extension attributes into the Shipping Protection totals table, saving the entity type and quote ID as well
+     * This save the Shipping Protection data from the invoice's extension attributes into the Shipping Protection totals table, saving the entity type and invoice ID as well
      *
-     * @param QuoteRepository $subject
+     * @param InvoiceRepository $subject
      * @param $result
-     * @param $quote
+     * @param $invoice
      * @return mixed
      */
-    public function afterSave(\Magento\Quote\Model\QuoteRepository $subject, $result, $quote)
+    public function afterSave(\Magento\Sales\Model\Order\InvoiceRepository $subject, $result, $invoice)
     {
         if (!$this->extend->isEnabled()) {
             return $result;
         }
 
-        $extensionAttributes = $quote->getExtensionAttributes();
+        $extensionAttributes = $invoice->getExtensionAttributes();
         if ($extensionAttributes === null) {
-            $extensionAttributes = $this->cartExtensionFactory->create();
+            $extensionAttributes = $this->invoiceExtensionFactory->create();
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
@@ -87,7 +89,7 @@ class QuoteRepositoryPlugin
             $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
                 $shippingProtection,
                 $result,
-                ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+                ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
             );
         }
         return $result;
