@@ -7,78 +7,87 @@
 namespace Extend\Integration\Observer;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\Integration;
-use Extend\Integration\Service\Api\OrderObserverHandler;
-use Magento\Framework\Event\ObserverInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Api\OrderObserverHandler;
+use Magento\Framework\Event\Observer;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
+use Psr\Log\LoggerInterface;
 
-class InvoiceSaveAfter implements ObserverInterface
+class InvoiceSaveAfter extends BaseExtendObserver
 {
     /**
-     * @var \Psr\log\LoggerInterface
+     * @var InvoiceExtensionFactory
      */
-    private $logger;
-    private OrderObserverHandler $orderObserverHandler;
-    private Integration $integration;
-    private StoreManagerInterface $storeManager;
+    private $invoiceExtensionFactory;
 
+    /**
+     * @var ShippingProtectionTotalRepositoryInterface
+     */
+    private $shippingProtectionTotalRepository;
+
+    /**
+     * @var OrderObserverHandler
+     */
+    private $orderObserverHandler;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param InvoiceExtensionFactory $invoiceExtensionFactory
+     * @param ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
+     * @param OrderObserverHandler $orderObserverHandler
+     */
     public function __construct(
-        \Psr\log\LoggerInterface $logger,
-        OrderObserverHandler $orderObserverHandler,
-        Integration $integration,
+        LoggerInterface $logger,
+        ExtendService $extendService,
+        Integration $extendIntegrationService,
         StoreManagerInterface $storeManager,
+        InvoiceExtensionFactory $invoiceExtensionFactory,
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        InvoiceExtensionFactory $invoiceExtensionFactory
+        OrderObserverHandler $orderObserverHandler
     ) {
-        $this->logger = $logger;
-        $this->orderObserverHandler = $orderObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
-        $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
+        $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
+        $this->orderObserverHandler = $orderObserverHandler;
     }
 
     /**
-     * @param \Magento\Framework\Event\Observer $observer
+     * @param Observer $observer
      * @return void
      */
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    protected function _execute(Observer $observer)
     {
-        try {
-            $extensionAttributes = $observer->getInvoice()->getExtensionAttributes();
-            if ($extensionAttributes === null) {
-                $extensionAttributes = $this->invoiceExtensionFactory->create();
-            }
-            $shippingProtection = $extensionAttributes->getShippingProtection();
+        $invoice = $observer->getInvoice();
 
-            if ($observer->getInvoice() && $shippingProtection) {
-                $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
-                    $shippingProtection,
-                    $observer->getInvoice(),
-                    ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
-                );
-            }
-            $this->orderObserverHandler->execute(
-                [
-                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
-                    'type' => 'middleware',
-                ],
-                $observer->getInvoice()->getOrder(),
-                ['invoice_id' => $observer->getInvoice()->getId()]
-            );
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error(
-                'Extend Order Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
+        $extensionAttributes = $invoice->getExtensionAttributes();
+
+        if ($extensionAttributes === null) {
+            $extensionAttributes = $this->invoiceExtensionFactory->create();
+        }
+
+        $shippingProtection = $extensionAttributes->getShippingProtection();
+
+        if ($invoice && $shippingProtection) {
+            $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
+                $shippingProtection,
+                $invoice,
+                ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
             );
         }
+
+        $this->orderObserverHandler->execute(
+            [
+                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+                'type' => 'middleware',
+            ],
+            $invoice->getOrder(),
+            ['invoice_id' => $invoice->getId()]
+        );
     }
 }

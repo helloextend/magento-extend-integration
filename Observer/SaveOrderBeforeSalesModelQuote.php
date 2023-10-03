@@ -6,51 +6,73 @@
 
 namespace Extend\Integration\Observer;
 
+use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Magento\Framework\DataObject\Copy;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Quote\Api\Data\CartExtensionFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Sales\Model\Order;
+use Magento\Quote\Model\Quote;
+use Psr\Log\LoggerInterface;
 
-class SaveOrderBeforeSalesModelQuote implements ObserverInterface
+class SaveOrderBeforeSalesModelQuote extends BaseExtendObserver
 {
     /**
-     * @var Copy
+     * @var CartExtensionFactory
      */
-    protected $objectCopyService;
+    private $cartExtensionFactory;
 
     /**
      * @var OrderExtensionFactory
      */
     private $orderExtensionFactory;
-    private CartExtensionFactory $cartExtensionFactory;
 
     /**
-     * @param Copy $objectCopyService
+     * @var Copy
+     */
+    private $objectCopyService;
+
+    /**
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param CartExtensionFactory $cartExtensionFactory
      * @param OrderExtensionFactory $orderExtensionFactory
+     * @param Copy $objectCopyService
      */
     public function __construct(
-        Copy $objectCopyService,
+        LoggerInterface $logger,
+        ExtendService $extendService,
+        Integration $extendIntegrationService,
+        StoreManagerInterface $storeManager,
+        CartExtensionFactory $cartExtensionFactory,
         OrderExtensionFactory $orderExtensionFactory,
-        CartExtensionFactory $cartExtensionFactory
+        Copy $objectCopyService
     ) {
-        $this->objectCopyService = $objectCopyService;
-        $this->orderExtensionFactory = $orderExtensionFactory;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->cartExtensionFactory = $cartExtensionFactory;
+        $this->orderExtensionFactory = $orderExtensionFactory;
+        $this->objectCopyService = $objectCopyService;
     }
 
     /**
      * Copy Shipping Protection extension attribute from quote to order
      *
      * @param Observer $observer
-     * @return SaveOrderBeforeSalesModelQuote
+     * @return void
      */
-    public function execute(Observer $observer)
+    protected function _execute(Observer $observer)
     {
-        /* @var Order $order */
-        $order = $observer->getEvent()->getData('order');
-        /* @var Quote $quote */
-        $quote = $observer->getEvent()->getData('quote');
+        $event = $observer->getEvent();
+
+        /** @var Order $order */
+        $order = $event->getData('order');
+
+        /** @var Quote $quote */
+        $quote = $event->getData('quote');
 
         $quoteExtensionAttributes = $quote->getExtensionAttributes();
 
@@ -60,9 +82,11 @@ class SaveOrderBeforeSalesModelQuote implements ObserverInterface
 
         if ($quoteExtensionAttributes->getShippingProtection() !== null) {
             $extensionAttributes = $order->getExtensionAttributes();
+
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->orderExtensionFactory->create();
             }
+
             $order->setExtensionAttributes($extensionAttributes);
 
             $this->objectCopyService->copyFieldsetToTarget(
@@ -72,7 +96,5 @@ class SaveOrderBeforeSalesModelQuote implements ObserverInterface
                 $order
             );
         }
-
-        return $this;
     }
 }

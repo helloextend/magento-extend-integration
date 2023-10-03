@@ -7,69 +7,47 @@
 namespace Extend\Integration\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\ShipmentObserverHandler;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order\Shipment;
 use Psr\Log\LoggerInterface;
 
-class SalesOrderShipmentSaveAfter implements ObserverInterface
+class SalesOrderShipmentSaveAfter extends BaseExtendObserver
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     /**
      * @var ShipmentObserverHandler
      */
     private $shipmentObserverHandler;
 
     /**
-     * @var Integration
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param ShipmentObserverHandler $shipmentObserverHandler
      */
-    private $integration;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
     public function __construct(
         LoggerInterface $logger,
-        ShipmentObserverHandler $shipmentObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
+        ExtendService $extendService,
+        Integration $extendIntegrationService,
+        StoreManagerInterface $storeManager,
+        ShipmentObserverHandler $shipmentObserverHandler
     ) {
-        $this->logger = $logger;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->shipmentObserverHandler = $shipmentObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
     }
 
     /**
      * @param Observer $observer
      * @return void
      */
-    public function execute(Observer $observer)
+    protected function _execute(Observer $observer)
     {
-        try {
-            $shipment = $observer->getEvent()->getShipment();
-            $endpoint = $this->resolveEndpoint($shipment);
-            $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error(
-                'Extend Shipment Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
-        }
+        $shipment = $observer->getEvent()->getShipment();
+        $endpoint = $this->resolveEndpoint($shipment);
+        $this->shipmentObserverHandler->execute($endpoint, $shipment, []);
     }
 
     /**

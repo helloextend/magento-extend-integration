@@ -7,52 +7,42 @@
 namespace Extend\Integration\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\OrderObserverHandler;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Psr\Log\LoggerInterface;
 
-class SalesOrderSaveAfter implements ObserverInterface
+class SalesOrderSaveAfter extends BaseExtendObserver
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     /**
      * @var OrderObserverHandler
      */
     private $orderObserverHandler;
 
     /**
-     * @var Integration
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param ProductObserverHandler $productObserverHandler
      */
-    private $integration;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
     public function __construct(
         LoggerInterface $logger,
-        OrderObserverHandler $orderObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
+        ExtendService $extendService,
+        Integration $extendIntegrationService,
+        StoreManagerInterface $storeManager,
+        OrderObserverHandler $orderObserverHandler
     ) {
-        $this->logger = $logger;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->orderObserverHandler = $orderObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
     }
 
     /**
      * @param Observer $observer
      * @return void
      */
-    public function execute(Observer $observer)
+    protected function _execute(Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
 
@@ -60,28 +50,15 @@ class SalesOrderSaveAfter implements ObserverInterface
         $orderUpdatedAt = $order->getUpdatedAt();
 
         if ($orderCreatedAt !== $orderUpdatedAt) {
-            try {
-                $this->orderObserverHandler->execute(
-                    [
-                        'path' =>
-                            Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'],
-                        'type' => 'middleware',
-                    ],
-                    $order,
-                    []
-                );
-            } catch (\Exception $exception) {
-                // silently handle errors
-                $this->logger->error(
-                    'Extend Order Observer Handler encountered the following error: ' .
-                        $exception->getMessage()
-                );
-                $this->integration->logErrorToLoggingService(
-                    $exception->getMessage(),
-                    $this->storeManager->getStore()->getId(),
-                    'error'
-                );
-            }
+            $this->orderObserverHandler->execute(
+                [
+                    'path' =>
+                        Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_update'],
+                    'type' => 'middleware',
+                ],
+                $order,
+                []
+            );
         }
     }
 }

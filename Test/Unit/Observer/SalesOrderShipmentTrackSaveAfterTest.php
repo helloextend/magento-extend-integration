@@ -7,6 +7,7 @@
 namespace Extend\Integration\Test\Unit\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\ShipmentObserverHandler;
 use Extend\Integration\Observer\SalesOrderShipmentTrackSaveAfter;
 use Magento\Store\Model\StoreManagerInterface;
@@ -15,7 +16,6 @@ use Magento\Sales\Model\Order\Shipment;
 use Magento\Sales\Model\Order\Shipment\Track;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -24,34 +24,14 @@ use Exception;
 class SalesOrderShipmentTrackSaveAfterTest extends TestCase
 {
     /**
-     * @var LoggerInterface
+     * @var Observer|MockObject
      */
-    private $logger;
+    private $observer;
 
     /**
-     * @var SalesOrderShipmentTrackSaveAfter
+     * @var Event|MockObject
      */
-    private $import;
-
-    /**
-     * @var StoreManagerInterface|MockObject
-     */
-    private $storeManager;
-
-    /**
-     * @var Store|MockObject
-     */
-    private $store;
-
-    /**
-     * @var ShipmentObserverHandler|MockObject
-     */
-    private $shipmentObserverHandler;
-
-    /**
-     * @var Integration|MockObject
-     */
-    private $integration;
+    private $event;
 
     /**
      * @var Track|MockObject
@@ -64,100 +44,143 @@ class SalesOrderShipmentTrackSaveAfterTest extends TestCase
     private $shipmentMock;
 
     /**
-     * @var Observer|MockObject
+     * @var Store|MockObject
      */
-    private $observer;
+    private $store;
 
     /**
-     * @var Event|MockObject
+     * @var LoggerInterface|MockObject
      */
-    private $event;
+    private $logger;
 
     /**
-     * @var ObjectManager
+     * @var ExtendService|MockObject
      */
-    protected $objectManager;
+    private $extendService;
+
+    /**
+     * @var Integration|MockObject
+     */
+    private $integration;
+
+    /**
+     * @var StoreManagerInterface|MockObject
+     */
+    private $storeManager;
+
+    /**
+     * @var ShipmentObserverHandler|MockObject
+     */
+    private $shipmentObserverHandler;
+
+    /**
+     * @var SalesOrderShipmentTrackSaveAfter
+     */
+    private $import;
 
     protected function setUp(): void
     {
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-        $this->shipmentObserverHandler = $this->getMockBuilder(ShipmentObserverHandler::class)
-            ->setMethods(['execute'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->store = $this->getMockBuilder(Store::class)
-            ->setMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->setMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager
-            ->expects($this->any())
-            ->method('getStore')
-            ->willReturn($this->store);
-        $this->shipmentMock = $this->getMockBuilder(Shipment::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->trackMock = $this->getMockBuilder(Track::class)
-            ->setMethods(['getShipment'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->trackMock
-            ->expects($this->any())
-            ->method('getShipment')
-            ->willReturn($this->shipmentMock);
+        $this->shipmentMock = $this->createStub(Shipment::class);
+        $this->trackMock = $this->createConfiguredMock(Track::class, [
+            'getShipment' => $this->shipmentMock
+        ]);
         $this->event = $this->getMockBuilder(Event::class)
             ->addMethods(['getTrack'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->event
-            ->expects($this->any())
             ->method('getTrack')
             ->willReturn($this->trackMock);
-        $this->observer = $this->createPartialMock(Observer::class, ['getEvent']);
-        $this->observer
-            ->expects($this->any())
-            ->method('getEvent')
-            ->willReturn($this->event);
-        $this->objectManager = new ObjectManager($this);
-        $this->import = $this->objectManager->getObject(SalesOrderShipmentTrackSaveAfter::class, [
-            'logger' => $this->logger,
-            'shipmentObserverHandler' => $this->shipmentObserverHandler,
-            'integration' => $this->integration,
-            'storeManager' => $this->storeManager,
+        $this->observer = $this->createConfiguredMock(Observer::class, [
+            'getEvent' => $this->event,
         ]);
+        $this->store = $this->createMock(Store::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->extendService = $this->createMock(ExtendService::class);
+        $this->integration = $this->createMock(Integration::class);
+        $this->storeManager = $this->createConfiguredMock(StoreManagerInterface::class, [
+            'getStore' => $this->store
+        ]);
+        $this->shipmentObserverHandler = $this->createMock(ShipmentObserverHandler::class);
+        $this->import = new SalesOrderShipmentTrackSaveAfter(
+            $this->logger,
+            $this->extendService,
+            $this->integration,
+            $this->storeManager,
+            $this->shipmentObserverHandler
+        );
     }
 
-    public function testExecutesShipmentObserver()
+    public function testExecutesShipmentObserverWhenExtendIsEnabled()
     {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getEvent');
+        $this->event
+            ->expects($this->once())
+            ->method('getTrack');
+        $this->trackMock
+            ->expects($this->once())
+            ->method('getShipment');
         $this->shipmentObserverHandler
             ->expects($this->once())
             ->method('execute')
             ->with(
-                $this->equalTo([
+                [
                     'path' =>
                         Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_shipments_update'],
                     'type' => 'middleware',
-                ]),
-                $this->equalTo($this->shipmentMock),
-                $this->equalTo([])
+                ],
+                $this->shipmentMock,
+                []
             );
+        $this->import->execute($this->observer);
+    }
+
+    public function testSkipsExecutionIfExtendIsNotEnabled()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(false);
+        $this->shipmentObserverHandler
+            ->expects($this->never())
+            ->method('execute');
         $this->import->execute($this->observer);
     }
 
     public function testLogsErrorsToLoggingService()
     {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getEvent');
+        $this->event
+            ->expects($this->once())
+            ->method('getTrack');
+        $this->trackMock
+            ->expects($this->once())
+            ->method('getShipment');
+        $this->storeManager
+            ->expects($this->once())
+            ->method('getStore');
         $this->shipmentObserverHandler
             ->expects($this->once())
             ->method('execute')
             ->willThrowException(new Exception());
-        $this->logger->expects($this->once())->method('error');
-        $this->integration->expects($this->once())->method('logErrorToLoggingService');
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->integration
+            ->expects($this->once())
+            ->method('logErrorToLoggingService');
         $this->import->execute($this->observer);
     }
 }

@@ -7,6 +7,9 @@
 namespace Extend\Integration\Test\Unit\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Api\Data\ShippingProtectionInterface;
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\OrderObserverHandler;
 use Extend\Integration\Observer\InvoiceSaveAfter;
 use Magento\Store\Model\StoreManagerInterface;
@@ -15,7 +18,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Api\Data\InvoiceExtension;
 use Magento\Framework\Event\Observer;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -23,158 +26,284 @@ use Exception;
 
 class InvoiceSaveAfterTest extends TestCase
 {
-  /**
-   * @var string
-   */
-  private string $invoiceId;
+    /**
+     * @var Observer|MockObject
+     */
+    private $observer;
 
-  /**
-   * @var LoggerInterface
-   */
-  private $logger;
+    /**
+     * @var Invoice|MockObject
+     */
+    private $invoice;
 
-  /**
-   * @var InvoiceSaveAfter
-   */
-  private $import;
+    /**
+     * @var InvoiceExtension|MockObject
+     */
+    private $invoiceExtension;
 
-  /**
-   * @var StoreManagerInterface|MockObject
-   */
-  private $storeManager;
+    /**
+     * @var ShippingProtectionInterface|MockObject
+     */
+    private $shippingProtection;
 
-  /**
-   * @var Store|MockObject
-   */
-  private $store;
+    /**
+     * @var Order|MockObject
+     */
+    private $orderMock;
 
-  /**
-   * @var OrderObserverHandler|MockObject
-   */
-  private $orderObserverHandler;
+    /**
+     * @var string
+     */
+    private string $invoiceId = 'test';
 
-  /**
-   * @var Integration|MockObject
-   */
-  private $integration;
+    /**
+     * @var Store|MockObject
+     */
+    private $store;
 
-  /**
-   * @var Order|MockObject
-   */
-  private $orderMock;
+    /**
+     * @var LoggerInterface|MockObject
+     */
+    private $logger;
 
-  /**
-   * @var Observer|MockObject
-   */
-  private $observer;
+    /**
+     * @var ExtendService|MockObject
+     */
+    private $extendService;
 
-  /**
-   * @var Invoice|MockObject
-   */
-  private $invoice;
+    /**
+     * @var Integration|MockObject
+     */
+    private $integration;
 
-  /**
-   * @var InvoiceExtension|MockObject
-   */
-  private $invoiceExtension;
+    /**
+     * @var StoreManagerInterface|MockObject
+     */
+    private $storeManager;
 
-  /**
-   * @var ObjectManager
-   */
-  protected $objectManager;
+    /**
+     * @var InvoiceExtensionFactory|MockObject
+     */
+    private $invoiceExtensionFactory;
 
-  protected function setUp(): void
-  {
-    $this->invoiceId = 'test';
-    $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-    $this->orderObserverHandler = $this->getMockBuilder(OrderObserverHandler::class)
-      ->setMethods(['execute'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->integration = $this->getMockBuilder(Integration::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->store = $this->getMockBuilder(Store::class)
-      ->setMethods(['getId'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-      ->setMethods(['getStore'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->storeManager
-      ->expects($this->any())
-      ->method('getStore')
-      ->willReturn($this->store);
-    $this->orderMock = $this->createMock(Order::class);
-    $this->invoice = $this->getMockBuilder(Invoice::class)
-      ->setMethods(['getOrder', 'getId', 'getExtensionAttributes'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->invoice
-      ->expects($this->any())
-      ->method('getOrder')
-      ->willReturn($this->orderMock);
-    $this->invoice
-      ->expects($this->any())
-      ->method('getId')
-      ->willReturn($this->invoiceId);
-    $this->invoiceExtension = $this->getMockBuilder(InvoiceExtension::class)
-      ->setMethods(['getShippingProtection'])
-      ->getMock();
-    $this->invoiceExtension
-      ->expects($this->any())
-      ->method('getShippingProtection')
-      ->willReturn(null);
-    $this->invoice
-      ->expects($this->any())
-      ->method('getExtensionAttributes')
-      ->willReturn($this->invoiceExtension);
-    $this->observer = $this->createPartialMock(Observer::class, ['__call']);
-    $this->observer
-      ->method('__call')
-      ->will(
-        $this->returnCallback(
-          function ($data) {
-            $args = func_get_args();
-            if ($args[0] === 'getInvoice')
-              return $this->invoice;
-          }
-        )
-      );
-    $this->objectManager = new ObjectManager($this);
-    $this->import = $this->objectManager->getObject(InvoiceSaveAfter::class, [
-      'logger' => $this->logger,
-      'orderObserverHandler' => $this->orderObserverHandler,
-      'integration' => $this->integration,
-      'storeManager' => $this->storeManager,
-    ]);
-  }
+    /**
+     * @var ShippingProtectionTotalRepositoryInterface|MockObject
+     */
+    private $shippingProtectionTotalRepository;
 
-  public function testExecutesOrdersObserver()
-  {
-    $this->orderObserverHandler
-      ->expects($this->once())
-      ->method('execute')
-      ->with(
-        $this->equalTo([
-          'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
-          'type' => 'middleware',
-        ]),
-        $this->equalTo($this->orderMock),
-        $this->equalTo(['invoice_id' => $this->invoiceId])
-      );
-    $this->import->execute($this->observer);
-  }
+    /**
+     * @var OrderObserverHandler|MockObject
+     */
+    private $orderObserverHandler;
 
-  public function testLogsErrorsToLoggingService()
-  {
-    $this->orderObserverHandler
-      ->expects($this->once())
-      ->method('execute')
-      ->willThrowException(new Exception());
-    $this->logger->expects($this->once())->method('error');
-    $this->integration->expects($this->once())->method('logErrorToLoggingService');
-    $this->import->execute($this->observer);
-  }
+    /**
+     * @var InvoiceSaveAfter
+     */
+    private $import;
+
+    protected function setUp(): void
+    {
+        $this->orderMock = $this->createMock(Order::class);
+        $this->invoice = $this->createConfiguredMock(Invoice::class, [
+            'getOrder' => $this->orderMock,
+            'getId' => $this->invoiceId,
+        ]);
+        $this->observer = $this->getMockBuilder(Observer::class)
+            ->addMethods(['getInvoice'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->observer
+            ->method('getInvoice')
+            ->willReturn($this->invoice);
+        $this->shippingProtection = $this->createMock(ShippingProtectionInterface::class);
+        $this->invoiceExtension = $this->getMockBuilder(InvoiceExtension::class)
+            ->onlyMethods(['getShippingProtection'])
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->store = $this->createMock(Store::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->extendService = $this->createMock(ExtendService::class);
+        $this->integration = $this->createMock(Integration::class);
+        $this->storeManager = $this->createConfiguredMock(StoreManagerInterface::class, [
+            'getStore' => $this->store
+        ]);
+        $this->invoiceExtensionFactory = $this->createMock(InvoiceExtensionFactory::class);
+        $this->shippingProtectionTotalRepository = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
+        $this->orderObserverHandler = $this->createMock(OrderObserverHandler::class);
+        $this->import = new InvoiceSaveAfter(
+            $this->logger,
+            $this->extendService,
+            $this->integration,
+            $this->storeManager,
+            $this->invoiceExtensionFactory,
+            $this->shippingProtectionTotalRepository,
+            $this->orderObserverHandler
+        );
+    }
+
+    public function testPersistsShippingProtectionExtensionAttributeAndExecutesOrdersObserverWhenExtendIsEnabledAndExtensionAttributesHaveShippingProtection()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getInvoice');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getExtensionAttributes')
+            ->willReturn($this->invoiceExtension);
+        $this->invoiceExtension
+            ->expects($this->once())
+            ->method('getShippingProtection')
+            ->willReturn($this->shippingProtection);
+        $this->invoice
+            ->expects($this->once())
+            ->method('getOrder');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getId');
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->with(
+                [
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+                    'type' => 'middleware',
+                ],
+                $this->orderMock,
+                ['invoice_id' => $this->invoiceId]
+            );
+        $this->import->execute($this->observer);
+    }
+
+    public function testCreatesExtensionAttributesAndPersistsShippingProtectionExtensionAttributeAndExecutesOrdersObserverWhenExtendIsEnabledWhenInvoiceDoesNotHaveExtensionAttributesAndExtensionAttributesHaveShippingProtection()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getInvoice');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getExtensionAttributes')
+            ->willReturn(null);
+        $this->invoiceExtensionFactory
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->invoiceExtension);
+        $this->invoiceExtension
+            ->expects($this->once())
+            ->method('getShippingProtection')
+            ->willReturn($this->shippingProtection);
+        $this->invoice
+            ->expects($this->once())
+            ->method('getOrder');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getId');
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->with(
+                [
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+                    'type' => 'middleware',
+                ],
+                $this->orderMock,
+                ['invoice_id' => $this->invoiceId]
+            );
+        $this->import->execute($this->observer);
+    }
+
+    public function testDoesNotPersistsShippingProtectionExtensionAttributeAndExecutesOrdersObserverWhenExtendIsEnabledAndExtensionAttributesDoNotHaveShippingProtection()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getInvoice');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getExtensionAttributes')
+            ->willReturn($this->invoiceExtension);
+        $this->invoiceExtension
+            ->expects($this->once())
+            ->method('getShippingProtection')
+            ->willReturn(null);
+        $this->invoice
+            ->expects($this->once())
+            ->method('getOrder');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getId');
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->with(
+                [
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+                    'type' => 'middleware',
+                ],
+                $this->equalTo($this->orderMock),
+                ['invoice_id' => $this->invoiceId]
+            );
+        $this->import->execute($this->observer);
+    }
+
+    public function testSkipsExecutionIfExtendIsNotEnabled()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(false);
+        $this->orderObserverHandler
+            ->expects($this->never())
+            ->method('execute');
+        $this->import->execute($this->observer);
+    }
+
+    public function testLogsErrorsToLoggingService()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getInvoice');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getExtensionAttributes')
+            ->willReturn($this->invoiceExtension);
+        $this->invoiceExtension
+            ->expects($this->once())
+            ->method('getShippingProtection')
+            ->willReturn(null);
+        $this->invoice
+            ->expects($this->once())
+            ->method('getOrder');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getId');
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->willThrowException(new Exception());
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->integration
+            ->expects($this->once())
+            ->method('logErrorToLoggingService');
+        $this->storeManager
+            ->expects($this->once())
+            ->method('getStore');
+        $this->import->execute($this->observer);
+    }
 }

@@ -8,87 +8,67 @@ namespace Extend\Integration\Observer;
 
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\BatchProductObserverHandler;
-use Magento\Framework\Event\ObserverInterface;
+use Extend\Integration\Service\Extend as ExtendService;
 use Magento\Framework\Event\Observer;
 use Magento\CatalogImportExport\Model\Import\Product;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
 
-class CatalogProductImportBunchSaveAfter implements ObserverInterface
+class CatalogProductImportBunchSaveAfter extends BaseExtendObserver
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     /**
      * @var BatchProductObserverHandler
      */
     private $batchProductObserverHandler;
 
     /**
-     * @var Integration
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param ProductObserverHandler $productObserverHandler
      */
-    private $integration;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
     public function __construct(
-        LoggerInterface $logger,
-        BatchProductObserverHandler $batchProductObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
+       LoggerInterface $logger,
+       ExtendService $extendService,
+       Integration $extendIntegrationService,
+       StoreManagerInterface $storeManager,
+        BatchProductObserverHandler $batchProductObserverHandler
     ) {
-        $this->logger = $logger;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->batchProductObserverHandler = $batchProductObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
     }
 
     /**
      * @param Observer $observer
      * @return void
      */
-    public function execute(Observer $observer)
+    protected function _execute(Observer $observer)
     {
-        try {
-            $bunch = $observer->getEvent()->getBunch();
+        $event = $observer->getEvent();
 
-            /** @var Product $adapter */
-            $adapter = $observer->getEvent()->getAdapter();
+        $bunch = $event->getBunch();
 
-            $productIds = [];
+        /** @var Product $adapter */
+        $adapter = $event->getAdapter();
 
-            foreach ($bunch as $rowNum => $rowData) {
-                $productData = $adapter->getNewSku($rowData[Product::COL_SKU]);
+        $productIds = [];
 
-                if (isset($productData['entity_id'])) {
-                    $productId = $productData['entity_id'];
+        foreach ($bunch as $rowNum => $rowData) {
+            $productData = $adapter->getNewSku($rowData[Product::COL_SKU]);
 
-                    array_push($productIds, $productId);
-                }
+            if (isset($productData['entity_id'])) {
+                $productId = $productData['entity_id'];
+
+                array_push($productIds, $productId);
             }
-
-            $endpoint = [
-                'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'],
-                'type' => 'middleware',
-            ];
-
-            $this->batchProductObserverHandler->execute($endpoint, $productIds, []);
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error(
-                'Extend Batch Product Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
         }
+
+        $endpoint = [
+            'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'],
+            'type' => 'middleware',
+        ];
+
+        $this->batchProductObserverHandler->execute($endpoint, $productIds, []);
     }
 }

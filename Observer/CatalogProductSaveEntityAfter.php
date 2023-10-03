@@ -7,70 +7,49 @@
 namespace Extend\Integration\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\ProductObserverHandler;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Psr\Log\LoggerInterface;
 
-class CatalogProductSaveEntityAfter implements ObserverInterface
+class CatalogProductSaveEntityAfter extends BaseExtendObserver
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     /**
      * @var ProductObserverHandler
      */
     private $productObserverHandler;
 
     /**
-     * @var Integration
+     * @param LoggerInterface $logger
+     * @param ExtendService $extendService
+     * @param Integration $extendIntegrationService
+     * @param StoreManagerInterface $storeManager
+     * @param ProductObserverHandler $productObserverHandler
      */
-    private $integration;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
     public function __construct(
         LoggerInterface $logger,
-        ProductObserverHandler $productObserverHandler,
-        Integration $integration,
-        StoreManagerInterface $storeManager
+        ExtendService $extendService,
+        Integration $extendIntegrationService,
+        StoreManagerInterface $storeManager,
+        ProductObserverHandler $productObserverHandler
     ) {
-        $this->logger = $logger;
+        parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->productObserverHandler = $productObserverHandler;
-        $this->integration = $integration;
-        $this->storeManager = $storeManager;
     }
 
     /**
      * @param Observer $observer
      * @return void
      */
-    public function execute(Observer $observer)
+    protected function _execute(Observer $observer)
     {
         $product = $observer->getEvent()->getProduct();
+
         $endpoint = $this->resolveEndpoint($product);
 
-        try {
-            $this->productObserverHandler->execute($endpoint, $product, []);
-        } catch (\Exception $exception) {
-            // silently handle errors
-            $this->logger->error(
-                'Extend Product Observer Handler encountered the following error: ' .
-                    $exception->getMessage()
-            );
-            $this->integration->logErrorToLoggingService(
-                $exception->getMessage(),
-                $this->storeManager->getStore()->getId(),
-                'error'
-            );
-        }
+        $this->productObserverHandler->execute($endpoint, $product, []);
     }
 
     /**

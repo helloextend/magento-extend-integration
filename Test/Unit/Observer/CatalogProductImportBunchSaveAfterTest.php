@@ -7,13 +7,13 @@
 namespace Extend\Integration\Test\Unit\Observer;
 
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Extend as ExtendService;
 use Extend\Integration\Service\Api\BatchProductObserverHandler;
 use Extend\Integration\Observer\CatalogProductImportBunchSaveAfter;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Store;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\CatalogImportExport\Model\Import\Product;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -21,51 +21,6 @@ use Exception;
 
 class CatalogProductImportBunchSaveAfterTest extends TestCase
 {
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var CatalogProductImportBunchSaveAfter
-     */
-    private $import;
-
-    /**
-     * @var StoreManagerInterface|MockObject
-     */
-    private $storeManager;
-
-    /**
-     * @var Store|MockObject
-     */
-    private $store;
-
-    /**
-     * @var BatchProductObserverHandler|MockObject
-     */
-    private $batchProductObserverHandler;
-
-    /**
-     * @var Integration|MockObject
-     */
-    private $integration;
-
-    /**
-     * @var array
-     */
-    private $bunchDataArrayMock;
-
-    /**
-     * @var array
-     */
-    private $productDataArrayMocks;
-
-    /**
-     * @var Product|MockObject
-     */
-    private $adapterMock;
-
     /**
      * @var Observer|MockObject
      */
@@ -77,107 +32,176 @@ class CatalogProductImportBunchSaveAfterTest extends TestCase
     private $event;
 
     /**
-     * @var ObjectManager
+     * @var Product|MockObject
      */
-    protected $objectManager;
+    private $adapterMock;
+
+    /**
+     * @var array
+     */
+    private $bunchDataArrayMock  = [
+        1 => [
+            'sku' => 'sku1',
+        ],
+        2 => [
+            'sku' => 'sku2',
+        ],
+    ];
+
+    /**
+     * @var array
+     */
+    private $productDataArrayMocks = [['entity_id' => 1], ['entity_id' => 2]];
+
+    /**
+     * @var Store|MockObject
+     */
+    private $store;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
+    private $logger;
+
+    /**
+     * @var ExtendService|MockObject
+     */
+    private $extendService;
+
+    /**
+     * @var StoreManagerInterface|MockObject
+     */
+    private $storeManager;
+
+    /**
+     * @var Integration|MockObject
+     */
+    private $integration;
+
+    /**
+     * @var BatchProductObserverHandler|MockObject
+     */
+    private $batchProductObserverHandler;
+
+    /**
+     * @var CatalogProductImportBunchSaveAfter
+     */
+    private $import;
 
     protected function setUp(): void
     {
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
-        $this->batchProductObserverHandler = $this->getMockBuilder(
-            BatchProductObserverHandler::class
-        )
-            ->onlyMethods(['execute'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->store = $this->getMockBuilder(Store::class)
-            ->onlyMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->onlyMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager
-            ->expects($this->any())
-            ->method('getStore')
-            ->willReturn($this->store);
+        $this->adapterMock = $this->createMock(Product::class);
+        $this->adapterMock
+            ->method('getNewSku')
+            ->willReturn($this->returnValueMap([
+                [$this->bunchDataArrayMock[1]['sku'], $this->productDataArrayMocks[0]],
+                [$this->bunchDataArrayMock[2]['sku'], $this->productDataArrayMocks[1]],
+            ]));
         $this->event = $this->getMockBuilder(Event::class)
             ->addMethods(['getBunch', 'getAdapter'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->bunchDataArrayMock = [
-            1 => [
-                'sku' => 'sku1',
-            ],
-            2 => [
-                'sku' => 'sku2',
-            ],
-        ];
-        $this->productDataArrayMocks = [['entity_id' => 1], ['entity_id' => 2]];
-        $this->adapterMock = $this->getMockBuilder(Product::class)
-            ->onlyMethods(['getNewSku'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->adapterMock
-            ->expects($this->at(0))
-            ->method('getNewSku')
-            ->with('sku1')
-            ->willReturn($this->productDataArrayMocks[0]);
-        $this->adapterMock
-            ->expects($this->at(1))
-            ->method('getNewSku')
-            ->with('sku2')
-            ->willReturn($this->productDataArrayMocks[1]);
         $this->event
-            ->expects($this->any())
             ->method('getBunch')
             ->willReturn($this->bunchDataArrayMock);
         $this->event
-            ->expects($this->any())
             ->method('getAdapter')
             ->willReturn($this->adapterMock);
-        $this->observer = $this->createPartialMock(Observer::class, ['getEvent']);
-        $this->observer
-            ->expects($this->any())
-            ->method('getEvent')
-            ->willReturn($this->event);
-        $this->objectManager = new ObjectManager($this);
-        $this->import = $this->objectManager->getObject(CatalogProductImportBunchSaveAfter::class, [
-            'logger' => $this->logger,
-            'batchProductObserverHandler' => $this->batchProductObserverHandler,
-            'integration' => $this->integration,
-            'storeManager' => $this->storeManager,
+        $this->observer = $this->createConfiguredMock(Observer::class, [
+            'getEvent' => $this->event,
         ]);
+        $this->store = $this->createMock(Store::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->extendService = $this->createMock(ExtendService::class);
+        $this->integration = $this->createMock(Integration::class);
+        $this->storeManager = $this->createConfiguredMock(StoreManagerInterface::class, [
+            'getStore' => $this->store
+        ]);
+        $this->batchProductObserverHandler = $this->createMock(BatchProductObserverHandler::class);
+        $this->import = new CatalogProductImportBunchSaveAfter(
+            $this->logger,
+            $this->extendService,
+            $this->integration,
+            $this->storeManager,
+            $this->batchProductObserverHandler
+        );
     }
 
-    public function testExecutesProductsBatchObserverHandler()
+    public function testExecutesProductsBatchObserverHandlerWhenExtendIsEnabled()
     {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getEvent');
+        $this->event
+            ->expects($this->once())
+            ->method('getBunch');
+        $this->event
+            ->expects($this->once())
+            ->method('getAdapter');
+        $this->adapterMock
+            ->expects($this->exactly(2))
+            ->method('getNewSku');
         $this->batchProductObserverHandler
             ->expects($this->once())
             ->method('execute')
             ->with(
-                $this->equalTo([
+                [
                     'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_products_create'],
                     'type' => 'middleware',
-                ]),
-                $this->equalTo([1, 2]),
+                ],
+                [1, 2],
                 []
             );
         $this->import->execute($this->observer);
     }
 
+    public function testSkipsExecutionIfExtendIsNotEnabled()
+    {
+        $this->extendService
+              ->expects($this->once())
+              ->method('isEnabled')
+              ->willReturn(false);
+        $this->batchProductObserverHandler
+            ->expects($this->never())
+            ->method('execute');
+        $this->import->execute($this->observer);
+    }
+
     public function testLogsErrorsToLoggingService()
     {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getEvent');
+        $this->event
+            ->expects($this->once())
+            ->method('getBunch');
+        $this->event
+            ->expects($this->once())
+            ->method('getAdapter');
+        $this->adapterMock
+            ->expects($this->exactly(2))
+            ->method('getNewSku');
         $this->batchProductObserverHandler
             ->expects($this->once())
             ->method('execute')
             ->willThrowException(new Exception());
-        $this->logger->expects($this->once())->method('error');
-        $this->integration->expects($this->once())->method('logErrorToLoggingService');
+        $this->storeManager
+            ->expects($this->once())
+            ->method('getStore');
+        $this->logger
+            ->expects($this->once())
+            ->method('error');
+        $this->integration
+            ->expects($this->once())
+            ->method('logErrorToLoggingService');
         $this->import->execute($this->observer);
     }
 }
