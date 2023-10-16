@@ -94,8 +94,10 @@ class ProductInstaller
                 $this->processMediaGalleryEntry($this->getMediaImagePath(), $product->getSku());
             }
         } catch (Exception $exception) {
-            throw new Exception(
-                'There was an error creating the Extend Protection Plan Product' . $exception
+            throw new SetupException(
+                new Phrase('%1', [
+                    $exception->getMessage(),
+                ])
             );
         }
     }
@@ -113,8 +115,10 @@ class ProductInstaller
                 $this->deleteImageFromPubMedia();
             }
         } catch (Exception $exception) {
-            throw new Exception(
-                'There was an error deleting the Extend Protection Plan Product' . $exception
+            throw new SetupException(
+                new Phrase('There was a problem deleting the Extend Protection Product: %1', [
+                    $exception->getMessage(),
+                ])
             );
         }
     }
@@ -163,7 +167,7 @@ class ProductInstaller
             return $product;
         } catch (Exception $exception) {
             throw new SetupException(
-                new Phrase('There was a problem create the Extend Protection Product: ', [
+                new Phrase('There was a problem creating the Extend Protection Product: %1', [
                     $exception->getMessage(),
                 ])
             );
