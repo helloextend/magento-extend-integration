@@ -121,8 +121,14 @@ define([
         // Update SP on cart changes
         customerData.get('cart').subscribe(function (cart) {
           const items = ExtendMagento.formatCartItemsForSp(cart.items)
+          const totals = magentoQuote.getTotals()
+          const isShippingProtectionInCart =
+            ExtendMagento.isShippingProtectionInOrder(totals())
 
-          Extend.shippingProtection.update({ items })
+          Extend.shippingProtection.update({
+            items,
+            isShippingProtectionInCart,
+          })
         })
       } catch (error) {
         // Swallow error to avoid impacting customer checkout experience
