@@ -81,7 +81,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      *
      * @param int $storeId
      * @return StoreIntegrationInterface
-     * @throw NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getByStoreIdAndActiveEnvironment(int $storeId): StoreIntegrationInterface
     {

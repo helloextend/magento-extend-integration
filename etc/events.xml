@@ -30,4 +30,10 @@
     <event name="catalog_product_import_bunch_save_after">
         <observer instance="Extend\Integration\Observer\CatalogProductImportBunchSaveAfter" name="extend_catalog_product_import_bunch_save_after"/>
     </event>
+    <event name="catalog_category_save_after">
+        <observer instance="Extend\Integration\Observer\CatalogCategorySaveAfter" name="extend_catalog_category_save_after"/>
+    </event>
+    <event name="catalog_category_delete_before">
+        <observer instance="Extend\Integration\Observer\CatalogCategoryDeleteBefore" name="extend_catalog_category_delete_before"/>
+    </event>
 </config>
