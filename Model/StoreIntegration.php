@@ -64,6 +64,8 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     /**
      * Set Extend client ID
      *
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - setExtendClientId
      * @param string $extendClientId
      * @return void
      */
@@ -75,6 +77,8 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     /**
      * Set Extend client secret
      *
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - setExtendClientSecret
      * @param string $extendClientSecret
      * @return void
      */
@@ -130,6 +134,8 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     }
 
     /**
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Model/ExtendOAuthClient - getExtendClientId
      * @return string|null
      */
     public function getExtendClientId(): ?string
@@ -138,6 +144,8 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     }
 
     /**
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Model/ExtendOAuthClient - getExtendClientSecret
      * @return string|null
      */
     public function getExtendClientSecret(): ?string

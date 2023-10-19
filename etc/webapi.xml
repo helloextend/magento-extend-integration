@@ -43,7 +43,7 @@
         </resources>
     </route>
     <route url="/V1/extend/integration/client" method="POST">
-        <service class="Extend\Integration\Api\StoreIntegrationRepositoryInterface" method="attachClientIdAndSecretToIntegration"/>
+        <service class="Extend\Integration\Api\ExtendOAuthClientRepositoryInterface" method="saveClientToIntegration"/>
         <resources>
             <resource ref="Extend_Integration::manage"/>
         </resources>

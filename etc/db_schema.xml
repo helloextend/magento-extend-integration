@@ -37,4 +37,17 @@
             <column name="client_id"/>
         </constraint>
     </table>
+    <table name="extend_integration_oauth_client" resource="default" engine="innodb" comment="Extend OAuth Client data used to authorize Extend Magento API calls">
+        <column xsi:type="int" name="extend_integration_oauth_client_id" unsigned="true" nullable="false" identity="true" comment="Extend Integration OAuth Client Entity ID"/>
+        <column xsi:type="int" name="integration_id" unsigned="true" nullable="false" identity="false" comment="Magento Integration ID"/>
+        <column xsi:type="varchar" name="client_id" nullable="false" comment="Extend OAuth Client ID"/>
+        <column xsi:type="text" name="client_secret" nullable="false" comment="Extend OAuth Client Secret"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="extend_integration_oauth_client_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="EXTEND_INTEGRATION_OAUTH_CLIENT_INTEGRATION_ID_INTEGRATION_INTEGRATION_ID" table="extend_integration_oauth_client" column="integration_id" referenceTable="integration" referenceColumn="integration_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="EXTEND_INTEGRATION_OAUTH_CLIENT_INTEGRATION_ID">
+            <column name="integration_id"/>
+        </constraint>
+    </table>
 </schema>

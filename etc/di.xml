@@ -8,6 +8,7 @@
     <preference for="Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface" type="Extend\Integration\Model\ShippingProtectionTotalRepository"/>
     <preference for="Extend\Integration\Api\ProductProtectionInterface" type="Extend\Integration\Model\ProductProtection"/>
     <preference for="Extend\Integration\Api\StoreIntegrationRepositoryInterface" type="Extend\Integration\Model\StoreIntegrationRepository"/>
+    <preference for="Extend\Integration\Api\ExtendOAuthClientRepositoryInterface" type="Extend\Integration\Model\ExtendOAuthClientRepository"/>
     <type name="Magento\Sales\Model\OrderRepository">
         <plugin sortOrder="1" name="extendIntegrationOrderRepository" type="Extend\Integration\Plugin\Model\OrderRepositoryPlugin"/>
     </type>

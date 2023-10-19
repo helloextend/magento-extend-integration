@@ -102,6 +102,8 @@ interface StoreIntegrationRepositoryInterface
     /**
      * endpoint to save a client id and client secret to all store relationships under an integration
      *
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClientRepository
+     * @see Extend/Integration/Api/ExtendOAuthClientRepositoryInterface - saveClientToIntegration
      * @param string $consumerKey
      * @param string $clientId
      * @param string $clientSecret

@@ -54,6 +54,8 @@ interface StoreIntegrationInterface
     /**
      * Set Extend client ID
      *
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - setExtendClientId
      * @param string $extendClientId
      * @return void
      */
@@ -62,6 +64,8 @@ interface StoreIntegrationInterface
     /**
      * Set Extend client secret
      *
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - setExtendClientSecret
      * @param string $extendClientSecret
      * @return void
      */
@@ -98,11 +102,15 @@ interface StoreIntegrationInterface
     public function getExtendStoreUuid(): ?string;
 
     /**
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - getExtendClientId
      * @return string|null
      */
     public function getExtendClientId(): ?string;
 
     /**
+     * @deprecated [PAR-5480] Extend OAuth Client data is now handled by the ExtendOAuthClient
+     * @see Extend/Integration/Api/Data/ExtendOAuthClientInterface - getExtendClientSecret
      * @return string|null
      */
     public function getExtendClientSecret(): ?string;

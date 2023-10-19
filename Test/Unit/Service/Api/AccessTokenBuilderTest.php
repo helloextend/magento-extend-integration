@@ -8,35 +8,77 @@ namespace Extend\Integration\Test\Unit\Service\Api;
 
 use PHPUnit\Framework\TestCase;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use Extend\Integration\Api\Data\ExtendOAuthClientInterface;
 use Extend\Integration\Api\Data\StoreIntegrationInterface;
+use Extend\Integration\Api\ExtendOAuthClientRepositoryInterface;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\HTTP\Client\Curl;
 use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class AccessTokenBuilderTest extends TestCase
 {
-    private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
-    private ScopeConfigInterface $scopeConfig;
-    private Curl $curl;
-    private EncryptorInterface $encryptor;
-    private string $integrationId = '1';
-    private string $clientId = 'client_id';
-    private string $encryptedClientSecret = 'encrypted_client_secret';
-    private string $decryptedClientSecret = 'decrypted_client_secret';
-    private int $storeId = 1;
-    private StoreIntegrationInterface $storeIntegration;
-    private string $activeEnvironmentApiURL = 'https://example.com';
-    private string $tokenGrantType = 'client_credentials';
-    private string $scope = 'magento:webhook';
-    private string $accessToken = 'access_token';
-    private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
-    private AccessTokenBuilder $accessTokenBuilder;
+    /** @var string */
+    private $integrationId = '1';
+
+    /** @var string */
+    private $clientId = 'client_id';
+
+    /** @var string */
+    private $encryptedClientSecret = 'encrypted_client_secret';
+
+    /** @var string */
+    private $decryptedClientSecret = 'decrypted_client_secret';
+
+    /** @var int */
+    private $storeId = 1;
+
+    /** @var string */
+    private $activeEnvironmentApiURL = 'https://example.com';
+
+    /** @var string */
+    private $tokenGrantType = 'client_credentials';
+
+    /** @var string */
+    private $scope = 'magento:webhook';
+
+    /** @var string */
+    private $accessToken = 'access_token';
+
+    /** @var ExtendOAuthClientRepositoryInterface */
+    private $extendOAuthClientRepository;
+
+    /** @var StoreIntegrationRepositoryInterface */
+    private $storeIntegrationRepository;
+
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
+
+    /** @var Curl */
+    private $curl;
+
+    /** @var EncryptorInterface */
+    private $encryptor;
+
+    /** @var ExtendOAuthClientInterface */
+    private $extendOAuthClient;
+
+    /** @var StoreIntegrationInterface */
+    private $storeIntegration;
+
+    /** @var ActiveEnvironmentURLBuilder */
+    private $activeEnvironmentURLBuilder;
+
+    /** @var AccessTokenBuilder */
+    private $accessTokenBuilder;
 
     protected function setUp(): void
     {
+        $this->extendOAuthClient = $this->createStub(ExtendOAuthClientInterface::class);
+
         $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
             ->onlyMethods(['getExtendClientId', 'getExtendClientSecret'])
             ->disableOriginalConstructor()
@@ -58,6 +100,10 @@ class AccessTokenBuilderTest extends TestCase
             ->method('getValue')
             ->with(\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
+
+        $this->extendOAuthClientRepository = $this->createStub(
+            ExtendOAuthClientRepositoryInterface::class
+        );
 
         $this->storeIntegrationRepository = $this->getMockBuilder(
             StoreIntegrationRepositoryInterface::class
@@ -94,6 +140,7 @@ class AccessTokenBuilderTest extends TestCase
 
         $this->objectManager = new ObjectManager($this);
         $this->accessTokenBuilder = $this->objectManager->getObject(AccessTokenBuilder::class, [
+            'extendOAuthClientRepository' => $this->extendOAuthClientRepository,
             'storeIntegrationRepository' => $this->storeIntegrationRepository,
             'scopeConfig' => $this->scopeConfig,
             'curl' => $this->curl,
@@ -102,8 +149,15 @@ class AccessTokenBuilderTest extends TestCase
         ]);
     }
 
-    public function testGetAccessTokenReturnsAccessTokenWhenRepoReturnsValidIntegrationAndAPIResponseComesBackWithAccessToken()
+    public function testGetAccessTokenReturnsAccessTokenWhenNoExtendOAuthClientDataExistsAndRepoReturnsValidIntegrationAndAPIResponseComesBackWithAccessToken()
     {
+        // Mock the ExtendOAuthClientRepository to throw NoSuchEntityException to trigger fallback
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException());
+
         $this->storeIntegration
             ->expects($this->once())
             ->method('getExtendClientId')
@@ -140,8 +194,15 @@ class AccessTokenBuilderTest extends TestCase
         $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
     }
 
-    public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoDoesNotReturnStoreIds()
+    public function testGetAccessTokenReturnsEmptyAccessTokenWhenNoExtendOAuthClientDataExistsAndRepoDoesNotReturnStoreIds()
     {
+        // Mock the ExtendOAuthClientRepository to throw NoSuchEntityException to trigger fallback
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException());
+
         $this->storeIntegrationRepository
             ->expects($this->once())
             ->method('getListByIntegration')
@@ -150,8 +211,15 @@ class AccessTokenBuilderTest extends TestCase
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
-    public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoReturnsIntegrationWithoutClientInfo()
+    public function testGetAccessTokenReturnsEmptyAccessTokenWhenNoExtendOAuthClientDataExistsAndRepoReturnsIntegrationWithoutClientInfo()
     {
+        // Mock the ExtendOAuthClientRepository to throw NoSuchEntityException to trigger fallback
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException());
+
         $this->storeIntegration
             ->expects($this->once())
             ->method('getExtendClientId')
@@ -173,8 +241,15 @@ class AccessTokenBuilderTest extends TestCase
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
-    public function testGetAccessTokenReturnsEmptyAccessTokenWhenRepoReturnsValidIntegrationAndAPIResponseComesBackWithNoAccessToken()
+    public function testGetAccessTokenReturnsEmptyAccessTokenWhenNoExtendOAuthClientDataExistsAndRepoReturnsValidIntegrationAndAPIResponseComesBackWithNoAccessToken()
     {
+        // Mock the ExtendOAuthClientRepository to throw NoSuchEntityException to trigger fallback
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException());
+
         $this->storeIntegration
             ->expects($this->once())
             ->method('getExtendClientId')
@@ -203,5 +278,47 @@ class AccessTokenBuilderTest extends TestCase
                 ])
             );
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
+    }
+
+    public function testGetAccessTokenReturnsAccessToken()
+    {
+        // Expect that ExtendOAuthClientRepository is called with the integration ID
+        // and returns an ExtendOAuthClient instance
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+
+        // Expect that the ExtendOAuthClient instance is called to get the client_id
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+
+        // Expect that the ExtendOAuthClient instance is called to get the client_secret
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
+
+        // Expect that a POST request is made to the token exchange endpoint
+        $this->curl->expects($this->once())->method('post');
+
+        // Mock a successful responds from the token exchange endpoint
+        $this->curl
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(
+                json_encode([
+                    'access_token' => $this->accessToken,
+                ])
+            );
+
+        // Execute the method under test and assert that the access token is returned
+        $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
+
+        // Expect that storeIntegrationRepository->getListByIntegration was not called
+        $this->storeIntegrationRepository->expects($this->never())->method('getListByIntegration');
     }
 }
