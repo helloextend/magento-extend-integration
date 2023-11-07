@@ -5,27 +5,27 @@
  */
 
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
-?>
+/** @var \Extend\Integration\Block\Adminhtml\Sales\Order\Creditmemo\Totals $block */
 
+?>
+<?php if ($block->getOriginalShippingProtection() > 0): ?>
     <tr>
         <td class="label">
             <?= $block->escapeHtml(__('Shipping Protection')) ?>
             <div id="shipping_protection_adv"></div>
-            <?php if ($block->getOriginalShippingProtection() > 0): ?>
                 <div class="sp-buttons-container">
                     <button name="full" type="button" class="full"><?=__('Full')?></button>
                     <button name="zero" type="button" class="zero"><?=__('0')?></button>
                 </div>
-            <?php endif; ?>
         </td>
         <td>
             <input type="text"
-                   name="creditmemo[shipping_protection]"
-                   data-full="<?= /* @noEscape */ $block->getOriginalShippingProtection() ?>"
-                   value="<?= /* @noEscape */ $block->getShippingProtection() ?>"
-                   class="input-text admin__control-text not-negative-amount"
-                   readonly="readonly"
-                   id="shipping_protection"/>
+                name="creditmemo[shipping_protection]"
+                data-full="<?= /* @noEscape */ $block->getOriginalShippingProtection() ?>"
+                value="<?= /* @noEscape */ $block->getShippingProtection() ?>"
+                class="input-text admin__control-text not-negative-amount"
+                readonly="readonly"
+                id="shipping_protection"/>
             <?php $scriptString = <<<script
                 require(['prototype'], function(){
 
@@ -50,14 +50,18 @@
                 
                 spFull.addEventListener('click', () => {
                     shippingProtectionInput.value = shippingProtectionInput.getAttribute('data-full');
-                    updateTotalsButton.removeAttribute('disabled');
-                    updateTotalsButton.classList.remove('disabled');
+                    if(updateTotalsButton) {
+                        updateTotalsButton.removeAttribute('disabled');
+                        updateTotalsButton.classList.remove('disabled');
+                    }
                 });
                 
                 spZero.addEventListener('click', () => {
                     shippingProtectionInput.value = 0;
-                    updateTotalsButton.removeAttribute('disabled');
-                    updateTotalsButton.classList.remove('disabled');
+                    if(updateTotalsButton) {
+                        updateTotalsButton.removeAttribute('disabled');
+                        updateTotalsButton.classList.remove('disabled');
+                    }
                 });
 
                 if ($('shipping_protection')) {
@@ -83,4 +87,4 @@ script;
             <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
         </td>
     </tr>
-
+<?php endif; ?>
