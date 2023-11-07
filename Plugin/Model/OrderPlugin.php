@@ -10,6 +10,7 @@ use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Service\Extend;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Item;
 
 class OrderPlugin
 {
@@ -34,15 +35,16 @@ class OrderPlugin
      * @param $result
      * @return mixed
      */
-    public function afterGetInvoiceCollection(\Magento\Sales\Model\Order $subject, $result)
+    public function afterGetInvoiceCollection(Order $subject, $result)
     {
         if (!$this->extend->isEnabled())
             return $result;
 
         foreach ($result->getItems() as $invoice) {
-            if ($invoice->getId()) {
+            $invoiceId = $invoice->getId();
+            if ($invoiceId ) {
                 $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
-                    $invoice->getId(),
+                    $invoiceId,
                     ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
                     $invoice
                 );
@@ -59,15 +61,16 @@ class OrderPlugin
      * @param $result
      * @return mixed
      */
-    public function afterGetCreditmemosCollection(\Magento\Sales\Model\Order $subject, $result)
+    public function afterGetCreditmemosCollection(Order $subject, $result)
     {
         if (!$this->extend->isEnabled())
             return $result;
 
         foreach ($result->getItems() as $creditmemo) {
-            if ($creditmemo->getId()) {
+            $creditMemoId = $creditmemo->getId();
+            if ($creditMemoId) {
                 $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
-                    $creditmemo->getId(),
+                    $creditMemoId,
                     ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
                     $creditmemo
                 );
@@ -86,19 +89,46 @@ class OrderPlugin
      * @return mixed
      */
     public function afterLoadByIncrementId(
-        \Magento\Sales\Model\Order $subject,
+        Order $subject,
         $result,
         $incrementId
     ) {
         if (!$this->extend->isEnabled())
             return $result;
 
-        if ($result->getId()) {
+        $orderId = $result->getId();
+        if ($orderId) {
             $this->shippingProtectionTotalRepository->getAndSaturateExtensionAttributes(
-                $result->getId(),
+                $orderId,
                 ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
                 $result
             );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Prevents reorder if order has product protection plans
+     *
+     * Needs to fire regardless of Extend being enabled or not
+     *
+     * @param Order $subject
+     * @param bool $result
+     * @return bool
+     */
+    public function afterCanReorder(Order $subject, bool $result)
+    {
+        if ($result) {
+            $itemsCollection = $subject->getItemsCollection();
+            /** @var Item $item */
+            foreach ($itemsCollection->getItems() as $item) {
+                $productName = $item->getName();
+
+                if ($productName === Extend::WARRANTY_PRODUCT_NAME) {
+                    return false;
+                }
+            }
         }
 
         return $result;

@@ -58,4 +58,7 @@
     <type name="Magento\Paypal\Model\Api\Nvp">
         <plugin name="extend_paypal_custom_fee_api_call" type="Extend\Integration\Plugin\Paypal\Model\Nvp"/>
     </type>
+    <type name="Magento\Sales\CustomerData\LastOrderedItems">
+        <plugin sortOrder="1" name="extendLastOrderedItems" type="Extend\Integration\Plugin\Checkout\CustomerData\LastOrderedItemsPlugin"/>
+    </type>
 </config>
