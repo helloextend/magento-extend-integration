@@ -13,10 +13,10 @@
         <td class="label">
             <?= $block->escapeHtml(__('Shipping Protection')) ?>
             <div id="shipping_protection_adv"></div>
-                <div class="sp-buttons-container">
-                    <button name="full" type="button" class="full"><?=__('Full')?></button>
-                    <button name="zero" type="button" class="zero"><?=__('0')?></button>
-                </div>
+            <div class="sp-buttons-container" id="extend_sp_buttons_container">
+                <button name="full" type="button" class="full" id="extend_sp_buttons_container__full"><?=__('Full')?></button>
+                <button name="zero" type="button" class="zero" id="extend_sp_buttons_container__zero"><?=__('0')?></button>
+            </div>
         </td>
         <td>
             <input type="text"
@@ -43,26 +43,30 @@
                     ]
                 ]);
                 
-                const spFull = document.querySelectorAll('.sp-buttons-container .full')[0];
-                const spZero = document.querySelectorAll('.sp-buttons-container .zero')[0];
-                const shippingProtectionInput = document.querySelectorAll('#shipping_protection')[0];
+                const spButtonsContainer = document.getElementById('extend_sp_buttons_container');
+                const shippingProtectionInput = document.getElementById('shipping_protection');
                 const updateTotalsButton = document.querySelectorAll('.update-totals-button')[0];
                 
-                spFull.addEventListener('click', () => {
-                    shippingProtectionInput.value = shippingProtectionInput.getAttribute('data-full');
-                    if(updateTotalsButton) {
-                        updateTotalsButton.removeAttribute('disabled');
-                        updateTotalsButton.classList.remove('disabled');
-                    }
-                });
-                
-                spZero.addEventListener('click', () => {
-                    shippingProtectionInput.value = 0;
-                    if(updateTotalsButton) {
-                        updateTotalsButton.removeAttribute('disabled');
-                        updateTotalsButton.classList.remove('disabled');
-                    }
-                });
+                if (spButtonsContainer && shippingProtectionInput) {
+                    spButtonsContainer.addEventListener('click', (event) => {
+                        if (event.target.id === 'extend_sp_buttons_container__full') {
+                            shippingProtectionInput.value = shippingProtectionInput.getAttribute('data-full');
+                        }
+                        if (event.target.id === 'extend_sp_buttons_container__zero') {
+                            shippingProtectionInput.value = 0;
+                        }
+                        if (
+                            updateTotalsButton && 
+                            (
+                                event.target.id === 'extend_sp_buttons_container__zero' || 
+                                event.target.id === 'extend_sp_buttons_container__full'
+                            )
+                        ) {
+                            updateTotalsButton.removeAttribute('disabled');
+                            updateTotalsButton.classList.remove('disabled');
+                        }
+                    });
+                }
 
                 if ($('shipping_protection')) {
                     $('shipping_protection').advaiceContainer = $('shipping_protection_adv');
