@@ -113,17 +113,22 @@ class AccessTokenBuilder
         return '';
     }
 
-    /**
-     * Get the Extend OAuth client_id and client_secret.
-     *
-     * @return array{clientId: string|null, clientSecret: string|null}
-     */
-    private function getExtendOAuthClientData(): array
+	/**
+	 * Get the Extend OAuth client_id and client_secret, with integration id optionally provided.
+	 *
+	 * @param int|null $integrationId
+	 *
+	 * @return array{clientId: string|null, clientSecret: string|null}
+	 */
+    public function getExtendOAuthClientData(int $integrationId = null): array
     {
-        // Get the integration ID from the configuration
-        $integrationId = (int) $this->scopeConfig->getValue(
-            \Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG
-        );
+
+		if (!$integrationId) {
+			// Get the integration ID from the configuration
+			$integrationId = (int)$this->scopeConfig->getValue(
+				\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG
+			);
+		}
 
         // First try to get the client_id and client_secret from the ExtendOAuthClient table.
         $clientDataFromExtendOAuthClient = $this->getClientDataFromExtendOAuthClient($integrationId);

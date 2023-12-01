@@ -110,3 +110,48 @@ img[id='extend-x-logo'] {
   margin: auto 0;
   height: 160px;
 }
+
+.accordion fieldset[id="extend_integration"].config tr[id="row_extend_integration_environment"] td.value {
+    position: relative;
+    padding-right: 120px;
+}
+
+fieldset[id="extend_integration"] div[id="extend_activation_status"] {
+    width: 100px;
+    height: 20px;
+    position: absolute;
+    right: 1rem;
+    top: 3rem;
+    background-repeat: no-repeat;
+    background-position: left center;
+    box-sizing: border-box;
+}
+
+fieldset[id="extend_integration"] div[id="extend_activation_status"].inactive {
+    &:after {
+        content: "Not Active";
+        font-weight: 700;
+        padding-left: 2px;
+    }
+}
+
+fieldset[id="extend_integration"] div[id="extend_activation_status"].active {
+    &:after {
+        content: "Active";
+        font-weight: 700;
+        padding-left: 2px;
+    }
+}
+
+div[id="how_to_activate"] h3 {
+    font-size: 16px;
+    color: #000;
+}
+
+.how-to-activate ul {
+    padding-left: 40px;
+}
+
+.how-to-activate li {
+    margin-bottom: 10px;
+}

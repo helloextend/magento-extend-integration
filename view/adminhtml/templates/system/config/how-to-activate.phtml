@@ -1,0 +1,25 @@
+<div class="how-to-activate" id="how_to_activate">
+    <h3><?=__('How to Activate:')?></h3>
+    <ul>
+        <li><?=__('Go to %1', '<a href="'. $this->getIntegrationUrl() . '">integration settings</a>')?></li>
+        <li><?=__('Click on Authorize (or Re-Authorize) for %1', '<span id="active_integration_title">Extend Integration - Demo</span>')?></li>
+        <li><?=__('A new window should pop up prompting you to log into the Extend Merchant Portal with your credentials. <em>Hint: If you do not see the login window, please check that an ad-blocker is not preventing the login from showing</em>')?></li>
+        <li><?=__('After logging into the Extend Merchant Portal, come back to this page and refresh. It may take a few seconds for the activation to complete.')?></li>
+    </ul>
+</div>
+<?php if($integrations = $this->getIntegrations()): ?>
+    <script type="text/x-magento-init">
+        {
+            "#how_to_activate": {
+                "activationStatus": [
+                    <?php foreach ($integrations as $key => $integration): ?>
+                        {
+                            "integrationId": "<?=$integration['integration_id']?>",
+                            "activationStatus": "<?=$integration['activation_status']?>"
+                        }<?= array_key_last($integrations) === $key ? '' : ',' ?>
+                    <?php endforeach; ?>
+                ]
+            }
+        }
+    </script>
+<?php endif; ?>
