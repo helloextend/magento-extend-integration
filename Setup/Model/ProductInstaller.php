@@ -114,6 +114,16 @@ class ProductInstaller
                 $this->productRepository->delete($productToBeDeleted);
                 $this->deleteImageFromPubMedia();
             }
+
+            $existingLegacyProduct = $this->productFactory->create();
+            $legacyProductId = $this->productResource->getIdBySku(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+            $this->productResource->load($existingLegacyProduct, $legacyProductId);
+            if ($existingLegacyProduct->getId()) {
+                $legacyProductToBeDeleted = $this->productRepository->get(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+                $this->registry->register('isSecureArea', true);
+                $this->productRepository->delete($legacyProductToBeDeleted);
+                $this->deleteImageFromPubMedia();
+            }
         } catch (Exception $exception) {
             throw new SetupException(
                 new Phrase('There was a problem deleting the Extend Protection Product: %1', [

@@ -11,7 +11,9 @@ class Extend
     /**
      * warranty product sku
      */
-    public const WARRANTY_PRODUCT_SKU = 'extend-protection-plan';
+    public const WARRANTY_PRODUCT_SKU = 'xtd-pp-pln';
+
+    public const WARRANTY_PRODUCT_LEGACY_SKU = 'extend-protection-plan';
 
     /**
      * warranty product name
@@ -55,6 +57,11 @@ class Extend
     )
     {
         $this->scopeConfig = $scopeConfig;
+    }
+
+    public static function isProductionProtectionSku(string $sku): bool
+    {
+      return $sku === self::WARRANTY_PRODUCT_SKU || $sku === self::WARRANTY_PRODUCT_LEGACY_SKU;
     }
 
     public function isEnabled(): bool

@@ -349,7 +349,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
 
                 if ($item &&
                     $item->getProduct() &&
-                    $item->getProduct()->getSku() !== Extend::WARRANTY_PRODUCT_SKU
+                    !Extend::isProductionProtectionSku($item->getProduct()->getSku())
                 ) {
                     throw new LocalizedException(
                         new Phrase('Cannot update non product-protection item')
@@ -366,7 +366,7 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             // Check whether a product protection item already exists in the cart
             if (!isset($item) || $item === false) {
                 foreach ($quote->getItems() as $quoteItem) {
-                    if ($quoteItem->getSku(Extend::WARRANTY_PRODUCT_SKU) &&
+                    if (Extend::isProductionProtectionSku($quoteItem->getSku()) &&
                         $quoteItem->getOptionByCode('plan_id') &&
                         $quoteItem->getOptionByCode('plan_id')->getValue() == $planId &&
                         $quoteItem->getOptionByCode('associated_product_sku') &&
@@ -396,7 +396,12 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 $item = $this->itemFactory->create();
             }
 
-            $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+            try {
+              $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+            } catch (NoSuchEntityException $e) {
+              $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+            }
+
             $item->setProduct($product);
 
             // When adding plans to the cart (i.e. not normalization)

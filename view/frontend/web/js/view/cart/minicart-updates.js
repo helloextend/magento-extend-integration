@@ -22,8 +22,13 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
         lineItemSku: cartItem.product_sku,
         lineItems: cartItems,
       })
-      if (cartItem.product_sku === 'extend-protection-plan' || isWarrantyInCart)
+      if (
+        cartItem.product_sku === 'extend-protection-plan' ||
+        cartItem.product_sku === 'xtd-pp-pln' ||
+        isWarrantyInCart
+      ) {
         return
+      }
       const qtyElem = document.getElementById(
         `cart-item-${cartItem.item_id}-qty`,
       )

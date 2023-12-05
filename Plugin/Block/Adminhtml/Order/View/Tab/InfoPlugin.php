@@ -81,7 +81,7 @@ class InfoPlugin
         $order = $subject->getOrder();
 
         $extendPlanItems = array_filter($order->getItems(), function ($item) {
-          return ($item->getSku() === Extend::WARRANTY_PRODUCT_SKU); // need to also consider shipping protection here
+          return Extend::isProductionProtectionSku($item->getSku()); // need to also consider shipping protection here
         });
 
         $activeStoreId = $order->getStoreId();

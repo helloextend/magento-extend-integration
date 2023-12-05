@@ -64,7 +64,13 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
       lineItemSku: sku,
       lineItems: cartItems,
     })
-    if (sku === 'extend-protection-plan' || isWarrantyInCart) return
+    if (
+      sku === 'extend-protection-plan' ||
+      sku === 'xtd-pp-pln' ||
+      isWarrantyInCart
+    ) {
+      return
+    }
 
     const activeProductData = {
       referenceId: config[0].selectedProductSku,

@@ -65,7 +65,7 @@ class OrderItemRepositoryPlugin
             $orderItems = $searchResult->getItems();
 
             foreach ($orderItems as &$item) {
-                if ($item->getSku() === 'extend-protection-plan') {
+                if (Extend::isProductionProtectionSku($item->getSku())) {
                     // create extension attributes
                     $extensionAttributes = $this->orderItemExtensionFactory->create();
 

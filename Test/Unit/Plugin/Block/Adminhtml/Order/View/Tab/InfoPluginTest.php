@@ -209,6 +209,36 @@ class InfoPluginTest extends TestCase
     );
   }
 
+  public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsLegacyExtendPlans()
+  {
+    $this->mockOrderItem
+      ->expects($this->any())
+      ->method('getSku')
+      ->willReturn(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+
+    $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, '');
+
+    $this->assertStringContainsString(
+      'View Contract(s) in Extend',
+      $postMethodHTML
+    );
+
+    $this->assertStringContainsString(
+      $this->mockMerchantPortalBaseURL,
+      $postMethodHTML
+    );
+
+    $this->assertStringNotContainsString(
+      'magento',
+      $postMethodHTML,
+    );
+
+    $this->assertStringContainsString(
+      $this->mockTransactionId,
+      $postMethodHTML
+    );
+  }
+
   public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenOrderDoesNotContainExtendPlans()
   {
     $this->mockOrderItem
