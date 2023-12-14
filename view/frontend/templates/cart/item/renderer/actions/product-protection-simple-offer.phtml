@@ -19,7 +19,10 @@ if ($category = $product->getCategory()) {
 
 $viewModel = $block->getData('viewModel');
 
-$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionCartOfferEnabled();
+$currencyCode = $viewModel->getCurrencyCode();
+$isCurrencySupported = $viewModel->isCurrencySupported();
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionCartOfferEnabled() && $isCurrencySupported;
 
 $productSku = $product->getSku();
 /** sanitizing to prevent whitespace and other abnormal characters from being used in a div id */
@@ -43,7 +46,8 @@ $sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
                                                 ->getActiveEnvironment() ?>",
                         "selectedProductSku": "<?= $product->getSku() ?>",
                         "selectedProductPrice": "<?= $product->getPrice() ?>",
-                        "productCategory": "<?= $categoryName ?>"
+                        "productCategory": "<?= $categoryName ?>",
+                        "currencyCode": "<?= $currencyCode ?>"
                     }
             ]
         }

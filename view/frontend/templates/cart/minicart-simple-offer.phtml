@@ -6,7 +6,9 @@
 $viewModel = $block->getData('viewModel');
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
-$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionMinicartOfferEnabled();
+$currencyCode = $viewModel->getCurrencyCode();
+$isCurrencySupported = $viewModel->isCurrencySupported();
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionMinicartOfferEnabled() && $isCurrencySupported;
 ?>
 
 <?php if ($shouldRender) : ?>
@@ -17,7 +19,8 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
             "minicartSimpleOffer": [
                 {
                     "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                    "activeEnvironment": "<?= $activeEnvironment ?>"
+                    "activeEnvironment": "<?= $activeEnvironment ?>",
+                    "currencyCode": "<?= $currencyCode ?>"
                 }
             ]
         }

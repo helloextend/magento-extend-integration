@@ -5,10 +5,16 @@
  */
 
 /** @var Magento\Framework\View\Element\Template $block */
+
+$currencyCode = $block->getData('viewModel')->getCurrencyCode();
+$isCurrencySupported = $block->getData('viewModel')->isCurrencySupported();
 ?>
+
 <script>
     window.ExtendConfig = {
         environment: "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-        storeId: "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>"
+        storeId: "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
+        currencyCode: "<?= $currencyCode ?>",
+        isCurrencySupported: <?= json_encode($isCurrencySupported) ?>
     }
 </script>

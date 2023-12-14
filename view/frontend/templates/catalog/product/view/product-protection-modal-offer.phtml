@@ -16,7 +16,10 @@ if ($category = $product->getCategory()) {
   $categoryName = $category->getName();
 }
 
-$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled();
+$currencyCode = $viewModel->getCurrencyCode();
+$isCurrencySupported = $viewModel->isCurrencySupported();
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled() && $isCurrencySupported;
 ?>
 
 <?php if ($shouldRender) : ?>
@@ -31,7 +34,8 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                       "activeEnvironment": "<?= $activeEnvironment ?>",
                       "productSku": "<?= $productSku ?>",
                       "productPrice": "<?= $productPrice ?>",
-                      "productCategory": "<?= $categoryName ?>"
+                      "productCategory": "<?= $categoryName ?>",
+                      "currencyCode": "<?= $currencyCode ?>"
                   }
               ]
           }

@@ -30,7 +30,8 @@ define([
         window.ExtendConfig &&
         window.ExtendConfig.environment &&
         window.ExtendConfig.storeId &&
-        window.checkoutConfig.extendEnable === '1'
+        window.checkoutConfig.extendEnable === '1' &&
+        window.ExtendConfig.isCurrencySupported
       )
         return true
       return false
@@ -116,6 +117,7 @@ define([
         Extend.config({
           storeId: window.ExtendConfig.storeId,
           environment: window.ExtendConfig.environment,
+          currency: window.ExtendConfig.currencyCode,
         })
 
         // Update SP on cart changes

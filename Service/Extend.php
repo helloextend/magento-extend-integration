@@ -6,6 +6,8 @@
 
 namespace Extend\Integration\Service;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+
 class Extend
 {
     /**
@@ -40,30 +42,58 @@ class Extend
 
     public const ENABLE_CART_BALANCING = 'extend_plans/product_protection/enable_cart_balancing';
 
-    public const ENABLE_PRODUCT_PROTECTION_CART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_cart_offer';
-    public const ENABLE_PRODUCT_PROTECTION_MINICART_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_minicart_offer';
-    public const ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_pdp_offer';
-    public const ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_post_purchase_lead_modal_offer';
-    public const ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER = 'extend_plans/product_protection/offer_display_settings/enable_product_catalog_page_modal_offer';
+    public const ENABLE_PRODUCT_PROTECTION_CART_OFFER =
+      'extend_plans/product_protection/offer_display_settings/enable_cart_offer';
+    public const ENABLE_PRODUCT_PROTECTION_MINICART_OFFER =
+      'extend_plans/product_protection/offer_display_settings/enable_minicart_offer';
+    public const ENABLE_PRODUCT_PROTECTION_PRODUCT_DISPLAY_PAGE_OFFER =
+      'extend_plans/product_protection/offer_display_settings/enable_pdp_offer';
+    public const ENABLE_PRODUCT_PROTECTION_POST_PURCHASE_LEAD_MODAL_OFFER =
+      'extend_plans/product_protection/offer_display_settings/enable_post_purchase_lead_modal_offer';
+    public const ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER =
+      'extend_plans/product_protection/offer_display_settings/enable_product_catalog_page_modal_offer';
 
     /**
      * Lead token url param
      */
     public const LEAD_TOKEN_URL_PARAM = 'leadToken';
-    private \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig;
 
+    /**
+     * Currencies which Extend Offers may support for a store.
+     * Note: This will be evolved over time as international support increases for Magento stores.
+     */
+    public const SUPPORTED_CURRENCIES = ['USD', 'CAD'];
+
+    /** @var ScopeConfigInterface */
+    private $scopeConfig;
+
+    /**
+     * Extend constructor
+     *
+     * @param ScopeConfigInterface $scopeConfig
+     */
     public function __construct(
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-    )
-    {
+        ScopeConfigInterface $scopeConfig
+    ) {
         $this->scopeConfig = $scopeConfig;
     }
 
+    /**
+     * Check if the sku matches an Extend product sku
+     *
+     * @param string $sku
+     * @return boolean
+     */
     public static function isProductionProtectionSku(string $sku): bool
     {
-      return $sku === self::WARRANTY_PRODUCT_SKU || $sku === self::WARRANTY_PRODUCT_LEGACY_SKU;
+        return $sku === self::WARRANTY_PRODUCT_SKU || $sku === self::WARRANTY_PRODUCT_LEGACY_SKU;
     }
 
+    /**
+     * Check if Extend module is enabled
+     *
+     * @return boolean
+     */
     public function isEnabled(): bool
     {
         return (bool)$this->scopeConfig->getValue(self::ENABLE_EXTEND);

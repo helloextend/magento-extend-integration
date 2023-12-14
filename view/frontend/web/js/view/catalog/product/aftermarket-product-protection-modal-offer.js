@@ -13,7 +13,13 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento'], function (
   return function openModal(config) {
     const leadToken = config[0].leadToken
     const storeId = config[0].extendStoreUuid
-    Extend.config({ storeId, environment: config[0].activeEnvironment })
+
+    Extend.config({
+      storeId,
+      environment: config[0].activeEnvironment,
+      currency: config[0].currencyCode,
+    })
+
     if (leadToken) {
       Extend.aftermarketModal.open({
         leadToken,

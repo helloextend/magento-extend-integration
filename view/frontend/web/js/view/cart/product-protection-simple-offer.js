@@ -80,6 +80,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
     Extend.config({
       storeId: config[0].extendStoreUuid,
       environment: config[0].activeEnvironment,
+      currency: config[0].currencyCode,
     })
 
     Extend.buttons.renderSimpleOffer(

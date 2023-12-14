@@ -111,6 +111,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
     const extendConfig = {
       storeId: config[0].extendStoreUuid,
       environment: config[0].activeEnvironment,
+      currency: config[0].currencyCode,
     }
     Extend.config(extendConfig)
 

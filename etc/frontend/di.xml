@@ -11,4 +11,12 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Directory\Controller\Currency\SwitchAction">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="string">Magento\Checkout\Model\Session</argument>
+            <argument name="quoteRepository" xsi:type="string">Magento\Quote\Api\CartRepositoryInterface</argument>
+            <argument name="shippingProtectionRepo" xsi:type="string">Extend\Integration\Model\ShippingProtectionTotalRepository</argument>
+        </arguments>
+        <plugin name="extend_currency_switch" type="Extend\Integration\Plugin\Directory\Controller\Currency\SwitchAction" sortOrder="1"/>
+    </type>
 </config>

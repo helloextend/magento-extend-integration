@@ -67,6 +67,7 @@ define([
     Extend.config({
       storeId: config[0].extendStoreUuid,
       environment: config[0].activeEnvironment,
+      currency: config[0].currencyCode,
     })
 
     for (let key in config) {
