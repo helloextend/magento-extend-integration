@@ -363,9 +363,13 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
                 );
             }
 
+            // this might be null if there is no quote persisted to the DB yet, so
+            // only need to look through quote items if it is NOT null
+            $currentQuoteItems = $quote->getItems();
+
             // Check whether a product protection item already exists in the cart
-            if (!isset($item) || $item === false) {
-                foreach ($quote->getItems() as $quoteItem) {
+            if ((!isset($item) || $item === false) && isset($currentQuoteItems)) {
+                foreach ($currentQuoteItems as $quoteItem) {
                     if (Extend::isProductionProtectionSku($quoteItem->getSku()) &&
                         $quoteItem->getOptionByCode('plan_id') &&
                         $quoteItem->getOptionByCode('plan_id')->getValue() == $planId &&
@@ -397,9 +401,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             }
 
             try {
-              $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
+                $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_SKU);
             } catch (NoSuchEntityException $e) {
-              $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+                $product = $this->productRepository->get(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
             }
 
             $item->setProduct($product);

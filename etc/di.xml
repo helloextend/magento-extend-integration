@@ -61,4 +61,7 @@
     <type name="Magento\Sales\CustomerData\LastOrderedItems">
         <plugin sortOrder="1" name="extendLastOrderedItems" type="Extend\Integration\Plugin\Checkout\CustomerData\LastOrderedItemsPlugin"/>
     </type>
+    <type name="Magento\Quote\Model\Quote">
+        <plugin sortOrder="1" name="extendIntegrationCart" type="Extend\Integration\Plugin\Model\QuotePlugin"/>
+    </type>
 </config>
