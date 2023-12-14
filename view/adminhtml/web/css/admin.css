@@ -155,3 +155,10 @@ div[id="how_to_activate"] h3 {
 .how-to-activate li {
     margin-bottom: 10px;
 }
+
+button[class="finish_integration"] {
+  background-color: #ffff;
+  border-color: #0033cc;
+  color: #0033cc;
+  margin-bottom: 1em;
+}

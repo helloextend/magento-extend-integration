@@ -30,6 +30,9 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <backend_model>Extend\Integration\Model\Config\Backend\Enable</backend_model>
                 </field>
+                <group id="finish_integration" translate="label" type="text" sortOrder="30" showInStore="1">
+                    <frontend_model>Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\FinishIntegration</frontend_model>
+                </group>
             </group>
         </section>
         <section id="extend_plans" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
