@@ -36,4 +36,7 @@
     <event name="catalog_category_delete_before">
         <observer instance="Extend\Integration\Observer\CatalogCategoryDeleteBefore" name="extend_catalog_category_delete_before"/>
     </event>
+    <event name="admin_system_config_save">
+        <observer instance="Extend\Integration\Observer\AdminSystemConfigSaveExtend" name="admin_system_config_save"/>
+    </event>
 </config>

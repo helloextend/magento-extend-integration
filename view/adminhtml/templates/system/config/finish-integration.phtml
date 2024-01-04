@@ -7,18 +7,17 @@
     <p>The <strong><?= $this->getCurrentIntegrationName() ?></strong> integration is not yet enabled. Please follow the steps detailed on the <a href="<?=$block->getDefaultScopeUrl()?>">Extend Settings</a> page to complete
           your setup and integration this store with Extend.</p>
 <?php elseif ($status === 1): ?>
-    <p>The <strong><?= $this->getCurrentIntegrationName() ?></strong> integration is enabled but not active for the current store.</p>
-    <div class="how-to-activate" id="how_to_activate">
-      <h3><?=__('How to Activate for current store:')?></h3>
-      <ul>
-          <li><?=__('Go to %1', '<a href="'. $this->getIntegrationUrl() . '">integration settings</a>')?></li>
-          <li><?=__('Click on the Edit icon for %1', $this->getCurrentIntegrationName())?></li>
-          <li><?=__('Click the "Stores Integrated with Extend" tab on the left-hand menu')?></li>
-          <li><?=__('Select the desried store(s) and press the "Save Stores for Extend Integration" button')?></li>
-      </ul>
+    <p>The current integration is <strong><?= $this->getCurrentIntegrationName() ?></strong>.</p>
+    <div>
+      <input type="checkbox" name="activate_current_store" id="activate_current_store" />
+      <label for="activate_current_store">Add Store to current Integration</label>
     </div>
 <?php elseif ($status === 2): ?>
-    <p>The <strong><?= $this->getCurrentIntegrationName() ?></strong> integration is enabled and active for the current store.</p>
+    <p>The current integration is <strong><?= $this->getCurrentIntegrationName() ?></strong>.</p>
+    <div>
+      <input type="checkbox" name="activate_current_store" id="activate_current_store" checked disabled />
+      <label for="activate_current_store">Add Store to current Integration</label>
+    </div>
 <?php elseif ($status === 3): ?>
     <p>The Extend integration could not be found for the given store. Usually in this case an integration was selected and then deleted. Please
       go to the <a href="<?=$block->getDefaultScopeUrl()?>">Extend Settings</a> page and select a new integration.
