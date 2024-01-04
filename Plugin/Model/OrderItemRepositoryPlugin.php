@@ -30,8 +30,20 @@ class OrderItemRepositoryPlugin
      * @var ProductProtectionFactory
      */
     private ProductProtectionFactory $productProtectionFactory;
+
+    /**
+     * @var Extend
+     */
     private Extend $extend;
 
+    /**
+     * OrderItemRepositoryPlugin
+     *
+     * @param OrderItemExtensionFactory $orderItemExtensionFactory
+     * @param CollectionFactory $quoteItemCollectionFactory
+     * @param ProductProtectionFactory $productProtectionFactory
+     * @param Extend $extend
+     */
     public function __construct(
         OrderItemExtensionFactory $orderItemExtensionFactory,
         CollectionFactory $quoteItemCollectionFactory,
@@ -55,8 +67,9 @@ class OrderItemRepositoryPlugin
         OrderItemRepositoryInterface $subject,
         OrderItemSearchResultInterface $searchResult
     ): OrderItemSearchResultInterface {
-        if (!$this->extend->isEnabled())
+        if (!$this->extend->isEnabled()) {
             return $searchResult;
+        }
 
         $orderItems = $searchResult->getItems();
 
@@ -76,9 +89,6 @@ class OrderItemRepositoryPlugin
                         ->addFieldToSelect('*')
                         ->addFieldToFilter('item_id', $quoteItemId)
                         ->getFirstItem();
-
-                    // get the quote item's product's options
-                    $productOptions = $quoteItem->getProduct()->getOptions();
 
                     $productProtection = $this->productProtectionFactory->create();
 
