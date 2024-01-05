@@ -15,14 +15,6 @@ li[id='menu-extend-integration-extend'] a::before {
   background-position: top center;
   margin: 0 auto 0 !important;
 }
-div[id='integration_edit_tabs_integration_stores_content']
-  .save-integration-stores {
-  background-color: #eb5202;
-  border: 0;
-  color: #fff;
-  font-size: 1.2em;
-  padding: 0.7875em 0;
-}
 
 /* styles for the Extend header in the admin settings panel */
 

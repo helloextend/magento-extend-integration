@@ -21,9 +21,6 @@
     <type name="Magento\Quote\Model\QuoteRepository">
         <plugin sortOrder="1" name="extendIntegrationQuoteRepository" type="Extend\Integration\Plugin\Model\QuoteRepositoryPlugin"/>
     </type>
-    <type name="Magento\Integration\Controller\Adminhtml\Integration\Save">
-        <plugin sortOrder="1" name="extendIntegrationSave" type="Extend\Integration\Plugin\Controller\Adminhtml\Integration\SavePlugin"/>
-    </type>
     <type name="Magento\Quote\Model\Cart\TotalsConverter">
         <plugin sortOrder="1" name="extendIntegrationTotalsConverter" type="Extend\Integration\Plugin\Model\Cart\TotalsConverterPlugin"/>
     </type>
