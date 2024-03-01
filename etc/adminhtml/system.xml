@@ -48,6 +48,12 @@
                     <frontend_model>Extend\Integration\Model\Config\Frontend\EnableShippingProtection</frontend_model>
                     <comment>Disabling Shipping Protection may render existing orders' totals inaccurate if the order was purchased with Shipping Protection.</comment>
                 </field>
+                <field id="shipping_protection_tax_class" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
+                    <label>Tax Class Config</label>
+                    <source_model>Magento\Tax\Model\TaxClass\Source\Product</source_model>
+                    <backend_model>Magento\Tax\Model\Config\TaxClass</backend_model>
+                    <comment>Set the Tax Class config for the Extend Shipping Protection product which will allow tax to be collected.</comment>
+                </field>
             </group>
             <group id="product_protection" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Product Protection</label>

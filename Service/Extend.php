@@ -53,6 +53,8 @@ class Extend
     public const ENABLE_PRODUCT_PROTECTION_PRODUCT_CATALOG_PAGE_MODAL_OFFER =
       'extend_plans/product_protection/offer_display_settings/enable_product_catalog_page_modal_offer';
 
+    public const SHIPPING_PROTECTION_TAX_CLASS = 'extend_plans/shipping_protection/shipping_protection_tax_class';
+
     /**
      * Lead token url param
      */
