@@ -67,6 +67,17 @@ class ShippingProtection extends \Magento\Framework\Model\AbstractModel implemen
     }
 
     /**
+     * Set SP Tax Amount
+     *
+     * @param float | null $spTax
+     * @return void
+     */
+    public function setShippingProtectionTax($spTax)
+    {
+        $this->setData(self::SHIPPING_PROTECTION_TAX, $spTax);
+    }
+
+    /**
      * Get base price
      *
      * @return float
@@ -114,5 +125,15 @@ class ShippingProtection extends \Magento\Framework\Model\AbstractModel implemen
     public function getSpQuoteId(): string
     {
         return $this->getData(self::SP_QUOTE_ID);
+    }
+
+    /**
+     * Get SP Tax Amount
+     *
+     * @return float
+     */
+    public function getShippingProtectionTax(): ?float
+    {
+        return $this->getData(self::SHIPPING_PROTECTION_TAX);
     }
 }

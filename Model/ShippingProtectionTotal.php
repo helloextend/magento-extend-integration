@@ -94,6 +94,17 @@ class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel imp
     }
 
     /**
+     * Set SP Tax Amount
+     *
+     * @param float $shippingProtectionTax
+     * @return void
+     */
+    public function setShippingProtectionTax($shippingProtectionTax)
+    {
+        $this->setData(self::SHIPPING_PROTECTION_TAX, $shippingProtectionTax);
+    }
+
+    /**
      * Get entity ID
      *
      * @return int
@@ -161,5 +172,15 @@ class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel imp
     public function getShippingProtectionCurrency(): string
     {
         return $this->getData(self::SHIPPING_PROTECTION_CURRENCY);
+    }
+
+    /**
+     * Get Shipping Protection tax amount
+     *
+     * @return float | null
+     */
+    public function getShippingProtectionTax(): ?float
+    {
+        return $this->getData(self::SHIPPING_PROTECTION_TAX);
     }
 }

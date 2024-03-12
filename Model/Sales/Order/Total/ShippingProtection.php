@@ -29,6 +29,8 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Total\AbstractTotal
 
             $order->setGrandTotal($order->getGrandTotal() + $order->getShippingProtection());
             $order->setBaseGrandTotal($order->getBaseGrandTotal() + $order->getBaseShippingProtection());
+
+            $order->setShippingProtectionTax($shippingProtection->getShippingProtectionTax());
         }
 
         return $this;

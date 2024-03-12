@@ -16,6 +16,7 @@ interface ShippingProtectionInterface
     const PRICE = 'price';
     const CURRENCY = 'currency';
     const SP_QUOTE_ID = 'sp_quote_id';
+    const SHIPPING_PROTECTION_TAX= 'shipping_protection_tax';
 
     /**
      * Set base price
@@ -58,6 +59,14 @@ interface ShippingProtectionInterface
     public function setSpQuoteId(string $spQuoteId);
 
     /**
+     * Set SP Tax Amount
+     *
+     * @param float $spTax
+     * @return void
+     */
+    public function setShippingProtectionTax(float $spTax);
+
+    /**
      * Get base price
      *
      * @return float
@@ -91,4 +100,11 @@ interface ShippingProtectionInterface
      * @return string
      */
     public function getSpQuoteId(): string;
+
+    /**
+     * Get SP Tax Amount
+     *
+     * @return float | null
+     */
+    public function getShippingProtectionTax(): ?float;
 }

@@ -41,9 +41,11 @@ interface ShippingProtectionTotalRepositoryInterface
      * @param float $price
      * @param string $currency
      * @param float|null $basePrice
+     * @param string|null $baseCurrency
+     * @param float|null $spTax
      * @return ShippingProtectionTotal
      */
-    public function save(int $entityId, int $entityTypeId, string $spQuoteId, float $price, string $currency, ?float $basePrice, ?string $baseCurrency): ShippingProtectionTotal;
+    public function save(int $entityId, int $entityTypeId, string $spQuoteId, float $price, string $currency, ?float $basePrice, ?string $baseCurrency, ?float $spTax): ShippingProtectionTotal;
 
     /**
      * Save Shipping Protection total using Magento quote ID in the session
@@ -53,12 +55,13 @@ interface ShippingProtectionTotalRepositoryInterface
      * @param string $currency
      * @param float|null $basePrice
      * @param string|null $baseCurrency
+     * @param float|null $spTax
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void;
+    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null): void;
 
     /**
      * Delete Shipping Protection total by record ID
@@ -105,10 +108,11 @@ interface ShippingProtectionTotalRepositoryInterface
      * @param string $currency
      * @param float|null $basePrice
      * @param string|null $baseCurrency
+     * @param float|null $spTax
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null): void;
+    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null): void;
 }

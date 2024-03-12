@@ -18,8 +18,14 @@ use Extend\Integration\Model\ShippingProtection as BaseShippingProtectionModel;
 use Magento\Quote\Api\Data\CartExtension;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Api\Data\ShippingInterface;
-
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Store\Model\Store;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Tax\Model\Calculation;
+use Magento\Quote\Model\Quote\Address\RateRequest;
 use Extend\Integration\Model\Quote\Total\ShippingProtection;
+use Extend\Integration\Model\ShippingProtectionTotal;
 
 class ShippingProtectionTest extends TestCase
 {
@@ -44,6 +50,36 @@ class ShippingProtectionTest extends TestCase
     private $shippingProtectionTotalRepositoryMock;
 
     /**
+     * @var StoreManagerInterface|MockObject
+     */
+    private $storeManagerMock;
+
+    /**
+     * @var Store
+     */
+    private $storeMock;
+
+    /**
+     * @var ScopeConfigInterface|MockObject
+     */
+    private $scopeConfigMock;
+
+    /**
+     * @var ScopeInterface|MockObject
+     */
+    private $scopeMock;
+
+    /**
+     * @var Calculation|MockObject
+     */
+    private $calculationMock;
+
+    /**
+     * @var RateRequest|MockObject
+     */
+    private $rateRequestMock;
+
+    /**
      * @var Quote|MockObject
      */
     private $quoteMock;
@@ -64,6 +100,11 @@ class ShippingProtectionTest extends TestCase
     private $shippingProtectionMock;
 
     /**
+     * @var ShippingProtectionTotal|MockObject
+     */
+    private $shippingProtectionTotalMock;
+
+    /**
      * @var ShippingProtection
      */
     private $testSubject;
@@ -82,35 +123,66 @@ class ShippingProtectionTest extends TestCase
      */
     private array $items;
 
+    /**
+     * @var float
+     */
+    private $spTaxClassId;
+
     protected function setUp(): void
     {
         // class under test's constructor dependencies
-        $this->shippingProtectionTotalRepositoryMock = $this->createStub(ShippingProtectionTotalRepositoryInterface::class);
+        $this->shippingProtectionTotalRepositoryMock = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
+        $this->storeManagerMock = $this->createStub(StoreManagerInterface::class);
+        $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
+        $this->scopeMock = $this->createStub(ScopeInterface::class);
         $this->serializerMock = $this->createStub(SerializerInterface::class);
         $this->cartExtensionMock = $this->createStub(CartExtension::class);
+        $this->storeMock = $this->createStub(Store::class);
+        $this->storeManagerMock->method('getStore')->willReturn($this->storeMock);
+        $this->calculationMock = $this->createStub(Calculation::class);
+        $this->rateRequestMock = $this->createStub(RateRequest::class);
+        $this->calculationMock->method('getRateRequest')->willReturn($this->rateRequestMock);
         $this->cartExtensionFactoryMock = $this->createConfiguredMock(
             CartExtensionFactory::class,
             ['create' => $this->cartExtensionMock]
         );
+        
+        $this->spTaxClassId = 2;
+        $this->shippingProtectionTotalMock = $this->createStub(\Extend\Integration\Model\ShippingProtectionTotal::class);
+        
+        $this->shippingProtectionTotalMock->method('getData')
+            ->willReturnMap([
+                ['extend_shipping_protection_id', 72],
+                ['entity_id', 72],
+                ['sp_quote_id', "10f2df29-d04c-4fb2-a857-6d382251e596"],
+                ['shipping_protection_base_price', null, 0.98],
+                ['shipping_protection_price', null, 0.98],
+                ['shipping_protection_tax', null, 0.0],
+                ['shipping_protection_base_currency', null, 'USD'],
+                ['shipping_protection_currency', null, 'USD'],
+                ['entity_type_id', null, 4],
+            ]);
 
-        // instantiate class under test
         $this->testSubject = new ShippingProtection(
             $this->shippingProtectionTotalRepositoryMock,
+            $this->storeManagerMock,
+            $this->scopeConfigMock,
             $this->serializerMock,
-            $this->cartExtensionFactoryMock
+            $this->cartExtensionFactoryMock,
+            $this->calculationMock
         );
-
+        
         // additional test dependencies
         $this->shippingAssignmentMock = $this->createConfiguredMock(ShippingAssignmentInterface::class, [
             'getShipping' => $this->createConfiguredMock(ShippingInterface::class, [
                 'getAddress' => $this->createStub(Address::class)
-            ])
-        ]);
+                ])
+            ]);
         $this->total = new Total();
         $this->shippingProtectionMock = $this->createStub(BaseShippingProtectionModel::class);
         $this->quoteMock = $this->createStub(Quote::class);
         $this->testSubject->setCode('shipping_protection');
-
+        
         $this->items = [
             0 => [
                 'id' => 1,
@@ -273,6 +345,56 @@ class ShippingProtectionTest extends TestCase
         $this->assertEquals($this->shippingProtectionPrice, $result['value']);
     }
 
+    public function testCollectWhenShippingProtectionTaxClassIsNotZero()
+    {
+        $this->shippingAssignmentMock->expects($this->once())->method('getItems')->willReturn([$this->items]);
+        $this->scopeConfigMock->method('getValue')
+        ->with('extend_plans/shipping_protection/shipping_protection_tax_class', ScopeInterface::SCOPE_STORE)
+        ->willReturn(2);
+        $this->shippingProtectionTotalRepositoryMock->expects($this->once())
+            ->method('get')
+            ->with(72, 4)
+            ->willReturn($this->shippingProtectionTotalMock);
+
+        // set up
+        $this->setTestConditions([
+            'extensionAttributesExist' => true,
+            'shippingProtectionExists' => true,
+            'shippingProtectionHasNonZeroPrice' => true,
+            'shippingProtectionHasNonZeroBasePrice' => true
+        ]);
+        $this->calculationMock->expects($this->once())->method('getRate')->willReturn(10);
+        // test and assert
+        $this->runCollect();
+        $this->assertEquals($this->shippingProtectionBasePrice, $this->total->getBaseTotalAmount('shipping_protection'));
+        $this->assertEquals($this->shippingProtectionPrice, $this->total->getTotalAmount('shipping_protection'));
+        $this->assertEquals(54.321, $this->total->getBaseTotalAmount('tax'));
+        $this->assertEquals(54.321, $this->total->getTotalAmount('tax'));
+    }
+
+    public function testCollectWhenShippingProtectionTaxClassIsZero()
+    {
+        $this->shippingAssignmentMock->expects($this->once())->method('getItems')->willReturn([$this->items]);
+        $this->scopeConfigMock->method('getValue')
+        ->with('extend_plans/shipping_protection/shipping_protection_tax_class', ScopeInterface::SCOPE_STORE)
+        ->willReturn(0);
+
+        // set up
+        $this->setTestConditions([
+            'extensionAttributesExist' => true,
+            'shippingProtectionExists' => true,
+            'shippingProtectionHasNonZeroPrice' => true,
+            'shippingProtectionHasNonZeroBasePrice' => true
+        ]);
+        $this->calculationMock->expects($this->once())->method('getRate')->willReturn(10);
+        // test and assert
+        $this->runCollect();
+        $this->assertEquals($this->shippingProtectionBasePrice, $this->total->getBaseTotalAmount('shipping_protection'));
+        $this->assertEquals($this->shippingProtectionPrice, $this->total->getTotalAmount('shipping_protection'));
+        $this->assertEquals(0, $this->total->getBaseTotalAmount('tax'));
+        $this->assertEquals(0, $this->total->getTotalAmount('tax'));
+    }
+
     /* =================================================================================================== */
     /* ========================== helper methods for setting up test conditions ========================== */
     /* =================================================================================================== */
@@ -299,8 +421,7 @@ class ShippingProtectionTest extends TestCase
      */
     private function setTestConditions(
         array $conditions
-    )
-    {
+    ) {
         (isset($conditions['extensionAttributesExist']) && $conditions['extensionAttributesExist']) ?
             $this->setExtensionAttributes() : $this->setExtensionAttributesNull();
 
@@ -317,6 +438,7 @@ class ShippingProtectionTest extends TestCase
     private function setExtensionAttributes(): void
     {
         $this->quoteMock->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
+        $this->quoteMock->method('getId')->willReturn(72);
     }
 
     private function setExtensionAttributesNull(): void

@@ -112,7 +112,8 @@ class ShippingProtectionTotalRepository implements
         float $price,
         string $currency,
         ?float $basePrice,
-        ?string $baseCurrency
+        ?string $baseCurrency,
+        ?float $spTaxAmt
     ): ShippingProtectionTotal {
         //need to make $entityId and $entityTypeId optional for SDK ajax call
         if (!($shippingProtectionTotal = $this->get($entityId, $entityTypeId))) {
@@ -126,6 +127,7 @@ class ShippingProtectionTotalRepository implements
         $shippingProtectionTotal->setShippingProtectionBaseCurrency($baseCurrency ?: $currency);
         $shippingProtectionTotal->setShippingProtectionPrice($price);
         $shippingProtectionTotal->setShippingProtectionCurrency($currency);
+        $shippingProtectionTotal->setShippingProtectionTax($spTaxAmt);
 
         $this->shippingProtectionTotalResource->save($shippingProtectionTotal);
 
@@ -150,7 +152,8 @@ class ShippingProtectionTotalRepository implements
         float $price,
         string $currency,
         float $basePrice = null,
-        string $baseCurrency = null
+        string $baseCurrency = null,
+        float $spTax = null
     ): void {
         $entityId = $this->checkoutSession->getQuote()->getId();
         $this->save(
@@ -160,7 +163,8 @@ class ShippingProtectionTotalRepository implements
             $price / 100,
             $currency,
             $basePrice / 100 ?: null,
-            $baseCurrency ?: null
+            $baseCurrency ?: null,
+            $spTax ?: null
         );
     }
 
@@ -222,6 +226,7 @@ class ShippingProtectionTotalRepository implements
         $shippingProtection->setPrice($shippingProtectionTotal->getShippingProtectionPrice());
         $shippingProtection->setCurrency($shippingProtectionTotal->getShippingProtectionCurrency());
         $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
+        $shippingProtection->setShippingProtectionTax($shippingProtectionTotal->getShippingProtectionTax());
 
         $extensionAttributes->setShippingProtection($shippingProtection);
         $result->setExtensionAttributes($extensionAttributes);
@@ -257,7 +262,8 @@ class ShippingProtectionTotalRepository implements
                     $shippingProtectionExtensionAttribute->getPrice(),
                     $shippingProtectionExtensionAttribute->getCurrency(),
                     $shippingProtectionExtensionAttribute->getBase(),
-                    $shippingProtectionExtensionAttribute->getBaseCurrency()
+                    $shippingProtectionExtensionAttribute->getBaseCurrency(),
+                    $shippingProtectionExtensionAttribute->getShippingProtectionTax()
                 );
 
                 $shippingProtection = $this->shippingProtectionFactory->create();
@@ -272,6 +278,10 @@ class ShippingProtectionTotalRepository implements
                 );
                 $shippingProtection->setSpQuoteId(
                     $shippingProtectionExtensionAttribute->getSpQuoteId()
+                );
+
+                $shippingProtection->setShippingProtectionTax(
+                    $shippingProtectionExtensionAttribute->getShippingProtectionTax()
                 );
 
                 $extensionAttributesForResaturation = $result->getExtensionAttributes();
@@ -290,6 +300,7 @@ class ShippingProtectionTotalRepository implements
      * @param string $currency
      * @param float|null $basePrice
      * @param string|null $baseCurrency
+     * @param float|null $spTax
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
@@ -300,8 +311,9 @@ class ShippingProtectionTotalRepository implements
         string $spQuoteId,
         float $price,
         string $currency,
-        float $basePrice = null,
-        string $baseCurrency = null
+        ?float $basePrice = null,
+        ?string $baseCurrency = null,
+        ?float $spTax = null
     ): void {
         $this->save(
             $cartId,
@@ -310,7 +322,8 @@ class ShippingProtectionTotalRepository implements
             $price / 100,
             $currency,
             $basePrice / 100 ?: null,
-            $baseCurrency ?: null
+            $baseCurrency ?: null,
+            $spTax ?: null
         );
     }
 }

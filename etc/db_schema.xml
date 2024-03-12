@@ -12,6 +12,7 @@
         <column xsi:type="varchar" name="shipping_protection_base_currency" comment="Shipping Protection Base Currency"/>
         <column xsi:type="float" name="shipping_protection_price" comment="Shipping Protection Price"/>
         <column xsi:type="varchar" name="shipping_protection_currency" comment="Shipping Protection Currency"/>
+        <column xsi:type="float" name="shipping_protection_tax" comment="Shipping Protection Tax"/>
         <column xsi:type="int" name="entity_type_id" comment="Entity Type ID"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="extend_shipping_protection_id"/>

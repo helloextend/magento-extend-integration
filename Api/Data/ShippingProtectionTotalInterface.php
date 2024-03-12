@@ -15,6 +15,7 @@ interface ShippingProtectionTotalInterface
     const SHIPPING_PROTECTION_BASE_CURRENCY = 'shipping_protection_base_currency';
     const SHIPPING_PROTECTION_PRICE = 'shipping_protection_price';
     const SHIPPING_PROTECTION_CURRENCY = 'shipping_protection_currency';
+    const SHIPPING_PROTECTION_TAX= 'shipping_protection_tax';
     const ENTITY_ID = 'entity_id';
     const ENTITY_TYPE_ID = 'entity_type_id';
     const SP_QUOTE_ID = 'sp_quote_id';
@@ -84,6 +85,13 @@ interface ShippingProtectionTotalInterface
     public function setShippingProtectionCurrency(string $shippingProtectionCurrency);
 
     /**
+     * Set Shipping Protection tax amount
+     *
+     * @param float $shippingProtectionTax
+     * @return void
+     */
+    public function setShippingProtectionTax(float $shippingProtectionTax);
+    /**
      * Get entity ID
      *
      * @return int
@@ -131,4 +139,11 @@ interface ShippingProtectionTotalInterface
      * @return string
      */
     public function getShippingProtectionCurrency(): string;
+
+    /**
+     * Get Shipping Protection tax amount
+     *
+     * @return float | null
+     */
+    public function getShippingProtectionTax(): ?float;
 }
