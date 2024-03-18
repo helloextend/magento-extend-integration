@@ -67,15 +67,21 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
                 if ((int) $item->getQty() > 0 && $item->getOrderItem()->getIsVirtual() == '0') {
                     $shippingProtectionBasePrice = $shippingProtection->getBase();
                     $shippingProtectionPrice = $shippingProtection->getPrice();
+                    $shippingProtectionTax = $shippingProtection->getShippingProtectionTax() ?? 0.0;
 
                     $invoice->setBaseShippingProtection($shippingProtectionBasePrice);
                     $invoice->setShippingProtection($shippingProtectionPrice);
+                    $invoice->setShippingProtectionTax($shippingProtectionTax);
 
                     $invoice->setGrandTotal(
-                        $invoice->getGrandTotal() + $invoice->getShippingProtection()
+                        $invoice->getGrandTotal() + $invoice->getShippingProtection() + $invoice->getShippingProtectionTax()
                     );
                     $invoice->setBaseGrandTotal(
-                        $invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection()
+                        $invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection() + $invoice->getShippingProtectionTax()
+                    );
+                    $invoice->setTaxAmount($invoice->getTaxAmount() + $invoice->getShippingProtectionTax());
+                    $invoice->setBaseTaxAmount(
+                        $invoice->getBaseTaxAmount() + $invoice->getShippingProtectionTax()
                     );
                     return $this;
                 }
@@ -88,15 +94,21 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
                 if ($item->getOrderItem()->getIsVirtual() == '0') {
                     $shippingProtectionBasePrice = $shippingProtection->getBase();
                     $shippingProtectionPrice = $shippingProtection->getPrice();
+                    $shippingProtectionTax = $shippingProtection->getShippingProtectionTax() ?? 0.0;
 
                     $invoice->setBaseShippingProtection($shippingProtectionBasePrice);
                     $invoice->setShippingProtection($shippingProtectionPrice);
+                    $invoice->setShippingProtectionTax($shippingProtectionTax);
 
                     $invoice->setGrandTotal(
-                        $invoice->getGrandTotal() + $invoice->getShippingProtection()
+                        $invoice->getGrandTotal() + $invoice->getShippingProtection() + $invoice->getShippingProtectionTax()
                     );
                     $invoice->setBaseGrandTotal(
-                        $invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection()
+                        $invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection() + $invoice->getShippingProtectionTax()
+                    );
+                    $invoice->setTaxAmount($invoice->getTaxAmount() + $invoice->getShippingProtectionTax());
+                    $invoice->setBaseTaxAmount(
+                        $invoice->getBaseTaxAmount() + $invoice->getShippingProtectionTax()
                     );
                     return $this;
                 }
@@ -132,6 +144,7 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
         $shippingProtection->setBase(0.0);
         $shippingProtection->setBaseCurrency($shippingProtectionTotal->getBaseCurrency());
         $shippingProtection->setPrice(0.0);
+        $shippingProtection->setShippingProtectionTax(0.0);
         $shippingProtection->setCurrency($shippingProtectionTotal->getCurrency());
         $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
         $extensionAttributes = $invoice->getExtensionAttributes();
