@@ -76,7 +76,9 @@ define([
           stringUtils.sanitizeForElementId(config[key].selectedProductSku),
         {
           referenceId: config[key].selectedProductSku,
-          price: config[key].selectedProductPrice * 100,
+          price: parseInt(
+            (config[key].selectedProductPrice * 100).toPrecision(10),
+          ),
         },
       )
     }
@@ -92,7 +94,9 @@ define([
         )
         const activeProductData = {
           referenceId: selectedProduct.selectedProductSku,
-          price: selectedProduct.selectedPrice * 100,
+          price: parseInt(
+            (selectedProduct.selectedProductPrice * 100).toPrecision(10),
+          ),
         }
         if (buttonInstance) {
           buttonInstance.setActiveProduct(activeProductData)
@@ -166,7 +170,9 @@ define([
               event.stopPropagation()
               Extend.modal.open({
                 referenceId: selectedProduct.selectedProductSku,
-                price: selectedProduct.selectedProductPrice * 100,
+                price: parseInt(
+                  (selectedProduct.selectedProductPrice * 100).toPrecision(10),
+                ),
                 onClose: function (plan, product) {
                   if (plan && product) {
                     const {
