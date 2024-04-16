@@ -79,7 +79,11 @@ class QuotePlugin
             return;
         }
 
-        $quoteItems = $subject->getAllItems();
+        // You may wonder why "getAllVisibleItems" and not "getAllItems"? The reason is that if you're fetching a
+        // configurable product (e.g. a shirt with many colors) the "getAllItems" method will return two lineItems:
+        // the configurable product and the simple product. The simple product will be second in this list and have a quantity
+        // of 1 which will break the cart balancing.
+        $quoteItems = $subject->getAllVisibleItems();
 
         foreach ($quoteItems as $quoteItem) {
             if (!Extend::isProductionProtectionSku($quoteItem->getSku())) {
@@ -144,7 +148,7 @@ class QuotePlugin
             $correspondingMerchantProductSku = $item->getOptionByCode('associated_product_sku')->getValue();
             $correspondingMerchantQuoteItem = null;
 
-            foreach ($subject->getAllItems() as $potentialMatchingMerchantQuoteItem) {
+            foreach ($subject->getAllVisibleItems() as $potentialMatchingMerchantQuoteItem) {
                 if ($potentialMatchingMerchantQuoteItem->getSku() === $correspondingMerchantProductSku) {
                     $correspondingMerchantQuoteItem = $potentialMatchingMerchantQuoteItem;
                     break;
@@ -248,7 +252,7 @@ class QuotePlugin
         Quote $quote,
         Item $merchantProductQuoteItem
     ): array {
-        $presentQuoteItems = $quote->getAllItems();
+        $presentQuoteItems = $quote->getAllVisibleItems();
         $matchingWarrantyQuoteItems = [];
         foreach ($presentQuoteItems as $potentialMatchingWarrantyQuoteItem) {
             if ($potentialMatchingWarrantyQuoteItem->getOptionByCode('associated_product_sku') &&

@@ -49,7 +49,7 @@ class QuotePluginTest extends TestCase
         $this->quoteMock = $this->getMockBuilder(Quote::class)
             ->disableOriginalConstructor()
             ->addMethods(['setTotalsCollectedFlag'])
-            ->onlyMethods(['getAllItems', 'getItemById', 'removeItem',])
+            ->onlyMethods(['getAllVisibleItems', 'getItemById', 'removeItem',])
             ->getMock();
         $this->quoteMock->method('setTotalsCollectedFlag')->willReturn($this->quoteMock);
         $this->quoteMock->method('removeItem')->willReturn($this->quoteMock);
@@ -658,7 +658,7 @@ class QuotePluginTest extends TestCase
     private function setExistingQuoteItems(array $quoteItems)
     {
         if (isset($quoteItems) && count($quoteItems) > 0) {
-            $this->quoteMock->method('getAllItems')->willReturn($quoteItems);
+            $this->quoteMock->method('getAllVisibleItems')->willReturn($quoteItems);
             $this->quoteMock->method('getItemById')->will($this->returnValueMap(
                 array_map(
                     function ($quoteItem) {
@@ -668,7 +668,7 @@ class QuotePluginTest extends TestCase
                 )
             ));
         } else {
-            $this->quoteMock->method('getAllItems')->willReturn([]);
+            $this->quoteMock->method('getAllVisibleItems')->willReturn([]);
             $this->quoteMock->method('getItemById')->willReturn(null);
         }
     }
