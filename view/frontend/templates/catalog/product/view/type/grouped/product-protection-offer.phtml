@@ -6,14 +6,8 @@
 
 /** @var $block Magento\GroupedProduct\Block\Product\View\Type\Grouped */
 
-$categoryName = '';
-
-if ($category = $block->getProduct()->getCategory()) {
-  $categoryName = $category->getName();
-}
-
 $viewModel = $block->getData('viewModel');
-
+$categoryModel = $block->getData('categoryModel');
 $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled();
 ?>
 
@@ -30,6 +24,14 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
         "#product_protection_offers": {
             "productProtectionOffer": [
                 <?php foreach ($block->getAssociatedProducts() as $key => $product) : ?>
+                    <?
+                      $categoryName = '';
+                      $categories = $product->getCategoryIds();
+
+                      if (count($categories) > 0) {
+                        $categoryName = $categoryModel->getCategoryNameById($categories[0]);
+                      }
+                    ?>
                     {
                         "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                         "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",

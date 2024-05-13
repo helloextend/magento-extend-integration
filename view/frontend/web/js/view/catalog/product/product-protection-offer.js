@@ -79,6 +79,7 @@ define([
           price: parseInt(
             (config[key].selectedProductPrice * 100).toPrecision(10),
           ),
+          category: config[key].productCategory,
         },
       )
     }
@@ -92,11 +93,13 @@ define([
           '#product_protection_offer_' +
             stringUtils.sanitizeForElementId(config[0].selectedProductSku),
         )
+
         const activeProductData = {
           referenceId: selectedProduct.selectedProductSku,
           price: parseInt(
             (selectedProduct.selectedProductPrice * 100).toPrecision(10),
           ),
+          category: config[0].productCategory,
         }
         if (buttonInstance) {
           buttonInstance.setActiveProduct(activeProductData)
@@ -168,11 +171,13 @@ define([
             } else {
               event.preventDefault()
               event.stopPropagation()
+
               Extend.modal.open({
                 referenceId: selectedProduct.selectedProductSku,
                 price: parseInt(
                   (selectedProduct.selectedProductPrice * 100).toPrecision(10),
                 ),
+                category: config[0].productCategory,
                 onClose: function (plan, product) {
                   if (plan && product) {
                     const {

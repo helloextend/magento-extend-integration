@@ -9,6 +9,7 @@
             <block class="Magento\Catalog\Block\Product\View" ifconfig="extend/integration/enable" after="-" name="extend.product.view.type.configurable.product-protection-offer" template="Extend_Integration::catalog/product/view/product-protection-offer.phtml">
                 <arguments>
                     <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                    <argument name="categoryModel" xsi:type="object">Extend\Integration\ViewModel\Category</argument>
                 </arguments>
             </block>
         </referenceBlock>

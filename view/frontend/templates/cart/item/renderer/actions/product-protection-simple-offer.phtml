@@ -11,13 +11,15 @@ $quote = $item->getQuote();
 
 $productType = $product->getTypeId();
 
-$categoryName = '';
-
-if ($category = $product->getCategory()) {
-  $categoryName = $category->getName();
-}
-
 $viewModel = $block->getData('viewModel');
+$categoryModel = $block->getData('categoryModel');
+
+$categoryName = '';
+$categories = $product->getCategoryIds();
+
+if (count($categories) > 0) {
+  $categoryName = $categoryModel->getCategoryNameById($categories[0]);
+}
 
 $currencyCode = $viewModel->getCurrencyCode();
 $isCurrencySupported = $viewModel->isCurrencySupported();

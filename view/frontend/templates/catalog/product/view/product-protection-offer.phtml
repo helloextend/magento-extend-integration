@@ -6,13 +6,15 @@
 
 /** @var $block \Magento\Catalog\Block\Product\View */
 
-$categoryName = '';
-
-if ($category = $block->getProduct()->getCategory()) {
-  $categoryName = $category->getName();
-}
-
 $viewModel = $block->getData('viewModel');
+$categoryModel = $block->getData('categoryModel');
+
+$categoryName = '';
+$categories = $block->getProduct()->getCategoryIds();
+
+if (count($categories) > 0) {
+  $categoryName = $categoryModel->getCategoryNameById($categories[0]);
+}
 
 $product = $block->getProduct();
 $productSku = $product->getSku();

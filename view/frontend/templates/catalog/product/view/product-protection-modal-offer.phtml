@@ -1,5 +1,6 @@
 <?php
 $viewModel = $block->getData('viewModel');
+$categoryModel = $block->getData('categoryModel');
 
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
@@ -12,8 +13,10 @@ $sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
 $productPrice = $product->getPrice();
 
 $categoryName = '';
-if ($category = $product->getCategory()) {
-  $categoryName = $category->getName();
+$categories = $product->getCategoryIds();
+
+if (count($categories) > 0) {
+  $categoryName = $categoryModel->getCategoryNameById($categories[0]);
 }
 
 $currencyCode = $viewModel->getCurrencyCode();

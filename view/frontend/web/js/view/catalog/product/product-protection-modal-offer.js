@@ -11,10 +11,15 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 ) {
   'use strict'
 
-  const handleAddToCartClick = function (productSku, productPrice) {
+  const handleAddToCartClick = function (
+    productSku,
+    productPrice,
+    productCategory,
+  ) {
     Extend.modal.open({
       referenceId: productSku,
       price: productPrice,
+      category: productCategory,
       onClose: function (plan, product) {
         if (plan && product) {
           const { planId, price, term, title, coverageType, offerId } = plan
@@ -53,6 +58,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 
     const productSku = config[0].productSku
     const productPrice = config[0].productPrice * 100
+    const productCategory = config[0].productCategory
 
     const addToCartButton = document
       .querySelector(
@@ -65,7 +71,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 
     if (addToCartButton) {
       const handler = function () {
-        handleAddToCartClick(productSku, productPrice)
+        handleAddToCartClick(productSku, productPrice, productCategory)
       }
 
       addToCartButton.addEventListener('click', handler)

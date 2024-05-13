@@ -16,8 +16,9 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
 
   const handleUpdate = function () {
     const cartItems = cartUtils.getCartItems()
+    let categories
 
-    cartItems.forEach(cartItem => {
+    cartItems.forEach(async cartItem => {
       const isWarrantyInCart = ExtendMagento.warrantyInCart({
         lineItemSku: cartItem.product_sku,
         lineItems: cartItems,
@@ -45,6 +46,29 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
           } else {
             // TODO: If warranty already in cart, no need to render
 
+            // Only fetch categories if we actually get to the point of needing to render an offer
+            // Once this is fetched once though we should never need to fetch categories again
+            // for the current execution of handleUpdate.
+            // Why Ajax? There's no JavaScript API to get categories in Magento and we can't use a
+            // ViewModel because the minicart doesn't rerender in cases such as items being added to cart.
+            if (!categories) {
+              categories = await new Promise((resolve, _reject) => {
+                $.ajax({
+                  url:
+                    window.BASE_URL + 'extend_integration/minicart/categories',
+                  type: 'GET',
+                  dataType: 'json',
+                  success: function (response) {
+                    resolve(response)
+                  },
+                  error: function (xhr, status, error) {
+                    console.error(error)
+                    resolve({})
+                  },
+                })
+              })
+            }
+
             simpleOfferElem = document.createElement('div')
             simpleOfferElem.setAttribute('id', simpleOfferElemId)
             simpleOfferElem.setAttribute('class', simpleOfferClass)
@@ -56,6 +80,7 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
               Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
                 referenceId: cartItem.product_sku,
                 price: cartItem.product_price_value * 100,
+                category: categories[cartItem.item_id],
                 onAddToCart: function (opts) {
                   addToCart(opts)
                 },
