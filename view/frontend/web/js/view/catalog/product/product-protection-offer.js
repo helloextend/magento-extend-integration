@@ -26,7 +26,7 @@ define([
   function getActiveProductConfig() {
     const swatches = $('div.swatch-attribute', '.product-info-main')
     let selectedProductSku = null
-    let selectedPrice = null
+    let selectedProductPrice = null
 
     if (swatches.length > 0) {
       const swatchesElem = $('[data-role=swatch-options]', '.product-info-main')
@@ -42,7 +42,7 @@ define([
             ? selectedProducts[0]
             : null
         if (selectedId && selectedId !== '') {
-          selectedPrice =
+          selectedProductPrice =
             swatchRenderer.options.jsonConfig.optionPrices[selectedId]
               .finalPrice.amount
           selectedProductSku = swatchRenderer.options.jsonConfig.sku[selectedId]
@@ -60,7 +60,7 @@ define([
           spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
       }
     }
-    return { selectedProductSku, selectedPrice }
+    return { selectedProductSku, selectedProductPrice }
   }
 
   return function (config) {
@@ -148,7 +148,7 @@ define([
                 selectedPlan
               const {
                 selectedProductSku: productId,
-                selectedPrice: listPrice,
+                selectedProductPrice: listPrice,
               } = selectedProduct
 
               const planToUpsert = {
