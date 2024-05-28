@@ -142,6 +142,8 @@ class ShippingProtectionTotalRepository implements
      * @param string $currency
      * @param float|null $basePrice
      * @param string|null $baseCurrency
+     * @param float|null $spTax
+     * @param string|null $offerType
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
@@ -153,8 +155,14 @@ class ShippingProtectionTotalRepository implements
         string $currency,
         float $basePrice = null,
         string $baseCurrency = null,
-        float $spTax = null
+        float $spTax = null,
+        string $offerType = null
     ): void {
+        if ($offerType === 'SPG') {
+          $price = 0.0;
+          $basePrice = 0.0;
+        }
+
         $entityId = $this->checkoutSession->getQuote()->getId();
         $this->save(
             $entityId,
@@ -248,9 +256,9 @@ class ShippingProtectionTotalRepository implements
         ExtensibleDataInterface $result,
         int $entityTypeId
     ): void {
-        if ($shippingProtectionExtensionAttribute->getBase() &&
+        if ($shippingProtectionExtensionAttribute->getBase() >= 0 &&
             $shippingProtectionExtensionAttribute->getBaseCurrency() &&
-            $shippingProtectionExtensionAttribute->getPrice() &&
+            $shippingProtectionExtensionAttribute->getPrice() >= 0 &&
             $shippingProtectionExtensionAttribute->getCurrency() &&
             $shippingProtectionExtensionAttribute->getSpQuoteId()
         ) {

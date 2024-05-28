@@ -94,7 +94,9 @@ class CreditmemoRepositoryPlugin
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if ($result && $shippingProtection) {
+        // Omit shipping protection from credit memos when price is $0 (i.e. SPG)
+        $isSpg = $shippingProtection && ($shippingProtection->getPrice() == 0);
+        if ($result && $shippingProtection && !$isSpg) {
             $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
                 $shippingProtection,
                 $result,

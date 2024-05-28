@@ -61,11 +61,11 @@ class Totals extends \Magento\Framework\View\Element\Template
 
     /**
      * Get Shipping Protection total from the entity's extension_attributes,
-     * return 0 if not found
+     * returns shipping protection price, null if not found
      *
-     * @return float
+     * @return float|null
      */
-    public function getShippingProtection(): float
+    public function getShippingProtection(): float|null
     {
         $source = $this->getParentBlock()->getSource();
 
@@ -89,10 +89,10 @@ class Totals extends \Magento\Framework\View\Element\Template
                 }
             }
             $shippingProtection = $extensionAttributes->getShippingProtection();
-            if ($shippingProtection && $shippingProtection->getPrice()) {
+            if ($shippingProtection && $shippingProtection->getPrice() >= 0) {
                 return (float) $shippingProtection->getPrice();
             } else {
-                return 0;
+                return NULL;
             }
         }
     }
@@ -104,11 +104,11 @@ class Totals extends \Magento\Framework\View\Element\Template
      */
     public function initTotals()
     {
-        if (!$this->getShippingProtection()) {
+        if ($this->getShippingProtection() === NULL) {
             return $this;
         }
 
-        if ($this->getShippingProtection() > 0) {
+        if ($this->getShippingProtection() >= 0) {
 
             $total = new \Magento\Framework\DataObject(
                 [

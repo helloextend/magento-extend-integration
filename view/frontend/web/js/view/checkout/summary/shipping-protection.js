@@ -13,14 +13,14 @@ define([
   return Component.extend({
     totals: quote.getTotals(),
     isDisplayed: function () {
-      return this.getValue() !== 0
+      return this.getValue() !== null
     },
     getShippingProtectionTotal: function () {
       var price = this.getValue()
       return this.getFormattedPrice(price)
     },
     getValue: function () {
-      var price = 0
+      var price = null
       try {
         if (this.totals() && totals.getSegment('shipping_protection')) {
           price = totals.getSegment('shipping_protection').value

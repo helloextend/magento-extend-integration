@@ -56,12 +56,13 @@ interface ShippingProtectionTotalRepositoryInterface
      * @param float|null $basePrice
      * @param string|null $baseCurrency
      * @param float|null $spTax
+     * @param string|null $offerType
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null): void;
+    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null, string $offerType = null): void;
 
     /**
      * Delete Shipping Protection total by record ID

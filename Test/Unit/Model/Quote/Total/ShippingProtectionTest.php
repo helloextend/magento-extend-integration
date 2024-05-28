@@ -146,10 +146,10 @@ class ShippingProtectionTest extends TestCase
             CartExtensionFactory::class,
             ['create' => $this->cartExtensionMock]
         );
-        
+
         $this->spTaxClassId = 2;
         $this->shippingProtectionTotalMock = $this->createStub(\Extend\Integration\Model\ShippingProtectionTotal::class);
-        
+
         $this->shippingProtectionTotalMock->method('getData')
             ->willReturnMap([
                 ['extend_shipping_protection_id', 72],
@@ -171,7 +171,7 @@ class ShippingProtectionTest extends TestCase
             $this->cartExtensionFactoryMock,
             $this->calculationMock
         );
-        
+
         // additional test dependencies
         $this->shippingAssignmentMock = $this->createConfiguredMock(ShippingAssignmentInterface::class, [
             'getShipping' => $this->createConfiguredMock(ShippingInterface::class, [
@@ -182,7 +182,7 @@ class ShippingProtectionTest extends TestCase
         $this->shippingProtectionMock = $this->createStub(BaseShippingProtectionModel::class);
         $this->quoteMock = $this->createStub(Quote::class);
         $this->testSubject->setCode('shipping_protection');
-        
+
         $this->items = [
             0 => [
                 'id' => 1,
@@ -328,7 +328,9 @@ class ShippingProtectionTest extends TestCase
             'shippingProtectionHasNonZeroPrice' => false
         ]);
         // test and assert
-        $this->assertEquals([], $this->runFetch());
+        $result = $this->runFetch();
+        $this->assertEquals('shipping_protection', $result['code']);
+        $this->assertEquals(0, $result['value']);
     }
 
     public function testFetchWhenShippingProtectionPriceIsGreaterThanZero()

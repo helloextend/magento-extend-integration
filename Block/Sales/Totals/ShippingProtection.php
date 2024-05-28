@@ -115,8 +115,8 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (!$shippingProtection || !$shippingProtection->getPrice()) {
-            return 0;
+        if (!$shippingProtection) {
+            return NULL;
         }
 
         return (float) $shippingProtection->getPrice();
@@ -130,15 +130,15 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
     public function initTotals()
     {
         $parent = $this->getParentBlock();
-        $type = getType($parent->getParentBlock());
         $this->_order = $parent->getOrder();
         $this->_source = $parent->getSource();
 
-        if ($this->getShippingProtection($parent) > 0) {
+        $shippingProtectionPrice = $this->getShippingProtection($parent);
+        if ($shippingProtectionPrice !== NULL) {
             $total = new \Magento\Framework\DataObject([
                 'code' => 'shipping_protection',
                 'strong' => false,
-                'value' => $this->getShippingProtection($parent),
+                'value' => $shippingProtectionPrice,
                 'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
             ]);
 

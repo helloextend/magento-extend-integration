@@ -5,7 +5,7 @@
  */
 
 namespace Extend\Integration\Model\Quote\Total;
- 
+
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Api\Data\CartExtensionFactory;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
@@ -106,8 +106,9 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
             $store
         );
         $taxRate = $this->calculation->getRate($request->setProductClassId($spTaxClassId));
-        
-        if ($shippingProtection && $shippingProtection->getPrice() > 0) {
+
+
+        if ($shippingProtection && $shippingProtection->getPrice() >= 0) {
             // If $spTaxClassId is set we need to calculate the order tax including the shipping protection cost
             if ($spTaxClassId && $spTaxClassId != 0) {
                 $spTaxAmount = ($taxRate/100) * $shippingProtection->getBase();
@@ -160,7 +161,7 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if (!$shippingProtection || !$shippingProtection->getPrice()) {
+        if (!$shippingProtection) {
             return [];
         }
 
