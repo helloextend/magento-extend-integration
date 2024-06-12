@@ -63,7 +63,7 @@ class OrderPlugin
      */
     public function afterGetCreditmemosCollection(Order $subject, $result)
     {
-        if (!$this->extend->isEnabled())
+        if (!$this->extend->isEnabled() || is_bool($result))
             return $result;
 
         foreach ($result->getItems() as $creditmemo) {

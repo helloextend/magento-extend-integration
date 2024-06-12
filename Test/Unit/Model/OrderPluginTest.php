@@ -195,6 +195,17 @@ class OrderPluginTest extends TestCase
         $this->orderPlugin->afterGetCreditmemosCollection($this->subject, $this->creditmemoCollectionResult);
     }
 
+    public function testAfterGetCreditmemosCollectionWhenResultIsFalse()
+    {
+        $this->extend
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->shippingProtectionTotalRepository
+            ->expects($this->never())
+            ->method('getAndSaturateExtensionAttributes');
+        $this->orderPlugin->afterGetCreditmemosCollection($this->subject, false);
+    }
+
     public function testAfterGetCreditmemosCollectionWhenExtendIsEnabledSetsExtensionAttributes()
     {
         $this->extend
