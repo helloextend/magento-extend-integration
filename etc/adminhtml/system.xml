@@ -33,6 +33,16 @@
                 <group id="finish_integration" translate="label" type="text" sortOrder="30" showInStore="1">
                     <frontend_model>Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\FinishIntegration</frontend_model>
                 </group>
+                <field id="create_prod_integration" type="button" sortOrder="40" showInDefault="1">
+                    <button_label>Create Production Integration</button_label>
+                    <button_url>extend_integration/integration/createprod</button_url>
+                    <frontend_model>Extend\Integration\Model\Config\Frontend\CreateProdIntegration</frontend_model>
+                </field>
+                <field id="create_demo_integration" type="button" sortOrder="40" showInDefault="1">
+                    <button_label>Create Demo Integration</button_label>
+                    <button_url>extend_integration/integration/createdemo</button_url>
+                    <frontend_model>Extend\Integration\Model\Config\Frontend\CreateDemoIntegration</frontend_model>
+                </field>
             </group>
         </section>
         <section id="extend_plans" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
