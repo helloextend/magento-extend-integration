@@ -164,7 +164,7 @@ class ShippingProtectionTotalRepositoryTest extends TestCase
     $this->total->expects($this->once())->method('setShippingProtectionPrice')->with(0.0);
     $this->shippingProtectionTotalResource->expects($this->once())->method('save');
 
-    $this->testSubject->saveBySdk('abc', $price, 'USD', $price, 'USD', 1.0, 'SPG');
+    $this->testSubject->saveBySdk('abc', $price, 'USD', $price, 'USD', 1.0, 'SAFE_PACKAGE');
   }
 
   public function testSaveBySdkNonSpg()

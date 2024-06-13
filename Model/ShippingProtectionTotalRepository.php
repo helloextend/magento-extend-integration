@@ -158,7 +158,7 @@ class ShippingProtectionTotalRepository implements
         float $spTax = null,
         string $offerType = null
     ): void {
-        if ($offerType === 'SPG') {
+        if ($offerType === 'SAFE_PACKAGE') {
           $price = 0.0;
           $basePrice = 0.0;
         }
