@@ -84,7 +84,7 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
                 ->setSetupType(1);
             $this->integrationService->update($prodIntegration->getData());
                 $demoIntegration = $this->integrationService
-                ->findByName('Extend Integration - Dem')
+                ->findByName('Extend Integration - Demo')
                 ->setSetupType(1);
             $this->integrationService->update($demoIntegration->getData());
         } catch (Exception $exception) {
