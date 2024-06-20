@@ -19,6 +19,7 @@ var config = {
       minicartSimpleOffer: 'Extend_Integration/js/view/cart/minicart-updates',
       cartUtils: 'Extend_Integration/js/utils/cart-utils',
       stringUtils: 'Extend_Integration/js/utils/string-utils',
+      spQuoteConfig: 'Extend_Integration/js/view/checkout/sp-quote-config',
     },
   },
 }
