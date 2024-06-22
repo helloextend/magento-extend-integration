@@ -105,6 +105,17 @@ class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel imp
     }
 
     /**
+     * Set offer type
+     *
+     * @param string|null $offerType
+     * @return void
+     */
+    public function setOfferType($offerType)
+    {
+        $this->setData(self::OFFER_TYPE, $offerType);
+    }
+
+    /**
      * Get entity ID
      *
      * @return int
@@ -182,5 +193,15 @@ class ShippingProtectionTotal extends \Magento\Framework\Model\AbstractModel imp
     public function getShippingProtectionTax(): ?float
     {
         return $this->getData(self::SHIPPING_PROTECTION_TAX);
+    }
+
+    /**
+     * Get offer type
+     *
+     * @return string|null
+     */
+    public function getOfferType(): ?string
+    {
+        return $this->getData(self::OFFER_TYPE);
     }
 }

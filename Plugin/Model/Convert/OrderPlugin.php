@@ -110,6 +110,7 @@ class OrderPlugin
                 );
                 $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                 $shippingProtection->setShippingProtectionTax($shippingProtectionTotalData->getShippingProtectionTax());
+                $shippingProtection->setOfferType($shippingProtectionTotalData->getOfferType());
                 $orderExtensionAttributes->setShippingProtection($shippingProtection);
             }
         }
@@ -173,6 +174,7 @@ class OrderPlugin
                 );
                 $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                 $shippingProtection->setShippingProtectionTax($shippingProtectionTotalData->getShippingProtectionTax());
+                $shippingProtection->setOfferType($shippingProtectionTotalData->getOfferType());
                 $orderExtensionAttributes->setShippingProtection($shippingProtection);
             }
         }
@@ -198,6 +200,7 @@ class OrderPlugin
                     $shippingProtection->setCurrency($shippingProtectionTotalData['currency']);
                     $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                     $shippingProtection->setShippingProtectionTax($shippingProtectionTotalData->getShippingProtectionTax());
+                    $shippingProtection->setOfferType($shippingProtectionTotalData->getOfferType());
                     $creditMemoExtensionAttributes->setShippingProtection($shippingProtection);
                     $result->setExtensionAttributes($creditMemoExtensionAttributes);
 

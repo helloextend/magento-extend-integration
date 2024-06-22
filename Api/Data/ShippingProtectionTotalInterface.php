@@ -19,6 +19,7 @@ interface ShippingProtectionTotalInterface
     const ENTITY_ID = 'entity_id';
     const ENTITY_TYPE_ID = 'entity_type_id';
     const SP_QUOTE_ID = 'sp_quote_id';
+    const OFFER_TYPE = 'offer_type';
 
     /**
      * Consts for Shipping Protection database table entity type, per row
@@ -91,6 +92,15 @@ interface ShippingProtectionTotalInterface
      * @return void
      */
     public function setShippingProtectionTax(float $shippingProtectionTax);
+
+    /**
+     * Set offer type
+     *
+     * @param string|null $offerType
+     * @return void
+     */
+    public function setOfferType(?string $offerType);
+
     /**
      * Get entity ID
      *
@@ -146,4 +156,11 @@ interface ShippingProtectionTotalInterface
      * @return float | null
      */
     public function getShippingProtectionTax(): ?float;
+
+    /**
+     * Get offer type
+     *
+     * @return string|null
+     */
+    public function getOfferType(): ?string;
 }

@@ -124,6 +124,7 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
                     $shippingProtection->getBase(),
                     $shippingProtection->getBaseCurrency(),
                     $spTaxAmount,
+                    $shippingProtection->getOfferType()
                 );
                 $total->addTotalAmount('tax', $spTaxAmount);
                 $total->addBaseTotalAmount('tax', $spTaxAmount);

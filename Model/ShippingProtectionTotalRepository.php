@@ -102,6 +102,8 @@ class ShippingProtectionTotalRepository implements
      * @param string $currency
      * @param float|null $basePrice
      * @param string|null $baseCurrency
+     * @param float|null $spTaxAmt
+     * @param string|null $offerType
      * @return ShippingProtectionTotal
      * @throws AlreadyExistsException
      */
@@ -113,7 +115,8 @@ class ShippingProtectionTotalRepository implements
         string $currency,
         ?float $basePrice,
         ?string $baseCurrency,
-        ?float $spTaxAmt
+        ?float $spTaxAmt,
+        ?string $offerType
     ): ShippingProtectionTotal {
         //need to make $entityId and $entityTypeId optional for SDK ajax call
         if (!($shippingProtectionTotal = $this->get($entityId, $entityTypeId))) {
@@ -128,6 +131,7 @@ class ShippingProtectionTotalRepository implements
         $shippingProtectionTotal->setShippingProtectionPrice($price);
         $shippingProtectionTotal->setShippingProtectionCurrency($currency);
         $shippingProtectionTotal->setShippingProtectionTax($spTaxAmt);
+        $shippingProtectionTotal->setOfferType($offerType);
 
         $this->shippingProtectionTotalResource->save($shippingProtectionTotal);
 
@@ -172,7 +176,8 @@ class ShippingProtectionTotalRepository implements
             $currency,
             $basePrice / 100 ?: null,
             $baseCurrency ?: null,
-            $spTax ?: null
+            $spTax ?: null,
+            $offerType ?: null
         );
     }
 
@@ -235,6 +240,7 @@ class ShippingProtectionTotalRepository implements
         $shippingProtection->setCurrency($shippingProtectionTotal->getShippingProtectionCurrency());
         $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
         $shippingProtection->setShippingProtectionTax($shippingProtectionTotal->getShippingProtectionTax());
+        $shippingProtection->setOfferType($shippingProtectionTotal->getOfferType());
 
         $extensionAttributes->setShippingProtection($shippingProtection);
         $result->setExtensionAttributes($extensionAttributes);
@@ -271,7 +277,8 @@ class ShippingProtectionTotalRepository implements
                     $shippingProtectionExtensionAttribute->getCurrency(),
                     $shippingProtectionExtensionAttribute->getBase(),
                     $shippingProtectionExtensionAttribute->getBaseCurrency(),
-                    $shippingProtectionExtensionAttribute->getShippingProtectionTax()
+                    $shippingProtectionExtensionAttribute->getShippingProtectionTax(),
+                    $shippingProtectionExtensionAttribute->getOfferType(),
                 );
 
                 $shippingProtection = $this->shippingProtectionFactory->create();
@@ -290,6 +297,10 @@ class ShippingProtectionTotalRepository implements
 
                 $shippingProtection->setShippingProtectionTax(
                     $shippingProtectionExtensionAttribute->getShippingProtectionTax()
+                );
+
+                $shippingProtection->setOfferType(
+                    $shippingProtectionExtensionAttribute->getOfferType()
                 );
 
                 $extensionAttributesForResaturation = $result->getExtensionAttributes();
@@ -321,7 +332,8 @@ class ShippingProtectionTotalRepository implements
         string $currency,
         ?float $basePrice = null,
         ?string $baseCurrency = null,
-        ?float $spTax = null
+        ?float $spTax = null,
+        ?string $offerType = null
     ): void {
         $this->save(
             $cartId,
@@ -331,7 +343,8 @@ class ShippingProtectionTotalRepository implements
             $currency,
             $basePrice / 100 ?: null,
             $baseCurrency ?: null,
-            $spTax ?: null
+            $spTax ?: null,
+            $offerType ?: null
         );
     }
 }

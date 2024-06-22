@@ -150,7 +150,7 @@ class ShippingProtectionTotalRepositoryTest extends TestCase
 
     $this->shippingProtectionTotalResource->expects($this->once())->method('save');
 
-    $res = $this->testSubject->save(123, 456, 'abc', 10.0, 'USD', 10.0, 'USD', 1.0);
+    $res = $this->testSubject->save(123, 456, 'abc', 10.0, 'USD', 10.0, 'USD', 1.0, 'OPT_IN');
 
     $this->assertEquals($this->total, $res);
   }

@@ -78,6 +78,17 @@ class ShippingProtection extends \Magento\Framework\Model\AbstractModel implemen
     }
 
     /**
+     * Set offer type
+     *
+     * @param string|null $offerType
+     * @return void
+     */
+    public function setOfferType(?string $offerType)
+    {
+        $this->setData(self::OFFER_TYPE, $offerType);
+    }
+
+    /**
      * Get base price
      *
      * @return float
@@ -135,5 +146,15 @@ class ShippingProtection extends \Magento\Framework\Model\AbstractModel implemen
     public function getShippingProtectionTax(): ?float
     {
         return $this->getData(self::SHIPPING_PROTECTION_TAX);
+    }
+
+    /**
+     * Get offer type
+     *
+     * @return string|null
+     */
+    public function getOfferType(): ?string
+    {
+        return $this->getData(self::OFFER_TYPE);
     }
 }

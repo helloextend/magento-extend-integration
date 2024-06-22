@@ -43,9 +43,10 @@ interface ShippingProtectionTotalRepositoryInterface
      * @param float|null $basePrice
      * @param string|null $baseCurrency
      * @param float|null $spTax
+     * @param string|null $offerType
      * @return ShippingProtectionTotal
      */
-    public function save(int $entityId, int $entityTypeId, string $spQuoteId, float $price, string $currency, ?float $basePrice, ?string $baseCurrency, ?float $spTax): ShippingProtectionTotal;
+    public function save(int $entityId, int $entityTypeId, string $spQuoteId, float $price, string $currency, ?float $basePrice, ?string $baseCurrency, ?float $spTax, ?string $offerType): ShippingProtectionTotal;
 
     /**
      * Save Shipping Protection total using Magento quote ID in the session
