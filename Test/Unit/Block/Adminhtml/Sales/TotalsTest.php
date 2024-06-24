@@ -2,6 +2,7 @@
 
 namespace Extend\Integration\Test\Unit\Block\Adminhtml\Sales;
 
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Block\Adminhtml\Sales\Totals;
 use PHPUnit\Framework\TestCase;
 use Magento\Backend\Block\Template\Context;
@@ -78,7 +79,7 @@ class TotalsTest extends TestCase
     // Add magic methods to the mock object
     $this->order = $this->getMockBuilder(\Magento\Sales\Model\Order::class)
       ->addMethods(
-        ['getShippingProtection']
+        ['getShippingProtection', 'getOmitSp']
       )
       ->onlyMethods(
         ['getExtensionAttributes']
@@ -120,20 +121,13 @@ class TotalsTest extends TestCase
     );
   }
 
-  public function testGetShippingProtectionWithZeroPrice()
-  {
-    $price = 0.0;
-    $this->setupTest($price);
-    $res = $this->testSubject->getShippingProtection();
-    $this->assertEquals($price, $res);
-  }
-
-  public function testGetShippingProtectionWithPositivePrice()
+  public function testGetShippingProtectionWithOmitSp()
   {
     $price = 10.0;
+    $this->order->method('getOmitSp')->willReturn(true);
     $this->setupTest($price);
     $res = $this->testSubject->getShippingProtection();
-    $this->assertEquals($price, $res);
+    $this->assertEquals(NULL, $res);
   }
 
   public function testGetShippingProtectionWithNoExtensionAttribute()
@@ -152,9 +146,64 @@ class TotalsTest extends TestCase
     $this->assertEquals(NULL, $res);
   }
 
-  public function testInitTotalsWithZeroPrice()
+  public function testGetShippingProtectionWithPositivePrice()
+  {
+    $price = 10.0;
+    $this->setupTest($price);
+    $res = $this->testSubject->getShippingProtection();
+    $this->assertEquals($price, $res);
+  }
+
+  public function testGetShippingProtectionNonSpgWithZeroPrice()
   {
     $price = 0.0;
+    $this->setupTest($price);
+    $res = $this->testSubject->getShippingProtection();
+    $this->assertEquals(NULL, $res);
+  }
+
+  public function testGetShippingProtectionSpgWithZeroPrice()
+  {
+    $price = 0.0;
+    $this->shippingProtection->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
+
+    $this->setupTest($price);
+    $res = $this->testSubject->getShippingProtection();
+    $this->assertEquals($price, $res);
+  }
+
+  public function testGetShippingProtectionSpgWithPositivePrice()
+  {
+    $price = 10.0;
+    $this->shippingProtection->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
+
+    $this->setupTest($price);
+    $res = $this->testSubject->getShippingProtection();
+    $this->assertEquals($price, $res);
+  }
+
+  public function testInitTotalsWithNegativePrice()
+  {
+    $price = -10.0;
+    $this->setupTest($price);
+    $this->block->expects($this->never())->method('addTotal');
+    $res = $this->testSubject->initTotals();
+    $this->assertEquals($this->testSubject, $res);
+  }
+
+  public function testInitTotalsNonSpgWithZeroPrice()
+  {
+    $price = 0.0;
+    $this->setupTest($price);
+    $this->block->expects($this->never())->method('addTotal');
+    $res = $this->testSubject->initTotals();
+    $this->assertEquals($this->testSubject, $res);
+  }
+
+  public function testInitTotalsSpgWithZeroPrice()
+  {
+    $price = 0.0;
+    $this->shippingProtection->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
     $this->setupTest($price);
     $this->block->expects($this->once())->method('addTotal');
     $res = $this->testSubject->initTotals();
@@ -170,6 +219,15 @@ class TotalsTest extends TestCase
     $this->assertEquals($this->testSubject, $res);
   }
 
+  public function testInitTotalsSpgWithPositivePrice()
+  {
+    $price = 10.0;
+    $this->shippingProtection->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
+    $this->setupTest($price);
+    $this->block->expects($this->once())->method('addTotal');
+    $res = $this->testSubject->initTotals();
+    $this->assertEquals($this->testSubject, $res);
+  }
 
   public function testInitTotalsWithNullShippingProtection()
   {
@@ -184,15 +242,6 @@ class TotalsTest extends TestCase
   {
     $price = 10.0;
     $this->setupTest($price, false);
-    $this->block->expects($this->never())->method('addTotal');
-    $res = $this->testSubject->initTotals();
-    $this->assertEquals($this->testSubject, $res);
-  }
-
-  public function testInitTotalsWithNegativePrice()
-  {
-    $price = -10.0;
-    $this->setupTest($price);
     $this->block->expects($this->never())->method('addTotal');
     $res = $this->testSubject->initTotals();
     $this->assertEquals($this->testSubject, $res);

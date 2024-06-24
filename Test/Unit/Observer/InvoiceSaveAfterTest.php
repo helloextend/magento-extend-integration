@@ -104,10 +104,18 @@ class InvoiceSaveAfterTest extends TestCase
     protected function setUp(): void
     {
         $this->orderMock = $this->createMock(Order::class);
-        $this->invoice = $this->createConfiguredMock(Invoice::class, [
-            'getOrder' => $this->orderMock,
-            'getId' => $this->invoiceId,
-        ]);
+        $this->invoice = $this->getMockBuilder(Invoice::class)
+            ->addMethods(
+              ['getOmitSp']
+            )
+            ->onlyMethods(
+              ['getOrder', 'getId', 'getExtensionAttributes']
+            )
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->invoice->method('getOrder')->willReturn($this->orderMock);
+        $this->invoice->method('getId')->willReturn($this->invoiceId);
+
         $this->observer = $this->getMockBuilder(Observer::class)
             ->addMethods(['getInvoice'])
             ->disableOriginalConstructor()
@@ -251,6 +259,49 @@ class InvoiceSaveAfterTest extends TestCase
                     'type' => 'middleware',
                 ],
                 $this->equalTo($this->orderMock),
+                ['invoice_id' => $this->invoiceId]
+            );
+        $this->import->execute($this->observer);
+    }
+
+    public function testSkipsExtensionAttributeSaveWhenOmitSp()
+    {
+        $this->invoice->method('getOmitSp')->willReturn(true);
+
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->observer
+            ->expects($this->once())
+            ->method('getInvoice');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getExtensionAttributes')
+            ->willReturn(null);
+        $this->invoiceExtensionFactory
+            ->expects($this->once())
+            ->method('create')
+            ->willReturn($this->invoiceExtension);
+        $this->invoiceExtension
+            ->expects($this->once())
+            ->method('getShippingProtection')
+            ->willReturn($this->shippingProtection);
+        $this->invoice
+            ->expects($this->once())
+            ->method('getOrder');
+        $this->invoice
+            ->expects($this->once())
+            ->method('getId');
+        $this->orderObserverHandler
+            ->expects($this->once())
+            ->method('execute')
+            ->with(
+                [
+                    'path' => Integration::EXTEND_INTEGRATION_ENDPOINTS['webhooks_orders_create'],
+                    'type' => 'middleware',
+                ],
+                $this->orderMock,
                 ['invoice_id' => $this->invoiceId]
             );
         $this->import->execute($this->observer);

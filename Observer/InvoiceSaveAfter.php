@@ -73,7 +73,7 @@ class InvoiceSaveAfter extends BaseExtendObserver
 
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if ($invoice && $shippingProtection) {
+        if ($invoice && !$invoice->getOmitSp() && $shippingProtection) {
             $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
                 $shippingProtection,
                 $invoice,

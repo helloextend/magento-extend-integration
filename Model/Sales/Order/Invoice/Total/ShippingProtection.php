@@ -10,6 +10,7 @@ use Extend\Integration\Api\Data\ShippingProtectionInterface;
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Model\ShippingProtectionFactory;
+use Extend\Integration\Model\ShippingProtectionTotalRepository;
 use Magento\Sales\Model\Order\Invoice;
 
 class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\AbstractTotal
@@ -42,27 +43,32 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
      */
     public function collect(Invoice $invoice): ShippingProtection
     {
+        $invoice->setOmitSp(false);
+
         if (($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()) &&
             $invoice->getOrderId()
         ) {
+            // Check if Shipping Protection has already been invoiced in this order
             foreach ($invoice
                     ->getOrder()
                     ->getInvoiceCollection()
                     ->getAllIds()
             as $invoiceId) {
-                if ($this->shippingProtectionTotalRepository->get(
-                    $invoiceId,
-                    ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
-                ) &&
-                    $this->shippingProtectionTotalRepository
-                        ->get($invoiceId, ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID)
-                        ->getShippingProtectionBasePrice() > 0
-                ) {
-                    $this->zeroOutShippingProtection($invoice, $shippingProtection);
+                $existingInvoiceSp = $this->shippingProtectionTotalRepository->get(
+                  $invoiceId,
+                  ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID
+                );
+                $isExistingInvoiceSpValid = $existingInvoiceSp->getId() && (
+                  $existingInvoiceSp->getShippingProtectionBasePrice() > 0
+                  || $existingInvoiceSp->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE
+                );
+                if ($isExistingInvoiceSpValid) {
+                    $invoice->setOmitSp(true);
                     return $this;
                 }
             }
 
+            // Check if the invoice only contains non-shippable items
             foreach ($invoice->getAllItems() as $item) {
                 if ((int) $item->getQty() > 0 && $item->getOrderItem()->getIsVirtual() == '0') {
                     $shippingProtectionBasePrice = $shippingProtection->getBase();
@@ -83,11 +89,16 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
                     $invoice->setBaseTaxAmount(
                         $invoice->getBaseTaxAmount() + $invoice->getShippingProtectionTax()
                     );
+
+                    // Return early since we've found a shippable item in the invoice
                     return $this;
                 }
             }
 
-            $this->zeroOutShippingProtection($invoice, $shippingProtection);
+            // If we reach this point, the invoice only contains non-shippable items
+            // so shipping protection will not be associated with this invoice
+            $invoice->setOmitSp(true);
+            return $this;
         } elseif ($shippingProtection = $invoice->getExtensionAttributes()->getShippingProtection()
         ) {
             foreach ($invoice->getAllItems() as $item) {
@@ -116,39 +127,5 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Invoice\Total\Abstra
         }
 
         return $this;
-    }
-
-    /**
-     * If shipping protection cannot be applied because it's already been invoiced,
-     * or the order only contains non-shippable items,
-     * then we need to zero it out in the totals and the extension attribute,
-     * which will persist to the database.
-     *
-     * @param Invoice $invoice
-     * @param ShippingProtectionInterface $shippingProtection
-     * @return void
-     */
-    private function zeroOutShippingProtection(
-        Invoice $invoice,
-        \Extend\Integration\Api\Data\ShippingProtectionInterface $shippingProtectionTotal
-    ) {
-        $invoice->setBaseShippingProtection(0.0);
-        $invoice->setShippingProtection(0.0);
-
-        $invoice->setGrandTotal($invoice->getGrandTotal() + $invoice->getShippingProtection());
-        $invoice->setBaseGrandTotal(
-            $invoice->getBaseGrandTotal() + $invoice->getBaseShippingProtection()
-        );
-
-        $shippingProtection = $this->shippingProtectionFactory->create();
-        $shippingProtection->setBase(0.0);
-        $shippingProtection->setBaseCurrency($shippingProtectionTotal->getBaseCurrency());
-        $shippingProtection->setPrice(0.0);
-        $shippingProtection->setShippingProtectionTax(0.0);
-        $shippingProtection->setCurrency($shippingProtectionTotal->getCurrency());
-        $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
-        $extensionAttributes = $invoice->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection($shippingProtection);
-        $invoice->setExtensionAttributes($extensionAttributes);
     }
 }

@@ -85,7 +85,7 @@ class InvoiceRepositoryPlugin
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        if ($result && $shippingProtection) {
+        if ($result && !$result->getOmitSp() && $shippingProtection) {
             $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
                 $shippingProtection,
                 $result,

@@ -64,8 +64,8 @@ class SavePlugin
             return $result;
 
         $invoice = $this->registry->registry('current_invoice');
-        if ($invoice) {
-            $invoiceExtensionAttributes = $invoice->getExtensionAttributes();
+        if ($invoice && !$invoice->getOmitSp()) {
+          $invoiceExtensionAttributes = $invoice->getExtensionAttributes();
             if ($invoiceExtensionAttributes === null) {
                 $invoiceExtensionAttributes = $this->invoiceExtensionFactory->create();
             }

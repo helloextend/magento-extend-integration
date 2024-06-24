@@ -15,6 +15,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 interface ShippingProtectionTotalRepositoryInterface
 {
+    const OFFER_TYPE_SAFE_PACKAGE = 'SAFE_PACKAGE';
+
     /**
      * Get Shipping Protection total record by entity ID and entity type
      *

@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Block\Adminhtml\Sales;
 
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
@@ -69,6 +70,10 @@ class Totals extends \Magento\Framework\View\Element\Template
     {
         $source = $this->getParentBlock()->getSource();
 
+        if ($source->getOmitSp()) {
+          return NULL;
+        }
+
         $shippingProtection = $source->getShippingProtection();
 
         if ($shippingProtection !== null) {
@@ -89,7 +94,7 @@ class Totals extends \Magento\Framework\View\Element\Template
                 }
             }
             $shippingProtection = $extensionAttributes->getShippingProtection();
-            if ($shippingProtection && $shippingProtection->getPrice() >= 0) {
+            if ($shippingProtection && ($shippingProtection->getPrice() > 0 || $shippingProtection->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE)) {
                 return (float) $shippingProtection->getPrice();
             } else {
                 return NULL;
@@ -104,12 +109,12 @@ class Totals extends \Magento\Framework\View\Element\Template
      */
     public function initTotals()
     {
-        if ($this->getShippingProtection() === NULL) {
+        $shippingProtectionPrice = $this->getShippingProtection();
+        if ($shippingProtectionPrice === NULL) {
             return $this;
         }
 
-        if ($this->getShippingProtection() >= 0) {
-
+        if ($shippingProtectionPrice >= 0) {
             $total = new \Magento\Framework\DataObject(
                 [
                     'code' => 'shipping_protection',
@@ -117,7 +122,6 @@ class Totals extends \Magento\Framework\View\Element\Template
                     'label' => __(\Extend\Integration\Service\Extend::SHIPPING_PROTECTION_LABEL),
                 ]
             );
-
             $this->getParentBlock()->addTotal($total, 'shipping');
         }
         return $this;
