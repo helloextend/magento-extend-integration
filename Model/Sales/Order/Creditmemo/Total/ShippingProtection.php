@@ -33,8 +33,10 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
      */
     public function collect(Creditmemo $creditmemo): ShippingProtection
     {
-        // Check for credit memos which have already refunded shipping protection
+        // Initialize to not omit the inclusion of SP in the credit memo
+        $creditmemo->setOmitSp(false);
 
+        // Check for credit memos which have already refunded shipping protection
         if ($shippingProtection = $creditmemo->getExtensionAttributes()->getShippingProtection()) {
             $shippingProtectionBasePrice = $shippingProtection->getBase();
             $shippingProtectionPrice = $shippingProtection->getPrice();
@@ -49,11 +51,12 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
                     if ($shippingProtectionEntity = $this->shippingProtectionTotalRepository->get(
                         $existingCreditMemo->getId(),
                         \Extend\Integration\Api\Data\ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID
-                    )
-                    ) {
-                        if ($shippingProtectionEntity->getData() &&
-                            $shippingProtectionEntity->getShippingProtectionPrice() > 0
-                        ) {
+                    )) {
+                        // SP entity attached to existing credit memos are valid if they have a price greater than 0 or are SPG
+                        if ($shippingProtectionEntity->getData() && (
+                          $shippingProtectionEntity->getShippingProtectionPrice() > 0
+                          || $shippingProtectionEntity->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE
+                        )) {
                             $existingCreditMemoWithSPCount = 1;
                             break;
                         }
@@ -67,7 +70,11 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
                 // If the shipping protection tax amount is set we know the store/order has/had sp taxability enabled, otherwise this returns null and we set to 0.
                 $shippingProtectionTax = $shippingProtection->getShippingProtectionTax() ?? 0.0;
 
-                $isRefundingSP = $shippingProtectionPrice > 0;
+                // SP is being refunded if the price is greater than 0 or if it's a SPG and hasn't been removed from the credit memo
+                $isRefundingSP = $shippingProtectionPrice > 0 || (
+                  $shippingProtection->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE
+                  && !$creditmemo->getSpgSpRemovedFromCreditMemo()
+                );
 
                 // Default SP totals and tax to 0. We'll override in specific scenarios below.
                 $spGrandTotalToAdd = 0.0;
@@ -107,41 +114,11 @@ class ShippingProtection extends \Magento\Sales\Model\Order\Creditmemo\Total\Abs
                 $creditmemo->setTaxAmount($creditmemo->getTaxAmount() + $spTaxAmountToAdd);
                 $creditmemo->setBaseTaxAmount($creditmemo->getBaseTaxAmount() + $spBaseTaxAmountToAdd);
             } else {
-                $this->zeroOutShippingProtection($creditmemo, $shippingProtection);
+                // An existing credit memo has already refunded shipping protection, so we skip any displaying or refunding of SP for this credit memo
+                $creditmemo->setOmitSp(true);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * If shipping protection cannot be refunded because it's already been shipped
-     * then we need to zero it out in the totals and the extension attribute,
-     * which will persist to the database.
-     *
-     * @param Creditmemo $creditmemo
-     * @param ShippingProtectionInterface $shippingProtection
-     * @return void
-     */
-    private function zeroOutShippingProtection(
-        Creditmemo $creditmemo,
-        ShippingProtectionInterface $shippingProtectionTotal
-    ) {
-        $creditmemo->setBaseShippingProtection(0.0);
-        $creditmemo->setShippingProtection(0.0);
-
-        $shippingProtection = $this->shippingProtectionFactory->create();
-
-        $shippingProtection->setBase(0.0);
-        $shippingProtection->setBaseCurrency($shippingProtectionTotal->getBaseCurrency());
-        $shippingProtection->setPrice(0.0);
-        $shippingProtection->setCurrency($shippingProtectionTotal->getCurrency());
-        $shippingProtection->setSpQuoteId($shippingProtectionTotal->getSpQuoteId());
-        $shippingProtection->setShippingProtectionTax(0.0);
-
-        $extensionAttributes = $creditmemo->getExtensionAttributes();
-        $extensionAttributes->setShippingProtection($shippingProtection);
-        $creditmemo->setExtensionAttributes($extensionAttributes);
-        $creditmemo->setData('original_shipping_protection', 0);
     }
 }

@@ -7,6 +7,7 @@
 namespace Extend\Integration\Plugin\Model\Convert;
 
 use Extend\Integration\Api\Data\ShippingProtectionTotalInterface;
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Model\ShippingProtectionTotalRepository;
 use Extend\Integration\Model\ShippingProtectionFactory;
 use Extend\Integration\Service\Extend;
@@ -187,16 +188,25 @@ class OrderPlugin
             );
             if ($post = $this->http->getPost('creditmemo')) {
                 if (isset($post['shipping_protection'])) {
+                    $postShippingProtectionPrice = $post['shipping_protection'];
+
+                    // If SPG and the value is empty, mark SP as removed from credit memo and set price to 0
+                    // The value is set to empty for the UI to display the input field as empty
+                    if ($shippingProtectionTotalData->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE && $postShippingProtectionPrice === '') {
+                        $postShippingProtectionPrice = 0;
+                        $result->setSpgSpRemovedFromCreditMemo(true);
+                    }
+
                     $creditMemoExtensionAttributes = $result->getExtensionAttributes();
                     if ($creditMemoExtensionAttributes === null) {
                         $creditMemoExtensionAttributes = $this->creditmemoExtensionFactory->create();
                     }
                     $shippingProtection = $this->shippingProtectionFactory->create();
-                    $shippingProtection->setBase($post['shipping_protection']);
+                    $shippingProtection->setBase($postShippingProtectionPrice);
                     $shippingProtection->setBaseCurrency(
                         $shippingProtectionTotalData['base_currency']
                     );
-                    $shippingProtection->setPrice($post['shipping_protection']);
+                    $shippingProtection->setPrice($postShippingProtectionPrice);
                     $shippingProtection->setCurrency($shippingProtectionTotalData['currency']);
                     $shippingProtection->setSpQuoteId($shippingProtectionTotalData->getSpQuoteId());
                     $shippingProtection->setShippingProtectionTax($shippingProtectionTotalData->getShippingProtectionTax());

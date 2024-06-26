@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Block\Adminhtml\Sales\Order\Creditmemo;
 
+use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
@@ -109,16 +110,50 @@ class Totals extends \Magento\Framework\View\Element\Template
     }
 
     /**
+     * Check if the Shipping Protection is SPG
+     *
+     * @return bool
+     */
+    public function isSpSpg()
+    {
+        $source = $this->getParentBlock()->getSource();
+        $extensionAttributes = $source->getExtensionAttributes();
+
+        if ($extensionAttributes === null) {
+            return false;
+        }
+
+        $shippingProtection = $extensionAttributes->getShippingProtection();
+
+        if ($shippingProtection === null) {
+            return false;
+        }
+
+        return $shippingProtection->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE;
+    }
+
+    /**
+     * Check if the Shipping Protection is SPG and has been removed from the credit memo
+     *
+     * @return bool
+     */
+    public function isSpgSpRemovedFromCreditMemo()
+    {
+        $source = $this->getParentBlock()->getSource();
+        return $source->getSpgSpRemovedFromCreditMemo();
+    }
+
+    /**
      * Initialize Shipping Protection total
      *
      * @return $this
      */
     public function initTotals()
     {
-        if ($this->getShippingProtection() !== null) {
+        $source = $this->getParentBlock()->getSource();
 
+        if ($this->getShippingProtection() !== null && !$source->getOmitSp()) {
             $total = new \Magento\Framework\DataObject(['code' => 'shipping_protection_block', 'block_name' => $this->getNameInLayout()]);
-
             $this->getParentBlock()->addTotal($total, 'shipping');
         }
         return $this;

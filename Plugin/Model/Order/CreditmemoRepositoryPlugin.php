@@ -94,9 +94,12 @@ class CreditmemoRepositoryPlugin
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
-        // Omit shipping protection from credit memos when price is $0 (i.e. SPG)
-        $isSpg = $shippingProtection && ($shippingProtection->getPrice() == 0);
-        if ($result && $shippingProtection && !$isSpg) {
+        $isRefunding = $shippingProtection && $shippingProtection->getPrice() > 0;
+
+        // SPG SP will be refunded unless it was marked as excluded from the credit memo by an admin
+        $isRefundingSpg = $shippingProtection && $shippingProtection->getOfferType() === ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE && !$creditMemo->getSpgSpRemovedFromCreditMemo();
+
+        if (!$creditMemo->getOmitSp() && $result && $shippingProtection && ($isRefunding || $isRefundingSpg)) {
             $this->shippingProtectionTotalRepository->saveAndResaturateExtensionAttribute(
                 $shippingProtection,
                 $result,

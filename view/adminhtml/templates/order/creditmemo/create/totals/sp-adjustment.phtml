@@ -6,23 +6,33 @@
 
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /** @var \Extend\Integration\Block\Adminhtml\Sales\Order\Creditmemo\Totals $block */
-
+$shippingProtectionPrice = $block->getShippingProtection();
+if ($block->isSpgSpRemovedFromCreditMemo()) {
+  $shippingProtectionPrice = '';
+}
 ?>
-<?php if ($block->getOriginalShippingProtection() > 0): ?>
+
+<?php if ($block->getOriginalShippingProtection() > 0 || $block->isSpSpg()): ?>
     <tr>
         <td class="label">
             <?= $block->escapeHtml(__('Shipping Protection')) ?>
             <div id="shipping_protection_adv"></div>
             <div class="sp-buttons-container" id="extend_sp_buttons_container">
-                <button name="full" type="button" class="full" id="extend_sp_buttons_container__full"><?=__('Full')?></button>
-                <button name="zero" type="button" class="zero" id="extend_sp_buttons_container__zero"><?=__('0')?></button>
+                <?php if ($block->isSpSpg()): ?>
+                    <div>(Safe Package Guarantee)</div>
+                    <button name="spg-add" type="button" class="zero" id="extend_sp_buttons_container__spg_add"><?=__('Add to Refund')?></button>
+                    <button name="spg-remove" type="button" class="full" id="extend_sp_buttons_container__spg_remove"><?=__('Remove from Refund')?></button>
+                <?php else: ?>
+                    <button name="full" type="button" class="full" id="extend_sp_buttons_container__full"><?=__('Full')?></button>
+                    <button name="zero" type="button" class="zero" id="extend_sp_buttons_container__zero"><?=__('0')?></button>
+                <?php endif; ?>
             </div>
         </td>
         <td>
             <input type="text"
                 name="creditmemo[shipping_protection]"
                 data-full="<?= /* @noEscape */ $block->getOriginalShippingProtection() ?>"
-                value="<?= /* @noEscape */ $block->getShippingProtection() ?>"
+                value="<?= /* @noEscape */ $shippingProtectionPrice ?>"
                 class="input-text admin__control-text not-negative-amount"
                 readonly="readonly"
                 id="shipping_protection"/>
@@ -42,11 +52,24 @@
                         }
                     ]
                 ]);
-                
+
                 const spButtonsContainer = document.getElementById('extend_sp_buttons_container');
                 const shippingProtectionInput = document.getElementById('shipping_protection');
                 const updateTotalsButton = document.querySelectorAll('.update-totals-button')[0];
-                
+
+                const spgAdd = document.getElementById('extend_sp_buttons_container__spg_add');
+                const spgRemove = document.getElementById('extend_sp_buttons_container__spg_remove');
+
+                if (spgAdd && spgRemove) {
+                    if (shippingProtectionInput.value === '0') {
+                        spgAdd.style.display = "none";
+                        spgRemove.style.display = "block";
+                    } else {
+                        spgAdd.style.display = "block";
+                        spgRemove.style.display = "none";
+                    }
+                }
+
                 if (spButtonsContainer && shippingProtectionInput) {
                     spButtonsContainer.addEventListener('click', (event) => {
                         if (event.target.id === 'extend_sp_buttons_container__full') {
@@ -55,11 +78,23 @@
                         if (event.target.id === 'extend_sp_buttons_container__zero') {
                             shippingProtectionInput.value = 0;
                         }
+                        if (event.target.id === 'extend_sp_buttons_container__spg_remove') {
+                            shippingProtectionInput.value = '';
+                            spgAdd.style.display = "block";
+                            spgRemove.style.display = "none";
+                        }
+                        if (event.target.id === 'extend_sp_buttons_container__spg_add') {
+                            shippingProtectionInput.value = 0;
+                            spgAdd.style.display = "none";
+                            spgRemove.style.display = "block";
+                        }
                         if (
-                            updateTotalsButton && 
+                            updateTotalsButton &&
                             (
-                                event.target.id === 'extend_sp_buttons_container__zero' || 
-                                event.target.id === 'extend_sp_buttons_container__full'
+                                event.target.id === 'extend_sp_buttons_container__zero' ||
+                                event.target.id === 'extend_sp_buttons_container__full' ||
+                                event.target.id === 'extend_sp_buttons_container__spg_remove' ||
+                                event.target.id === 'extend_sp_buttons_container__spg_add'
                             )
                         ) {
                             updateTotalsButton.removeAttribute('disabled');

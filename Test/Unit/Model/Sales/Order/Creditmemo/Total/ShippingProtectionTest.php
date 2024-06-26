@@ -165,7 +165,7 @@ class ShippingProtectionTest extends TestCase
     $this->creditmemoMock = $this->getMockBuilder(Creditmemo::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getOrder', 'getExtensionAttributes', 'setGrandTotal', 'setBaseGrandTotal', 'getGrandTotal', 'getBaseGrandTotal', 'getTaxAmount', 'getBaseTaxAmount','setTaxAmount', 'setBaseTaxAmount', 'setExtensionAttributes', 'setData', 'isLast'])
-      ->addMethods(['setShippingProtection', 'setBaseShippingProtection', 'getShippingProtection', 'getBaseShippingProtection', 'setShippingProtectionTax', 'getShippingProtectionTax'])
+      ->addMethods(['setShippingProtection', 'setBaseShippingProtection', 'getShippingProtection', 'getBaseShippingProtection', 'setShippingProtectionTax', 'getShippingProtectionTax', 'setOmitSp'])
       ->getMock();
     $this->extensionAttributesMock = $this->createStub(CreditmemoExtensionInterface::class);
     $this->creditmemoMock->method('getExtensionAttributes')
@@ -174,7 +174,7 @@ class ShippingProtectionTest extends TestCase
     $this->creditmemoMock->method('getBaseGrandTotal')->willReturn($this->creditmemoStartingBaseGrandTotal);
     $this->creditmemoMock->method('getTaxAmount')->willReturn($this->creditmemoStartingTaxAmount);
     $this->creditmemoMock->method('getBaseTaxAmount')->willReturn($this->creditmemoStartingTaxAmount);
-    
+
     // additional setup conditionally needed to cover the permutations in the test cases below
     $this->baseShippingProtectionModelMock = $this->createConfiguredMock(
       BaseShippingProtectionModel::class,
@@ -261,7 +261,7 @@ class ShippingProtectionTest extends TestCase
     ]);
 
     // expect the credit memo to be zeroed out
-    $this->expectCreditMemoToBeZeroedOut();
+    $this->expectOmitSpSetToTrue();
 
     // run the tested function
     $this->model->collect($this->creditmemoMock);
@@ -277,7 +277,29 @@ class ShippingProtectionTest extends TestCase
     ]);
 
     // expect the credit memo to be zeroed out
-    $this->expectCreditMemoToBeZeroedOut();
+    $this->expectOmitSpSetToTrue();
+
+    // run the tested function
+    $this->model->collect($this->creditmemoMock);
+  }
+
+  public function testCollectExistingCreditmemoWithSpgSp()
+  {
+    // order with shipping protection has one pre-existing credit memo that refunds shipping protection
+    $this->setTestConditions([
+      'extensionAttributesHasShippingProtection' => true,
+      'existingCreditMemo' => true,
+    ]);
+    $this->creditmemoCollectionMock->method('getItems')->willReturn([$this->preExistingCreditmemoMock]);
+    $this->shippingProtectionTotalRepositoryMock
+      ->method('get')
+      ->willReturn($this->preexistingShippingProtectionTotal);
+    $this->preexistingShippingProtectionTotal->method('getData')->willReturn(true);
+    $this->preexistingShippingProtectionTotal->method('getShippingProtectionPrice')->willReturn(0.0);
+    $this->preexistingShippingProtectionTotal->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
+
+    // expect the credit memo to be zeroed out
+    $this->expectOmitSpSetToTrue();
 
     // run the tested function
     $this->model->collect($this->creditmemoMock);
@@ -347,12 +369,12 @@ class ShippingProtectionTest extends TestCase
   /* =================================================================================================== */
   /* ============================== helper methods for validating results ============================== */
   /* =================================================================================================== */
-  
+
   /**
    *  This method asserts that when SP is included in the credit memo, the getters and setters are called twice each
    *  with the corresponding price values. The initial call will be to reset all of the totals and tax values to not include
    *  the sp tax. The second call will be to add the sp tax back into the totals and tax values.
-   * */ 
+   * */
   private function expectShippingProtectionPriceGettersAndSettersToBeCalledOnceEachWithCorrespondingPriceValues()
   {
     $this->baseShippingProtectionModelMock->expects($this->once())->method('getShippingProtectionTax')->willReturn($this->shippingProtectionTax);
@@ -383,11 +405,8 @@ class ShippingProtectionTest extends TestCase
     );
   }
 
-  private function expectCreditMemoToBeZeroedOut()
+  private function expectOmitSpSetToTrue()
   {
-    $this->creditmemoMock->expects($this->once())->method('setShippingProtection')->with(0.0);
-    $this->creditmemoMock->expects($this->once())->method('setBaseShippingProtection')->with(0.0);
-    $this->creditmemoMock->expects($this->once())->method('setExtensionAttributes')->with($this->anything());
-    $this->creditmemoMock->expects($this->once())->method('setData')->with('original_shipping_protection', 0);
+    $this->creditmemoMock->expects($this->exactly(2))->method('setOmitSp')->withConsecutive([false], [true]);
   }
 }
