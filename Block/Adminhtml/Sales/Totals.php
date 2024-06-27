@@ -66,7 +66,7 @@ class Totals extends \Magento\Framework\View\Element\Template
      *
      * @return float|null
      */
-    public function getShippingProtection(): float|null
+    public function getShippingProtection(): ?float
     {
         $source = $this->getParentBlock()->getSource();
 
