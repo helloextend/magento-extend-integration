@@ -19,7 +19,6 @@ if ($block->isSpgSpRemovedFromCreditMemo()) {
             <div id="shipping_protection_adv"></div>
             <div class="sp-buttons-container" id="extend_sp_buttons_container">
                 <?php if ($block->isSpSpg()): ?>
-                    <div>(Safe Package Guarantee)</div>
                     <button name="spg-add" type="button" class="zero" id="extend_sp_buttons_container__spg_add"><?=__('Add to Refund')?></button>
                     <button name="spg-remove" type="button" class="full" id="extend_sp_buttons_container__spg_remove"><?=__('Remove from Refund')?></button>
                 <?php else: ?>
