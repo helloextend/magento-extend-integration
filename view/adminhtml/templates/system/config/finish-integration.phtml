@@ -12,12 +12,26 @@
       <input type="checkbox" name="activate_current_store" id="activate_current_store" />
       <label for="activate_current_store">Add Store to current Integration</label>
     </div>
+    </br>
+    <?php if (!$this->isProdEnvironment()): ?>
+      <div>
+        <label for="extend_store_id">Extend Store ID to use (leave empty to create a store)</label>
+        <input type="text" name="extend_store_id" id="extend_store_id" />
+      </div>
+    <?php endif; ?>
 <?php elseif ($status === 2): ?>
     <p>The current integration is <strong><?= $this->getCurrentIntegrationName() ?></strong>.</p>
     <div>
       <input type="checkbox" name="activate_current_store" id="activate_current_store" checked disabled />
       <label for="activate_current_store">Add Store to current Integration</label>
     </div>
+    </br>
+    <?php if ($this->getExtendStoreUuid()): ?>
+      <div>
+        <label for="extend_store_id">Extend Store ID</label>
+        <input type="text" value="<?=$this->getExtendStoreUuid()?>" name="extend_store_id" id="extend_store_id" disabled />
+      </div>
+    <?php endif; ?>
 <?php elseif ($status === 3): ?>
     <p>The Extend integration could not be found for the given store. Usually in this case an integration was selected and then deleted. Please
       go to the <a href="<?=$block->getDefaultScopeUrl()?>">Extend Settings</a> page and select a new integration.

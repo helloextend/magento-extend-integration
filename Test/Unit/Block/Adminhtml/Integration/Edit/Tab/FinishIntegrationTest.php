@@ -10,6 +10,7 @@ use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\FinishIntegration;
 use Extend\Integration\Model\Config\Source\Environment;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
+use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\IntegrationException;
@@ -54,6 +55,11 @@ class FinishIntegrationTest extends TestCase
 	 */
 	private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
 
+  /**
+	 * @var ActiveEnvironmentURLBuilder|\PHPUnit\Framework\MockObject\MockObject
+	 */
+  private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
+
    /**
 	 * @var RequestInterface|\PHPUnit\Framework\MockObject\MockObject
 	 */
@@ -69,6 +75,7 @@ class FinishIntegrationTest extends TestCase
 		$this->context = $this->createMock(\Magento\Backend\Block\Template\Context::class);
 		$this->environment = $this->createMock(Environment::class);
 		$this->integrationService = $this->createMock(IntegrationServiceInterface::class);
+    $this->activeEnvironmentURLBuilder = $this->createMock(ActiveEnvironmentURLBuilder::class);
 		$this->accessTokenBuilder = $this->createMock(AccessTokenBuilder::class);
     $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
     $this->storeIntegrationRepository = $this->createMock(StoreIntegrationRepositoryInterface::class);
@@ -84,6 +91,7 @@ class FinishIntegrationTest extends TestCase
 			$this->accessTokenBuilder,
       $this->scopeConfig,
       $this->storeIntegrationRepository,
+      $this->activeEnvironmentURLBuilder,
 			$this->data
 		);
 	}
@@ -146,4 +154,61 @@ class FinishIntegrationTest extends TestCase
     $this->integrationService->method('get')->with($activeIntegration)->will($this->throwException(new IntegrationException(new Phrase('The integration with ID "1" doesn\'t exist.'))));
 		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_SEARCHING_FOR_DELETED_INTEGRATION);
 	}
+
+  public function testGetExtendStoreUuid()
+  {
+    $activeIntegration = 1;
+    $this->request->method('getParam')->willReturn(4);
+    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
+    $storeIntegration = $this->getMockBuilder(\Extend\Integration\Api\Data\StoreIntegrationInterface::class)
+      ->onlyMethods(['getExtendStoreUuid'])
+      ->disableOriginalConstructor()
+      ->getMockForAbstractClass();
+    $this->storeIntegrationRepository->method('getByStoreIdAndIntegrationId')->willReturn($storeIntegration);
+    $storeIntegration->method('getExtendStoreUuid')->willReturn('704aefe0-0d95-4cab-90de-edfbf6f7cb1f');
+    $this->assertEquals($this->finishIntegration->getExtendStoreUuid(), '704aefe0-0d95-4cab-90de-edfbf6f7cb1f');
+  }
+
+  public function testGetExtendStoreUuidWhenThereIsAGeneralException()
+  {
+    $activeIntegration = 1;
+    $this->request->method('getParam')->willReturn(4);
+    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
+    $this->storeIntegrationRepository->method('getByStoreIdAndIntegrationId')->will($this->throwException(new \Exception()));
+    $this->assertEquals($this->finishIntegration->getExtendStoreUuid(), null);
+  }
+
+  public function testIsProdEnvironmentTruthy()
+  {
+    $activeIntegration = 1;
+    $integrationModel = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
+      ->addMethods(['getEndpoint'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $integrationModel
+      ->expects($this->once())
+      ->method('getEndpoint')
+      ->willReturn('https://integ-mage.extend.com');
+    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
+    $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
+    $this->activeEnvironmentURLBuilder->method('getEnvironmentFromURL')->willReturn('prod');
+    $this->assertEquals($this->finishIntegration->isProdEnvironment(), true);
+  }
+
+  public function testIsProdEnvironmentFalsey()
+  {
+    $activeIntegration = 1;
+    $integrationModel = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
+      ->addMethods(['getEndpoint'])
+      ->disableOriginalConstructor()
+      ->getMock();
+    $integrationModel
+      ->expects($this->once())
+      ->method('getEndpoint')
+      ->willReturn('https://integ-mage-stage.extend.com');
+    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
+    $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
+    $this->activeEnvironmentURLBuilder->method('getEnvironmentFromURL')->willReturn('stage');
+    $this->assertEquals($this->finishIntegration->isProdEnvironment(), false);
+  }
 }

@@ -149,7 +149,7 @@ class AdminSystemConfigSaveExtendTest extends TestCase
         'getId' => 1,
       ]);
 
-      $this->request->expects($this->exactly(3))->method('getParam')->willReturn('extend', 'on', '3');
+      $this->request->expects($this->exactly(4))->method('getParam')->willReturn('extend', 'on', null, '3');
       $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
       $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
       $this->storeIntegrationRepository->method('getListByIntegration')->willReturn([1, 3, 5]);
@@ -196,7 +196,7 @@ class AdminSystemConfigSaveExtendTest extends TestCase
         ->method('getWebsiteId')
         ->willReturn('website_id');
 
-      $this->request->expects($this->exactly(3))->method('getParam')->willReturn('extend', 'on', '3');
+      $this->request->expects($this->exactly(4))->method('getParam')->willReturn('extend', 'on', null, '3');
       $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
       $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
       $this->storeIntegrationRepository->method('getListByIntegration')->willReturn([1, 5]);

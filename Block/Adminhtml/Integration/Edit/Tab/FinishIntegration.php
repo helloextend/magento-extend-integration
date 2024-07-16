@@ -11,6 +11,7 @@ use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Extend\Integration\Model\Config\Source\Environment;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
 use Extend\Integration\Service\Api\Integration;
+use Extend\Integration\Service\Api\ActiveEnvironmentURLBuilder;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -43,6 +44,7 @@ class FinishIntegration extends Field
 	private AccessTokenBuilder $accessTokenBuilder;
 	private ScopeConfigInterface $scopeConfig;
 	private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
+  private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
 
 	/**
 	 * Intro constructor
@@ -53,6 +55,7 @@ class FinishIntegration extends Field
    * @param AccessTokenBuilder $accessTokenBuilder
    * @param ScopeConfigInterface $scopeConfig
    * @param StoreIntegrationRepositoryInterface $storeIntegrationRepository
+   * @param ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
 	 * @param array $data
 	 */
 	public function __construct(
@@ -62,6 +65,7 @@ class FinishIntegration extends Field
 		AccessTokenBuilder $accessTokenBuilder,
 		ScopeConfigInterface $scopeConfig,
 		StoreIntegrationRepositoryInterface $storeIntegrationRepository,
+    ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
 		array                       $data = []
 	)
 	{
@@ -72,6 +76,7 @@ class FinishIntegration extends Field
 		$this->accessTokenBuilder = $accessTokenBuilder;
 		$this->scopeConfig = $scopeConfig;
 		$this->storeIntegrationRepository = $storeIntegrationRepository;
+    $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
 	}
 
 	/**
@@ -121,6 +126,21 @@ class FinishIntegration extends Field
 		return self::INACTIVE_INTEGRATION;
 	}
 
+  public function getExtendStoreUuid(): ?string
+  {
+    try {
+      $currentStore = (int) $this->getRequest()->getParam('store');
+      $activeIntegration = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
+      $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId(
+          $currentStore,
+          $activeIntegration
+      );
+      return $storeIntegration->getExtendStoreUuid();
+    } catch (\Exception $exception) {
+      return null;
+    }
+  }
+
   /**
 	 * Builds a URL that will take the user back to the global integration settings page instead of a store specific one
 	 *
@@ -153,6 +173,19 @@ class FinishIntegration extends Field
     $activeIntegration = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
     $integration = $this->integrationService->get($activeIntegration);
 		return $integration->getName();
+	}
+
+   /**
+	 * Fetches the name of the currently selected integration
+	 *
+	 * @return string
+	 */
+  public function isProdEnvironment(): bool
+	{
+    $activeIntegration = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
+    $integration = $this->integrationService->get($activeIntegration);
+    $env = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
+    return $env === 'prod';
 	}
 
   /**

@@ -75,6 +75,8 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
           return;
         }
 
+        $extendStoreId = $request->getParam('extend_store_id');
+
         $currentStore = $request->getParam('store');
         $activeIntegration = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
         $integration = $this->integrationService->get($activeIntegration);
@@ -113,7 +115,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
                 'magentoStoreUuid' => $integrationStore->getStoreUuid(),
                 'magentoStoreId' => $currentStore,
                 'magentoConsumerKey' => $oauthKey,
-                'extendStoreId' => $integrationStore->getExtendStoreUuid(),
+                'extendStoreId' => $extendStoreId ? $extendStoreId : $integrationStore->getExtendStoreUuid(),
                 'storeDomain' => rtrim(
                     str_replace(
                         ['https://', 'http://'],
