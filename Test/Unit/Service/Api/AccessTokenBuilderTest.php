@@ -8,7 +8,7 @@ namespace Extend\Integration\Test\Unit\Service\Api;
 
 use PHPUnit\Framework\TestCase;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use Extend\Integration\Api\Data\ExtendOAuthClientInterface;
+use Extend\Integration\Model\ExtendOAuthClient;
 use Extend\Integration\Api\Data\StoreIntegrationInterface;
 use Extend\Integration\Api\ExtendOAuthClientRepositoryInterface;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
@@ -48,6 +48,9 @@ class AccessTokenBuilderTest extends TestCase
     /** @var string */
     private $accessToken = 'access_token';
 
+    /** @var string */
+    private $encryptedAccessToken = 'encrypted_access_token';
+
     /** @var ExtendOAuthClientRepositoryInterface */
     private $extendOAuthClientRepository;
 
@@ -63,7 +66,7 @@ class AccessTokenBuilderTest extends TestCase
     /** @var EncryptorInterface */
     private $encryptor;
 
-    /** @var ExtendOAuthClientInterface */
+    /** @var ExtendOAuthClient */
     private $extendOAuthClient;
 
     /** @var StoreIntegrationInterface */
@@ -75,9 +78,21 @@ class AccessTokenBuilderTest extends TestCase
     /** @var AccessTokenBuilder */
     private $accessTokenBuilder;
 
+    /** @var array */
+    private $payload;
+
+    /** @var ObjectManager */
+    private $objectManager;
+
+    /** @var \Extend\Integration\Model\ResourceModel\ExtendOAuthClient */
+    private $extendOAuthClientResource;
+
     protected function setUp(): void
     {
-        $this->extendOAuthClient = $this->createStub(ExtendOAuthClientInterface::class);
+        $this->extendOAuthClient = $this->getMockBuilder(ExtendOAuthClient::class)
+            ->onlyMethods(['setExtendAccessToken', 'getExtendClientId', 'getExtendClientSecret', 'getExtendAccessToken'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
 
         $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
             ->onlyMethods(['getExtendClientId', 'getExtendClientSecret'])
@@ -101,9 +116,11 @@ class AccessTokenBuilderTest extends TestCase
             ->with(\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
 
-        $this->extendOAuthClientRepository = $this->createStub(
-            ExtendOAuthClientRepositoryInterface::class
-        );
+        $this->extendOAuthClientRepository = $this->getMockBuilder(ExtendOAuthClientRepositoryInterface::class)
+            ->onlyMethods(['getByIntegrationId'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
 
         $this->storeIntegrationRepository = $this->getMockBuilder(
             StoreIntegrationRepositoryInterface::class
@@ -113,14 +130,9 @@ class AccessTokenBuilderTest extends TestCase
             ->getMockForAbstractClass();
 
         $this->encryptor = $this->getMockBuilder(EncryptorInterface::class)
-            ->onlyMethods(['decrypt'])
+            ->onlyMethods(['decrypt', 'encrypt'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $this->encryptor
-            ->expects($this->any())
-            ->method('decrypt')
-            ->with($this->encryptedClientSecret)
-            ->willReturn($this->decryptedClientSecret);
 
         $this->activeEnvironmentURLBuilder = $this->getMockBuilder(
             ActiveEnvironmentURLBuilder::class
@@ -138,6 +150,10 @@ class AccessTokenBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->extendOAuthClientResource = $this->createStub(
+            \Extend\Integration\Model\ResourceModel\ExtendOAuthClient::class
+        );
+
         $this->objectManager = new ObjectManager($this);
         $this->accessTokenBuilder = $this->objectManager->getObject(AccessTokenBuilder::class, [
             'extendOAuthClientRepository' => $this->extendOAuthClientRepository,
@@ -146,6 +162,7 @@ class AccessTokenBuilderTest extends TestCase
             'curl' => $this->curl,
             'encryptor' => $this->encryptor,
             'activeEnvironmentURLBuilder' => $this->activeEnvironmentURLBuilder,
+            'extendOAuthClientResource' => $this->extendOAuthClientResource,
         ]);
     }
 
@@ -153,10 +170,22 @@ class AccessTokenBuilderTest extends TestCase
     {
         // Mock the ExtendOAuthClientRepository to throw NoSuchEntityException to trigger fallback
         $this->extendOAuthClientRepository
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getByIntegrationId')
             ->with((int) $this->integrationId)
-            ->willThrowException(new NoSuchEntityException());
+            ->willThrowException(new NoSuchEntityException())
+            ->willReturn($this->extendOAuthClient);
+
+        $this->encryptor
+            ->expects($this->once())
+            ->method('decrypt')
+            ->with($this->encryptedClientSecret)
+            ->willReturn($this->decryptedClientSecret);
+        $this->encryptor
+            ->expects($this->once())
+            ->method('encrypt')
+            ->with($this->accessToken)
+            ->willReturn($this->encryptedAccessToken);
 
         $this->storeIntegration
             ->expects($this->once())
@@ -191,6 +220,11 @@ class AccessTokenBuilderTest extends TestCase
                     'access_token' => $this->accessToken,
                 ])
             );
+        $this->extendOAuthClient->expects($this->once())->method('setExtendAccessToken');
+        $this->extendOAuthClientResource
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->extendOAuthClient);
         $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
     }
 
@@ -208,6 +242,7 @@ class AccessTokenBuilderTest extends TestCase
             ->method('getListByIntegration')
             ->with((int) $this->integrationId)
             ->willReturn([]);
+        $this->extendOAuthClient->expects($this->never())->method('setExtendAccessToken');
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
@@ -238,6 +273,7 @@ class AccessTokenBuilderTest extends TestCase
             ->method('getByStoreIdAndIntegrationId')
             ->with((int) $this->integrationId, $this->storeId)
             ->willReturn($this->storeIntegration);
+        $this->extendOAuthClient->expects($this->never())->method('setExtendAccessToken');
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
@@ -277,6 +313,7 @@ class AccessTokenBuilderTest extends TestCase
                     'other_property' => 'value',
                 ])
             );
+        $this->extendOAuthClient->expects($this->never())->method('setExtendAccessToken');
         $this->assertEquals('', $this->accessTokenBuilder->getAccessToken());
     }
 
@@ -285,10 +322,26 @@ class AccessTokenBuilderTest extends TestCase
         // Expect that ExtendOAuthClientRepository is called with the integration ID
         // and returns an ExtendOAuthClient instance
         $this->extendOAuthClientRepository
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getByIntegrationId')
             ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException())
             ->willReturn($this->extendOAuthClient);
+
+        $this->encryptor
+            ->expects($this->once())
+            ->method('decrypt')
+            ->with($this->encryptedClientSecret)
+            ->willReturn($this->decryptedClientSecret);
+        $this->encryptor
+            ->expects($this->once())
+            ->method('encrypt')
+            ->with($this->accessToken)
+            ->willReturn($this->encryptedAccessToken);
+
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('setExtendAccessToken');
 
         // Expect that the ExtendOAuthClient instance is called to get the client_id
         $this->extendOAuthClient
@@ -315,11 +368,163 @@ class AccessTokenBuilderTest extends TestCase
                 ])
             );
 
+        $this->extendOAuthClientResource
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->extendOAuthClient);
+
         // Execute the method under test and assert that the access token is returned
         $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
 
         // Expect that storeIntegrationRepository->getListByIntegration was not called
         $this->storeIntegrationRepository->expects($this->never())->method('getListByIntegration');
+    }
+
+    public function testReturnsExistingAccessTokenFromRecord()
+    {
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+
+
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendAccessToken')
+            ->willReturn($this->encryptedAccessToken);
+
+
+        // Expiry is more than a minute from now
+        $decryptedAccessToken = 'header.'.base64_encode(json_encode(['exp' => time() + 100])).'.footer';
+        $this->encryptor
+            ->expects($this->once())
+            ->method('decrypt')
+            ->with($this->encryptedAccessToken)
+            ->willReturn($decryptedAccessToken);
+
+        // Execute the method under test and assert that the access token is returned
+        $this->assertEquals($decryptedAccessToken, $this->accessTokenBuilder->getAccessToken());
+
+        $this->curl->expects($this->never())->method('post');
+    }
+
+    public function testFetchesNewAccessTokenIfStoredTokenIsWithinOneMinuteOfExpiry()
+    {
+        $this->extendOAuthClientRepository
+            ->expects($this->exactly(2))
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendAccessToken')
+            ->willReturn($this->encryptedAccessToken);
+
+        // Expiry is less than a minute from now
+        $decryptedAccessToken = 'header.'.base64_encode(json_encode(['exp' => time() + 30])).'.footer';
+        $this->encryptor
+            ->expects($this->exactly(2))
+            ->method('decrypt')
+            ->willReturnOnConsecutiveCalls($decryptedAccessToken, $this->decryptedClientSecret);
+        $this->encryptor
+            ->expects($this->once())
+            ->method('encrypt')
+            ->with($this->accessToken)
+            ->willReturn($this->encryptedAccessToken);
+
+        // Expect that a POST request is made to the token exchange endpoint
+        $this->curl->expects($this->once())->method('post');
+
+        // Mock a successful responds from the token exchange endpoint
+        $this->curl
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(
+                json_encode([
+                    'access_token' => $this->accessToken,
+                ])
+            );
+
+        $this->extendOAuthClient->expects($this->once())->method('setExtendAccessToken');
+        $this->extendOAuthClientResource
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->extendOAuthClient);
+
+        $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
+    }
+
+    public function testFetchesNewAccessTokenIfStoredTokenIsPassedExpiry()
+    {
+        $this->extendOAuthClientRepository
+            ->expects($this->exactly(2))
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendAccessToken')
+            ->willReturn($this->encryptedAccessToken);
+
+        // Expiry is one minute ago
+        $decryptedAccessToken = 'header.'.base64_encode(json_encode(['exp' => time() - 60])).'.footer';
+        $this->encryptor
+            ->expects($this->exactly(2))
+            ->method('decrypt')
+            ->willReturnOnConsecutiveCalls($decryptedAccessToken, $this->decryptedClientSecret);
+        $this->encryptor
+            ->expects($this->once())
+            ->method('encrypt')
+            ->with($this->accessToken)
+            ->willReturn($this->encryptedAccessToken);
+
+        // Expect that a POST request is made to the token exchange endpoint
+        $this->curl->expects($this->once())->method('post');
+
+        // Mock a successful responds from the token exchange endpoint
+        $this->curl
+            ->expects($this->once())
+            ->method('getBody')
+            ->willReturn(
+                json_encode([
+                    'access_token' => $this->accessToken,
+                ])
+            );
+
+        $this->extendOAuthClient->expects($this->once())->method('setExtendAccessToken');
+        $this->extendOAuthClientResource
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->extendOAuthClient);
+
+        $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
     }
 
 	public function testGetExtendOAuthClientDataWithNoIntegrationIdProvided()
@@ -341,7 +546,7 @@ class AccessTokenBuilderTest extends TestCase
 			->method('getExtendClientSecret')
 			->willReturn($this->encryptedClientSecret);
 
-		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData(), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret]);
+		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData(), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
 	}
 
 	public function testGetExtendOAuthClientDataWithIntegrationIdProvided()
@@ -363,7 +568,7 @@ class AccessTokenBuilderTest extends TestCase
 			->method('getExtendClientSecret')
 			->willReturn($this->encryptedClientSecret);
 
-		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret]);
+		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
 	}
 
 	public function testGetExtendOAuthClientDataWithIntegrationIdProvidedAndNoExtendOauth()

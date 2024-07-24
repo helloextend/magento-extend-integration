@@ -44,6 +44,7 @@
         <column xsi:type="int" name="integration_id" unsigned="true" nullable="false" identity="false" comment="Magento Integration ID"/>
         <column xsi:type="varchar" name="client_id" nullable="false" comment="Extend OAuth Client ID"/>
         <column xsi:type="text" name="client_secret" nullable="false" comment="Extend OAuth Client Secret"/>
+        <column xsi:type="text" name="access_token" nullable="true" comment="Extend Access Token"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="extend_integration_oauth_client_id"/>
         </constraint>

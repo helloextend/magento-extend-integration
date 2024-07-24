@@ -6,11 +6,13 @@
 
 namespace Extend\Integration\Service\Api;
 
+use Exception;
 use Extend\Integration\Api\ExtendOAuthClientRepositoryInterface;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\HTTP\Client\Curl;
+use Extend\Integration\Model\ResourceModel\ExtendOAuthClient as ExtendOAuthClientResource;
 
 class AccessTokenBuilder
 {
@@ -48,6 +50,9 @@ class AccessTokenBuilder
      */
     private $activeEnvironmentURLBuilder;
 
+    /** @var ExtendOAuthClientResource */
+    private $extendOAuthClientResource;
+
     /**
      * AccessTokenBuilder constructor
      *
@@ -57,6 +62,7 @@ class AccessTokenBuilder
      * @param Curl $curl
      * @param EncryptorInterface $encryptor
      * @param ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
+     * @param ExtendOAuthClientResource $extendOAuthClientResource
      */
     public function __construct(
         ExtendOAuthClientRepositoryInterface $extendOAuthClientRepository,
@@ -64,7 +70,8 @@ class AccessTokenBuilder
         ScopeConfigInterface $scopeConfig,
         Curl $curl,
         EncryptorInterface $encryptor,
-        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
+        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
+        ExtendOAuthClientResource $extendOAuthClientResource
     ) {
         $this->extendOAuthClientRepository = $extendOAuthClientRepository;
         $this->storeIntegrationRepository = $storeIntegrationRepository;
@@ -72,6 +79,7 @@ class AccessTokenBuilder
         $this->curl = $curl;
         $this->encryptor = $encryptor;
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
+        $this->extendOAuthClientResource = $extendOAuthClientResource;
     }
     /**
      * Get an Extend access token to make API calls to the Extend Magento service
@@ -81,6 +89,17 @@ class AccessTokenBuilder
     public function getAccessToken(): string
     {
         $clientData = $this->getExtendOAuthClientData();
+
+        // Check token already exists for OAuth client
+        if (isset($clientData['accessToken']) && $clientData['accessToken']) {
+          $decryptedAccessToken = $this->encryptor->decrypt($clientData['accessToken']);
+          $jwtPayload = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $decryptedAccessToken)[1]))), true);
+
+          // Compare expiry (minus a minute to account for any latency) to current time
+          if ($jwtPayload && isset($jwtPayload['exp']) && ($jwtPayload['exp'] - 60) > time()) {
+            return $decryptedAccessToken;
+          }
+        }
 
         $extendClientId = $clientData['clientId'];
         $extendClientSecret = $clientData['clientSecret'];
@@ -106,6 +125,7 @@ class AccessTokenBuilder
             $response = $this->curl->getBody();
             $data = json_decode($response, true);
             if (isset($data['access_token'])) {
+                $this->saveAccessToken($this->encryptor->encrypt($data['access_token']));
                 return $data['access_token'];
             }
         }
@@ -118,17 +138,17 @@ class AccessTokenBuilder
 	 *
 	 * @param int|null $integrationId
 	 *
-	 * @return array{clientId: string|null, clientSecret: string|null}
+	 * @return array{clientId: string|null, clientSecret: string|null, accessToken: string|null}
 	 */
     public function getExtendOAuthClientData(int $integrationId = null): array
     {
 
-		if (!$integrationId) {
-			// Get the integration ID from the configuration
-			$integrationId = (int)$this->scopeConfig->getValue(
-				\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG
-			);
-		}
+        if (!$integrationId) {
+          // Get the integration ID from the configuration
+          $integrationId = (int)$this->scopeConfig->getValue(
+            \Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG
+          );
+        }
 
         // First try to get the client_id and client_secret from the ExtendOAuthClient table.
         $clientDataFromExtendOAuthClient = $this->getClientDataFromExtendOAuthClient($integrationId);
@@ -146,7 +166,7 @@ class AccessTokenBuilder
      * Get the Extend OAuth client data from the ExtendOAuthClient table
      *
      * @param integer $integrationId
-     * @return array{clientId: string|null, clientSecret: string|null}
+     * @return array{clientId: string|null, clientSecret: string|null, accessToken: string|null}
      */
     private function getClientDataFromExtendOAuthClient(int $integrationId): array
     {
@@ -162,7 +182,8 @@ class AccessTokenBuilder
 
         return [
             'clientId' => $extendOAuthClient->getExtendClientId(),
-            'clientSecret' => $extendOAuthClient->getExtendClientSecret()
+            'clientSecret' => $extendOAuthClient->getExtendClientSecret(),
+            'accessToken' => $extendOAuthClient->getExtendAccessToken(),
         ];
     }
 
@@ -198,5 +219,28 @@ class AccessTokenBuilder
             'clientId' => null,
             'clientSecret' => null
         ];
+    }
+
+    /**
+     * Save the access token to the ExtendOAuthClient table
+     *
+     * @param string $accessToken
+     * @return void
+     */
+     private function saveAccessToken(string $accessToken): void
+    {
+        $integrationId = (int)$this->scopeConfig->getValue(
+            \Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG
+        );
+
+        try {
+          $extendOAuthClient = $this->extendOAuthClientRepository->getByIntegrationId($integrationId);
+          $extendOAuthClient->setExtendAccessToken($accessToken);
+          $this->extendOAuthClientResource->save($extendOAuthClient);
+        } catch (Exception $exception) {
+          // Quietly return if the integration ID is not found in the ExtendOAuthClient table
+          // or if there is an issue saving the access token since it will be re-retrieved on the next request anyways if needed
+          return;
+        }
     }
 }

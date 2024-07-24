@@ -55,6 +55,17 @@ class ExtendOAuthClient extends AbstractModel implements ExtendOAuthClientInterf
     }
 
     /**
+     * Set Extend access token
+     *
+     * @param string $extendAccessToken
+     * @return void
+     */
+    public function setExtendAccessToken(string $extendAccessToken): void
+    {
+        $this->setData(self::EXTEND_ACCESS_TOKEN, $extendAccessToken);
+    }
+
+    /**
      * Get Integration ID
      *
      * @return int|null
@@ -82,5 +93,15 @@ class ExtendOAuthClient extends AbstractModel implements ExtendOAuthClientInterf
     public function getExtendClientSecret(): ?string
     {
         return $this->getData(self::EXTEND_CLIENT_SECRET);
+    }
+
+    /**
+     * Get Extend access token
+     *
+     * @return string|null
+     */
+    public function getExtendAccessToken(): ?string
+    {
+        return $this->getData(self::EXTEND_ACCESS_TOKEN);
     }
 }

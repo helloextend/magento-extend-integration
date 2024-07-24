@@ -14,6 +14,7 @@ interface ExtendOAuthClientInterface
     public const INTEGRATION_ID = 'integration_id';
     public const EXTEND_CLIENT_ID = 'client_id';
     public const EXTEND_CLIENT_SECRET = 'client_secret';
+    public const EXTEND_ACCESS_TOKEN = 'access_token';
 
     /**
      * Set integration ID
@@ -40,6 +41,14 @@ interface ExtendOAuthClientInterface
     public function setExtendClientSecret(string $extendClientSecret): void;
 
     /**
+     * Set Extend Access Token
+     *
+     * @param string $extendAccessToken
+     * @return void
+     */
+    public function setExtendAccessToken(string $extendAccessToken): void;
+
+    /**
      * Get integration ID
      *
      * @return int|null
@@ -59,4 +68,11 @@ interface ExtendOAuthClientInterface
      * @return string|null
      */
     public function getExtendClientSecret(): ?string;
+
+    /**
+     * Get Extend Access Token
+     *
+     * @return string|null
+     */
+    public function getExtendAccessToken(): ?string;
 }
