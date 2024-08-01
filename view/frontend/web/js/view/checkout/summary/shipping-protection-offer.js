@@ -21,6 +21,7 @@ define([
   ExtendMagento,
 ) {
   'use strict'
+
   return Component.extend({
     defaults: {
       template: 'Extend_Integration/checkout/summary/shipping-protection-offer',
@@ -38,8 +39,8 @@ define([
     },
     renderSP: function () {
       try {
-        const items = ExtendMagento.formatCartItemsForSp(
-          customerData.get('cart')().items,
+        const items = ExtendMagento.formatQuoteItemsForSp(
+          magentoQuote.getItems(),
         )
         const totals = magentoQuote.getTotals()
 
@@ -121,8 +122,12 @@ define([
         })
 
         // Update SP on cart changes
-        customerData.get('cart').subscribe(function (cart) {
-          const items = ExtendMagento.formatCartItemsForSp(cart.items)
+        // Even though we're using quoteItems now, which have discount information, the best event to subscribe
+        // to still appears to be the cart.
+        customerData.get('cart').subscribe(function () {
+          const items = ExtendMagento.formatQuoteItemsForSp(
+            magentoQuote.getItems(),
+          )
           const totals = magentoQuote.getTotals()
           const isShippingProtectionInCart =
             ExtendMagento.isShippingProtectionInOrder(totals())
