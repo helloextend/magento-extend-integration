@@ -81,24 +81,25 @@ class AccessTokenBuilder
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
         $this->extendOAuthClientResource = $extendOAuthClientResource;
     }
+
     /**
      * Get an Extend access token to make API calls to the Extend Magento service
      *
      * @return string
      */
-    public function getAccessToken(): string
+    public function getAccessToken(int $expOffset = 60): string
     {
         $clientData = $this->getExtendOAuthClientData();
 
         // Check token already exists for OAuth client
         if (isset($clientData['accessToken']) && $clientData['accessToken']) {
-          $decryptedAccessToken = $this->encryptor->decrypt($clientData['accessToken']);
-          $jwtPayload = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $decryptedAccessToken)[1]))), true);
+            $decryptedAccessToken = $this->encryptor->decrypt($clientData['accessToken']);
+            $jwtPayload = json_decode(base64_decode(str_replace('_', '/', str_replace('-','+',explode('.', $decryptedAccessToken)[1]))), true);
 
-          // Compare expiry (minus a minute to account for any latency) to current time
-          if ($jwtPayload && isset($jwtPayload['exp']) && ($jwtPayload['exp'] - 60) > time()) {
-            return $decryptedAccessToken;
-          }
+            // Compare expiry (default: minus a minute to account for any latency) to current time
+            if ($jwtPayload && isset($jwtPayload['exp']) && ($jwtPayload['exp'] - $expOffset) > time()) {
+              return $decryptedAccessToken;
+            }
         }
 
         $extendClientId = $clientData['clientId'];
