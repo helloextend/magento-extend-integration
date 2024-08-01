@@ -23,6 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
+use Magento\Framework\Registry;
 
 class InvoiceSaveAfterTest extends TestCase
 {
@@ -97,6 +98,11 @@ class InvoiceSaveAfterTest extends TestCase
     private $orderObserverHandler;
 
     /**
+     * @var Registry|MockObject
+     */
+    private $registry;
+
+    /**
      * @var InvoiceSaveAfter
      */
     private $import;
@@ -138,6 +144,7 @@ class InvoiceSaveAfterTest extends TestCase
         $this->invoiceExtensionFactory = $this->createMock(InvoiceExtensionFactory::class);
         $this->shippingProtectionTotalRepository = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
         $this->orderObserverHandler = $this->createMock(OrderObserverHandler::class);
+        $this->registry = $this->createMock(Registry::class);
         $this->import = new InvoiceSaveAfter(
             $this->logger,
             $this->extendService,
@@ -145,7 +152,8 @@ class InvoiceSaveAfterTest extends TestCase
             $this->storeManager,
             $this->invoiceExtensionFactory,
             $this->shippingProtectionTotalRepository,
-            $this->orderObserverHandler
+            $this->orderObserverHandler,
+            $this->registry
         );
     }
 

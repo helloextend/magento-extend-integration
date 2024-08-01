@@ -15,6 +15,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Registry;
 
 class InvoiceSaveAfter extends BaseExtendObserver
 {
@@ -34,6 +35,11 @@ class InvoiceSaveAfter extends BaseExtendObserver
     private $orderObserverHandler;
 
     /**
+     * @var Registry
+     */
+    private Registry $registry;
+
+    /**
      * @param LoggerInterface $logger
      * @param ExtendService $extendService
      * @param Integration $extendIntegrationService
@@ -41,6 +47,7 @@ class InvoiceSaveAfter extends BaseExtendObserver
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
      * @param ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository
      * @param OrderObserverHandler $orderObserverHandler
+     * @param Registry $registry
      */
     public function __construct(
         LoggerInterface $logger,
@@ -49,12 +56,14 @@ class InvoiceSaveAfter extends BaseExtendObserver
         StoreManagerInterface $storeManager,
         InvoiceExtensionFactory $invoiceExtensionFactory,
         ShippingProtectionTotalRepositoryInterface $shippingProtectionTotalRepository,
-        OrderObserverHandler $orderObserverHandler
+        OrderObserverHandler $orderObserverHandler,
+        Registry $registry
     ) {
         parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->shippingProtectionTotalRepository = $shippingProtectionTotalRepository;
         $this->orderObserverHandler = $orderObserverHandler;
+        $this->registry = $registry;
     }
 
     /**
@@ -63,6 +72,9 @@ class InvoiceSaveAfter extends BaseExtendObserver
      */
     protected function _execute(Observer $observer)
     {
+        // Flag that other observers can reference to avoid making a duplicate webhook call
+        $this->registry->register('extend.invoice.created', true);
+
         $invoice = $observer->getInvoice();
 
         $extensionAttributes = $invoice->getExtensionAttributes();

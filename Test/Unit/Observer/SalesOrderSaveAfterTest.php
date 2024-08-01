@@ -18,6 +18,7 @@ use Magento\Framework\Event\Observer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Magento\Framework\Registry;
 use Exception;
 
 class SalesOrderSaveAfterTest extends TestCase
@@ -78,6 +79,11 @@ class SalesOrderSaveAfterTest extends TestCase
     private $orderObserverHandler;
 
     /**
+     * @var Registry|MockObject
+     */
+    private $registry;
+
+    /**
      * @var SalesOrderSaveAfter
      */
     private $import;
@@ -103,13 +109,32 @@ class SalesOrderSaveAfterTest extends TestCase
             'getStore' => $this->store
         ]);
         $this->orderObserverHandler = $this->createMock(OrderObserverHandler::class);
+        $this->registry = $this->createMock(Registry::class);
         $this->import = new SalesOrderSaveAfter(
             $this->logger,
             $this->extendService,
             $this->integration,
             $this->storeManager,
-            $this->orderObserverHandler
+            $this->orderObserverHandler,
+            $this->registry
         );
+    }
+
+    public function testReturnsEarlyIfInvoiceHasBeenCreated()
+    {
+        $this->extendService
+            ->expects($this->once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->registry
+            ->expects($this->once())
+            ->method('registry')
+            ->with('extend.invoice.created')
+            ->willReturn(true);
+        $this->orderObserverHandler
+            ->expects($this->never())
+            ->method('execute');
+        $this->import->execute($this->observer);
     }
 
     public function testSkipsExecutionWhenExtendIsEnabledAndOrderIsBeingCreated()
