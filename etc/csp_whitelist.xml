@@ -25,6 +25,7 @@
                 <value id="extend-demo-images" type="host">shipping-offers-static-images-bucket-demo.s3.amazonaws.com</value>
                 <value id="extend-static-assets" type="host">helloextend-static-assets.s3.amazonaws.com</value>
                 <value id="fallback-image" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/learnMoreModal-default-1654273334107-learnMoreModal.backgroundImageUrl_Generic_WomanwithBox2.jpg</value>
+                <value id="sp-offer-extend-logo" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/shippingProtectionCartOffer-default-1720746621507-extend_svg_cart.svg</value>
             </values>
         </policy>
     </policies>
