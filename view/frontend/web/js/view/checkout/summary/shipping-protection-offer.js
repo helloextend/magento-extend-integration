@@ -27,12 +27,15 @@ define([
       template: 'Extend_Integration/checkout/summary/shipping-protection-offer',
     },
     shouldRenderSP: function () {
+      const shippingMethod = magentoQuote.shippingMethod()
       if (
         window.ExtendConfig &&
         window.ExtendConfig.environment &&
         window.ExtendConfig.storeId &&
         window.checkoutConfig.extendEnable === '1' &&
-        window.ExtendConfig.isCurrencySupported
+        window.ExtendConfig.isCurrencySupported &&
+        (!shippingMethod ||
+          (shippingMethod && shippingMethod.method_code !== 'pickup'))
       )
         return true
       return false
@@ -119,6 +122,29 @@ define([
           storeId: window.ExtendConfig.storeId,
           environment: window.ExtendConfig.environment,
           currency: window.ExtendConfig.currencyCode,
+        })
+
+        magentoQuote.shippingMethod.subscribe(function (shippingMethod) {
+          if (shippingMethod.method_code === 'pickup') {
+            // If we don't destroy the instance then the next time we reload the _instance property will
+            // short-circuit the render and no offer will appear. This happens if you select in-store pickup
+            // after the offer initially renders and then change back to a shipping option.
+            Extend.shippingProtection.destroy()
+
+            const totals = magentoQuote.getTotals()
+            if (ExtendMagento.isShippingProtectionInOrder(totals())) {
+              ExtendMagento.removeSpPlanFromOrder({
+                callback: function (err, _resp) {
+                  if (err) {
+                    return
+                  }
+
+                  // getTotalsAction updates the `total_segments` returned in totals().
+                  getTotalsAction([])
+                },
+              })
+            }
+          }
         })
 
         // Update SP on cart changes
