@@ -19,4 +19,7 @@
         </arguments>
         <plugin name="extend_currency_switch" type="Extend\Integration\Plugin\Directory\Controller\Currency\SwitchAction" sortOrder="1"/>
     </type>
+    <type name="Magento\Framework\RequireJs\Config\File\Collector\Aggregated">
+        <plugin name="requirejsConfigPlugin" type="Extend\Integration\Plugin\RequireJs\AfterGetFilesPlugin" sortOrder="100"/>
+    </type>
 </config>

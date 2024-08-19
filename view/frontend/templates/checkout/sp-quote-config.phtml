@@ -5,24 +5,31 @@
  */
 
 /** @var Magento\Framework\View\Element\Template $block */
+/** @var Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid $viewModel */
+
+$viewModel = $block->getData('viewModel');
 
 $environment = $block->getData('viewModel')->getActiveEnvironment();
 $storeId = $block->getData('viewModel')->getExtendStoreUuid();
 $currencyCode = $block->getData('viewModel')->getCurrencyCode();
 $isCurrencySupported = $block->getData('viewModel')->isCurrencySupported();
+
+$shouldRender = $viewModel->isExtendShippingProtectionEnabled();
 ?>
 
-<script type="text/x-magento-init">
-{
-  "*": {
-    "spQuoteConfig": [
-      {
-        "environment": "<?= $environment ?>",
-        "storeId": "<?= $storeId ?>",
-        "currencyCode": "<?= $currencyCode ?>",
-        "isCurrencySupported": <?= json_encode($isCurrencySupported) ?>
+<?php if ($shouldRender): ?>
+    <script type="text/x-magento-init">
+    {
+      "*": {
+        "spQuoteConfig": [
+          {
+            "environment": "<?= $environment ?>",
+            "storeId": "<?= $storeId ?>",
+            "currencyCode": "<?= $currencyCode ?>",
+            "isCurrencySupported": <?= json_encode($isCurrencySupported) ?>
+          }
+        ]
       }
-    ]
-  }
-}
-</script>
+    }
+    </script>
+<?php endif; ?>

@@ -129,6 +129,16 @@ class EnvironmentAndExtendStoreUuid implements
     }
 
     /**
+     * Determine if Extend Product Protection is currently enabled
+     *
+     * @return bool
+     */
+    public function isExtendShippingProtectionEnabled(): bool
+    {
+        return $this->getScopedConfigValue(Extend::ENABLE_SHIPPING_PROTECTION) === '1';
+    }
+
+    /**
      * Determine if Extend Cart Balancing is currently enabled
      *
      * @return bool
