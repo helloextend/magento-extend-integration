@@ -23,7 +23,7 @@ class AfterGetFilesPlugin
      * @param ExtendService $extendService
      */
     public function __construct(
-        ExtendService $extendService,
+        ExtendService $extendService
     ) {
         $this->extendService = $extendService;
     }
