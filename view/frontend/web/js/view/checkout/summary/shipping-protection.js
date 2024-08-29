@@ -11,6 +11,9 @@ define([
 ], function ($, Component, quote, totals) {
   'use strict'
   return Component.extend({
+    defaults: {
+      template: 'Extend_Integration/checkout/summary/shipping-protection',
+    },
     totals: quote.getTotals(),
     isDisplayed: function () {
       return this.getValue() !== null

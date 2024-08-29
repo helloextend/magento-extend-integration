@@ -22,4 +22,7 @@
     <type name="Magento\Framework\RequireJs\Config\File\Collector\Aggregated">
         <plugin name="requirejsConfigPlugin" type="Extend\Integration\Plugin\RequireJs\AfterGetFilesPlugin" sortOrder="100"/>
     </type>
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="shippingProtectionCheckoutPlugin" type="Extend\Integration\Plugin\Checkout\LayoutProcessorPlugin" sortOrder="101"/>
+    </type>
 </config>

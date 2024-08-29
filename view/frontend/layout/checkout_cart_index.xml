@@ -5,16 +5,12 @@
   -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="checkout.cart.totals">
-            <arguments>
-                <argument name="jsLayout" xsi:type="array">
-                    <item name="components" xsi:type="array">
-                        <item name="shipping-protection" xsi:type="array">
-                            <item name="component" xsi:type="string">Extend_Integration/js/view/cart/shipping-protection</item>
-                        </item>
-                    </item>
-                </argument>
-            </arguments>
-        </referenceBlock>
+        <referenceContainer name="checkout.cart.totals.container">
+            <block name="extend.checkout.cart.totals.shipping.protection" template="Extend_Integration::checkout/cart/totals/shipping-protection.phtml" ifconfig="extend/integration/enable">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>
