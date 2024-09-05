@@ -31,8 +31,14 @@ class AfterGetFilesPlugin
         Aggregated $subject,
         $result
     ) {
-        // if the default Extend isEnabled boolean config value is false, remove the Extend files from the requirejs config
-        if (!$this->extendService->isEnabled()) {
+        // if the default Extend isEnabled boolean config value is false, or if both PP and SP
+        // are disabled for the given store context, remove the Extend files from the requirejs config.
+        if (!$this->extendService->isEnabled() ||
+            (
+                !$this->extendService->isProductProtectionEnabled() &&
+                !$this->extendService->isShippingProtectionEnabled()
+            )
+        ) {
             foreach ($result as $key => &$file) {
                 if ($file->getModule() == "Extend_Integration") {
                     unset($result[$key]);

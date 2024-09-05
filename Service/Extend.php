@@ -7,6 +7,8 @@
 namespace Extend\Integration\Service;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class Extend
 {
@@ -69,15 +71,21 @@ class Extend
     /** @var ScopeConfigInterface */
     private $scopeConfig;
 
+    /** @var StoreManagerInterface */
+    private $storeManager;
+
     /**
      * Extend constructor
      *
      * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager,
     ) {
         $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -92,12 +100,43 @@ class Extend
     }
 
     /**
-     * Check if Extend module is enabled
+     * Check if Extend module is enabled. No need to use any scope for this value, as it is only settable at the global
+     * level.
      *
      * @return boolean
      */
     public function isEnabled(): bool
     {
         return (bool)$this->scopeConfig->getValue(self::ENABLE_EXTEND);
+    }
+
+    /**
+     * Check if product protection is enabled. We need to retrieve this value using the store scope
+     * because this config value can be set at the store view level.
+     *
+     * @return boolean
+     */
+    public function isProductProtectionEnabled(): bool
+    {
+        return $this->isEnabled() && (bool)$this->scopeConfig->getValue(
+            self::ENABLE_PRODUCT_PROTECTION,
+            ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
+    }
+
+    /**
+     * Check if product protection is enabled. We need to retrieve this value using the store scope
+     * because this config value can be set at the store view level.
+     *
+     * @return boolean
+     */
+    public function isShippingProtectionEnabled(): bool
+    {
+        return $this->isEnabled() && (bool)$this->scopeConfig->getValue(
+            self::ENABLE_SHIPPING_PROTECTION,
+            ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
     }
 }

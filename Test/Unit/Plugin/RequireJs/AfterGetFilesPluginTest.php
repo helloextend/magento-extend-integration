@@ -73,15 +73,44 @@ class AfterGetFilesPluginTest extends TestCase
   /* =================================================================================================== */
 
 
-    public function testDoesNotFilterOutExtendFilesWhenExtendIsEnabled()
+    public function testDoesNotFilterOutExtendFilesWhenOnlyPpIsEnabled()
     {
         $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isProductProtectionEnabled')->willReturn(false);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(true);
         $this->expectUnfilteredFiles();
     }
 
-    public function testFiltersOutExtendFilesWhenExtendIsDisabled()
+    public function testDoesNotFilterOutExtendFilesWhenOnlySpIsEnabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isProductProtectionEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(false);
+        $this->expectUnfilteredFiles();
+    }
+
+    public function testDoesNotFilterOutExtendFilesWhenOnlyBothSpAndPpAreEnabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isProductProtectionEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(true);
+        $this->expectUnfilteredFiles();
+    }
+
+    public function testFiltersOutExtendFilesWhenSpAndPpAreDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isProductProtectionEnabled')->willReturn(false);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(false);
+        // expect the extend module file to be removed
+        $this->expectFilteredFiles();
+    }
+
+    public function testFiltersOutExtendFilesWhenExtendIsGloballyDisabledRegardlessOfOtherConfigValues()
     {
         $this->extendServiceMock->method('isEnabled')->willReturn(false);
+        $this->extendServiceMock->method('isProductProtectionEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(true);
         // expect the extend module file to be removed
         $this->expectFilteredFiles();
     }

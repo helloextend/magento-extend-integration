@@ -36,7 +36,7 @@ class LayoutProcessorPlugin
         LayoutProcessorInterface $subject,
         array $jsLayout
     ) {
-        if ($this->extendService->isEnabled()) {
+        if ($this->extendService->isShippingProtectionEnabled()) {
             // Add the SP offer to the shipping address layout
             $this->addShippingProtectionOfferToShippingAddressLayout($jsLayout);
             // Add the SP summary line to the sidebar layout

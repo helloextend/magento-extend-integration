@@ -52,7 +52,7 @@
             <resource>Magento_Catalog::config_catalog</resource>
             <group id="shipping_protection" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Shipping Protection</label>
-                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" canRestore="1">
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Shipping Protection</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <frontend_model>Extend\Integration\Model\Config\Frontend\EnableShippingProtection</frontend_model>

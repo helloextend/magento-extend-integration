@@ -71,16 +71,16 @@ class LayoutProcessorPluginTest extends TestCase
         $this->sidebarTotalsLayout = &$this->jsLayoutMock['components']['checkout']['children']['sidebar']['children']['summary']['children']['totals']['children'];
     }
 
-    public function testAddsShippingProtectionLayoutsWhenExtendIsEnabled()
+    public function testAddsShippingProtectionLayoutsWhenExtendShippingProtectionIsEnabled()
     {
-        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(true);
         $this->testSubject->afterProcess($this->layoutProcessorSubjectMock, $this->jsLayoutMock);
         $this->expectShippingProtectionComponentsToBeAddedToJSLayout();
     }
 
-    public function testDoesNothingWhenExtendIsDisabled()
+    public function testDoesNothingWhenExtendShippingProtectionIsDisabled()
     {
-        $this->extendServiceMock->method('isEnabled')->willReturn(false);
+        $this->extendServiceMock->method('isShippingProtectionEnabled')->willReturn(false);
         $this->testSubject->afterProcess($this->layoutProcessorSubjectMock, $this->jsLayoutMock);
         $this->expectJsLayoutNotToBeChanged();
     }
