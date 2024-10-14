@@ -1,0 +1,126 @@
+<div id="extend-integration-status">
+  <!-- Alert will initialize in a hidden state until needed -->
+  <div id="extend-alert-container" class="extend-alert extend-hidden">
+    <div id="extend-alert-body" class="extend-alert-body">
+      <!-- Use JS to inject specific messaging -->
+    </div>
+  </div>
+  <div
+    id="extend-activation-info-container"
+    class="extend-hidden extend-timeline"
+  >
+    <div
+      id="extend-timeline-item-activation_required"
+      class="extend-timeline-item"
+    >
+      <div class="extend-timeline-item-label">Activate Integration</div>
+      <div class="extend-timeline-item-body">
+        The Extend integration requires activation to continue.
+        <ul>
+          <li>
+            Go to
+            <a href="<?= /* @noEscape */ $this->getIntegrationUrl(); ?>"
+              >integration settings</a
+            >.
+          </li>
+          <li>
+            Click on Authorize/Activate for
+            <strong id="extend-integration-title">Extend Integration</strong>.
+          </li>
+          <li>
+            A new window should pop up prompting you to log into the Extend
+            Merchant Portal with your credentials.
+            <p>
+              <small>
+                <strong>
+                  <em
+                    >Hint: If you do not see the login window, please check that
+                    an ad-blocker is not preventing the login from showing.</em
+                  >
+                </strong>
+              </small>
+            </p>
+          </li>
+          <li>
+            After logging into the Extend Merchant Portal, come back to this
+            page and refresh. It may take a few seconds for the activation to
+            complete.
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div
+      id="extend-timeline-item-identity_link_required"
+      class="extend-timeline-item"
+    >
+      <div class="extend-timeline-item-label">Sync with Extend Account</div>
+      <div class="extend-timeline-item-body">
+        <div id="extend-identity-link-container">
+          <p>
+            To complete activation, you need to connect Magento to your Extend
+            account. Click the button below to open the Extend Merchant Portal
+            and complete the connection.
+          </p>
+          <p>
+            <strong>
+              <small>
+                <em
+                  >Hint: If you do not see the login window, please check that
+                  an ad-blocker is not preventing the login from showing.</em
+                >
+              </small>
+            </strong>
+          </p>
+          <button
+            id="extend-identity-link"
+            class="action-primary"
+            type="button"
+          >
+            Connect
+          </button>
+        </div>
+        <div
+          id="extend-connect-spinner"
+          class="extend-hidden extend-loading-container"
+        >
+          <div class="extend-spinner"></div>
+          <div class="extend-loading-body">
+            This may take a moment. The page will automatically refresh to
+            verify connection is complete, or you can
+            <a id="extend-identity-link-retry" href="" target="_blank"
+              >try again</a
+            >.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="extend-timeline-item-complete" class="extend-timeline-item">
+      <div class="extend-timeline-item-label">Integration Complete</div>
+      <div class="extend-timeline-item-body">
+        This integration is complete! Navigate to a specific store view to make
+        integration modifications for that store.
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php if($integrations = $this->getIntegrations()): ?>
+  <script type="text/x-magento-init">
+    {
+      "#extend-integration-status": {
+        "activationStatus": [
+          <?php foreach ($integrations as $key => $integration): ?>
+            {
+              "currentStep": "<?=$integration['current_step']?>",
+              "identityLinkUrl": "<?=$integration['identity_link_url']?>",
+              "integrationId": "<?=$integration['integration_id']?>",
+              "integrationName": "<?=$integration['integration_name']?>",
+              "oauthActivatedAt": "<?=$integration['oauth_activated_at']?>",
+              "prevActivationFailed": "<?=$integration['prev_activation_failed']?>"
+            }<?= array_key_last($integrations) === $key ? '' : ',' ?>
+          <?php endforeach; ?>
+        ]
+      }
+    }
+  </script>
+<?php endif; ?>

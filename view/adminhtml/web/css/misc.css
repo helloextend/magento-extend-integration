@@ -1,0 +1,4 @@
+/* This should be last to avoid cascade issues */
+.extend-hidden {
+  display: none;
+}

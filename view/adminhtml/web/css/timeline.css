@@ -1,0 +1,121 @@
+/**
+  * Extend Timeline Component
+  * @see https://ui.dev.extend.com/?path=/docs/customers-timeline--default
+  */
+
+.extend-timeline {
+  display: grid;
+  gap: 4px;
+  container-type: inline-size;
+}
+
+.extend-timeline-item {
+  position: relative;
+  display: grid;
+  gap: 4px 8px;
+  grid-template-columns: [timeline-start] min-content [timeline-end content-start] 1fr [content-end];
+  grid-template-rows: [top-start] min-content [top-end bottom-start] 1fr [bottom-end];
+  padding-bottom: 16px;
+}
+
+.extend-timeline-item::before {
+  content: '';
+  grid-column: timeline;
+  grid-row: top;
+  width: 12px;
+  height: 12px;
+  margin-block: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: #3e64ff;
+  background-clip: padding-box;
+}
+
+.extend-timeline-item::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 0.5px);
+  top: 28px;
+  bottom: 0;
+  grid-column: timeline;
+  grid-row: top / end;
+  width: 1px;
+  background: #3e64ff;
+}
+
+.extend-timeline-item:last-child::after {
+  display: none;
+}
+
+.extend-timeline-item-label {
+  line-height: 24px;
+  grid-column: content;
+}
+
+.extend-timeline-item-body {
+  grid-column: content;
+}
+
+.extend-timeline-item-body > ul {
+  padding-left: 20px;
+}
+
+.extend-timeline-item-body > ul > li {
+  margin: 8px auto;
+}
+
+.extend-timeline-item-body .action-primary {
+  border-radius: 4px;
+  background: rgb(0, 51, 204);
+  border-color: rgb(0, 51, 204);
+}
+
+.extend-timeline-item-body .action-primary:hover {
+  background: rgb(16, 31, 124);
+  border-color: rgb(16, 31, 124);
+}
+
+.extend-timeline-item-body .action-primary:focus {
+  background: rgb(0, 51, 204);
+  border-color: rgb(0, 51, 204);
+}
+
+.extend-timeline-item-state_current > .extend-timeline-item-label {
+  font-weight: 700;
+}
+
+.extend-timeline-item-state_current::before {
+  border: 2px solid #4771ff40;
+  background-clip: padding-box;
+}
+
+.extend-timeline-item-state_current::after {
+  background: #e3eaf0;
+}
+
+.extend-timeline-item-state_upcoming::before {
+  background: #c9d1dc;
+  background-clip: padding-box;
+}
+
+.extend-timeline-item-state_upcoming::after {
+  background: #e3eaf0;
+}
+
+.extend-timeline-item-state_complete > .extend-timeline-item-body {
+  display: none;
+}
+
+.extend-timeline-item-state_upcoming > .extend-timeline-item-body {
+  display: none;
+}
+
+.extend-timeline-item-state_success > .extend-timeline-item-label {
+  font-weight: 700;
+  color: #00894f;
+}
+
+.extend-timeline-item-state_success::before {
+  background: #00894f;
+  background-clip: padding-box;
+}

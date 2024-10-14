@@ -7,5 +7,10 @@
     <head>
         <css src="https://fonts.googleapis.com/css?family=Nunito+Sans%7CNunito+Sans:light%7CNunito+Sans:regular%7CNunito+Sans:medium%7CNunito+Sans:bold%7CNunito+Sans:semi-bold%7CNunito+Sans:extra-bold" src_type="url" rel="stylesheet" type="text/css"/>
         <css src="Extend_Integration::css/admin.css"/>
+        <css src="Extend_Integration::css/loader.css"/>
+        <css src="Extend_Integration::css/alert.css"/>
+        <css src="Extend_Integration::css/timeline.css"/>
+        <!-- Note: This should be loaded last -->
+        <css src="Extend_Integration::css/misc.css"/>
     </head>
 </page>

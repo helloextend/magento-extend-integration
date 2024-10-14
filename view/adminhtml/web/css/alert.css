@@ -1,0 +1,44 @@
+/**
+  * Extend Timeline Component
+  * @see https://ui.dev.extend.com/?path=/docs/components-feedback-inlinealert--default
+  */
+
+.extend-alert {
+  margin: 1.5rem auto;
+  display: flex;
+  align-items: flex-start;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 6px;
+  line-height: 20px;
+  font-size: 15px;
+  border: 1px solid rgb(201, 209, 220);
+  background-color: rgb(243, 246, 249);
+  color: rgb(64, 72, 82);
+}
+
+.extend-alert-error {
+  border: 1px solid rgb(255, 147, 159);
+  background-color: rgb(255, 232, 234);
+  color: rgb(138, 0, 17);
+}
+
+.extend-alert-info {
+  border: 1px solid rgb(166, 184, 255);
+  background-color: rgb(238, 243, 255);
+  color: rgb(0, 51, 204);
+}
+
+.extend-alert-success {
+  border: 1px solid rgb(125, 237, 183);
+  background-color: rgb(223, 255, 234);
+  color: rgb(1, 87, 53);
+}
+
+.extend-alert-warning {
+  border: 1px solid rgb(255, 207, 89);
+  background-color: rgb(255, 248, 212);
+  color: rgb(122, 59, 0);
+}
