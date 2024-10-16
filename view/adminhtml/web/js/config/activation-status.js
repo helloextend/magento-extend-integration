@@ -45,8 +45,10 @@ define([], function () {
     if (found) return new Date(found)
 
     // If there is no localStorage, we can leverage the the date of when the integration was activated
-    if (integration.oauthActivatedAt)
-      return new Date(integration.oauthActivatedAt)
+    // Since this is set by the server, it will be coming through as UTC
+    if (integration.oauthActivatedAt) {
+      return new Date(`${integration.oauthActivatedAt}Z`)
+    }
 
     return null
   }

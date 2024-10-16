@@ -28,10 +28,17 @@ class HowToActivate extends Field
 	 * @var string
 	 */
 	protected $_template = 'Extend_Integration::system/config/how-to-activate.phtml';
+	// TODO: MINT-2855 Switch to the following template instead of the one above
+	// protected $_template = 'Extend_Integration::system/config/integration-status.phtml';
 	private Environment $environment;
 	private IntegrationServiceInterface $integrationService;
 	private Context $context;
 	private AccessTokenBuilder $accessTokenBuilder;
+	private $stepMap = [
+		0 => 'activation_required',
+		1 => 'identity_link_required',
+		2 => 'complete'
+	];
 
 	/**
 	 * Intro constructor
@@ -75,14 +82,40 @@ class HowToActivate extends Field
 	 */
 	public function getIntegrations()
 	{
+		$urlBuilder = $this->context->getUrlBuilder();
 		$integrationsStatuses = [];
 		$environmentOptions = $this->environment->toOptionArray();
 		if ($environmentOptions) {
 			foreach ($environmentOptions as $environmentOption) {
 				$integration = $this->integrationService->get($environmentOption['value']);
+
+				$identityLinkUrl = $integration->getIdentityLinkUrl() . '?oauth_consumer_key=' . $integration->getConsumerKey() . '&success_call_back=' . $urlBuilder->getCurrentUrl();;
+				$isAuthHandshakeComplete = $this->isAuthHandshakeComplete($integration);
+				$isIdentityLinkConfirmed = $this->isIdentityLinkConfirmed($integration);
+				$isIntegrationComplete = $isAuthHandshakeComplete && $isIdentityLinkConfirmed;
+
+				$integrationCreatedAt = $integration->getCreatedAt();
+				$integrationUpdatedAt = $integration->getUpdatedAt();
+
+				$oauthActivatedAt = $isAuthHandshakeComplete && $integrationUpdatedAt > $integrationCreatedAt ? $integrationUpdatedAt : null;
+
+				$prevActivationFailed = !$isAuthHandshakeComplete && $integrationUpdatedAt > $integrationCreatedAt;
+
+				$currentStep = $this->stepMap[0];
+				if ($isIntegrationComplete) {
+					$currentStep = $this->stepMap[2];
+				} elseif ($isAuthHandshakeComplete) {
+					$currentStep = $this->stepMap[1];
+				}
+
 				$integrationsStatuses[] = [
+					'activation_status' => $this->getStatus($integration), // TODO: MINT-2855 Remove the activation status as this was only used by old template
+					'current_step' => $currentStep,
+					'identity_link_url' => $identityLinkUrl,
 					'integration_id' => $integration->getId(),
-					'activation_status' => $this->getStatus($integration)
+					'integration_name' => $environmentOption['label'],
+					'oauth_activated_at' => $oauthActivatedAt,
+					'prev_activation_failed' => $prevActivationFailed
 				];
 			}
 		}
@@ -113,5 +146,40 @@ class HowToActivate extends Field
 			return 0;
 		}
 
+	}
+
+	/**
+	 * Determines whether the integration has successfully performed the oauth handshake with Extend.
+	 * This is performed after the merchant clicks on Activate on the Magento Integrations page for
+	 * the Extend integration.
+	 *
+	 * @param \Magento\Integration\Model\Integration $integration
+	 * @return bool
+	 */
+	private function isAuthHandshakeComplete($integration): bool
+	{
+		$integrationStatus = $integration->getStatus();
+
+		return $integrationStatus === 1;
+	}
+
+	/**
+	 * Determines whether the merchant has completed the identity link handshake with Extend.
+	 * This is performed when the identity link pops up to the Merchant Portal and the merchant
+	 * successfully connects their Extend account to their Magento instance.
+	 *
+	 * @param \Magento\Integration\Model\Integration $integration
+	 * @return bool
+	 */
+	private function isIdentityLinkConfirmed($integration): bool
+	{
+		$clientData = $this->accessTokenBuilder->getExtendOAuthClientData($integration->getId());
+
+		if (isset($clientData['clientId']) && isset($clientData['clientSecret'])
+		) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
