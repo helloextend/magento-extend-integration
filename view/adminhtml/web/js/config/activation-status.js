@@ -95,6 +95,213 @@ define([], function () {
   }
 
   /**
+   * set up the 'Test Connection' button + all its related UI elements + functionality
+   * @returns {void}
+   */
+  function setupHealthcheck() {
+    // get the healthcheck elements
+    const {
+      healthcheckContainer,
+      healthcheckButton,
+      healthcheckButtonLabel,
+      healthcheckSpinner,
+      healthcheckAlertContainer,
+      healthcheckAlertBody,
+    } = getHealthcheckElements()
+
+    // short-circuit if any of the elements are missing
+    if (
+      !healthcheckContainer ||
+      !healthcheckButton ||
+      !healthcheckButtonLabel ||
+      !healthcheckSpinner ||
+      !healthcheckAlertContainer ||
+      !healthcheckAlertBody
+    ) {
+      return
+    }
+
+    // show the healthcheck container
+    showHealthcheckContainer(healthcheckContainer)
+
+    // add onclick listener to the healthcheck button
+    healthcheckButton.onclick = function () {
+      // remove any existing alert that may be left from a prior healthcheck attempt
+      clearHealthcheckAlert(healthcheckAlertContainer, healthcheckAlertBody)
+      // disable the button, unfocus it, remove its label, and show a spinner within it
+      displayHealthcheckButtonLoadingState(
+        healthcheckButton,
+        healthcheckButtonLabel,
+        healthcheckSpinner,
+      )
+
+      // make an authenticated request to the healthcheck endpoint
+      fetch('/rest/V1/extend/integration/healthcheck', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(response => response.json())
+        .then(data => {
+          // the 'code' property of the response json will be 200 if the healthcheck was successful
+          if (data.code === 200) {
+            // handle success by showing a success alert
+            handleHealthcheckSuccess(
+              healthcheckAlertContainer,
+              healthcheckAlertBody,
+            )
+          } else {
+            // handle any 400-level (or other) errors by displaying an error alert
+            handleHealthcheckError(
+              data,
+              healthcheckAlertContainer,
+              healthcheckAlertBody,
+            )
+          }
+        })
+        .finally(() => {
+          // re-enable the button, and hide the spinner
+          restoreHealthcheckButtonDefaultState(
+            healthcheckButton,
+            healthcheckButtonLabel,
+            healthcheckSpinner,
+          )
+        })
+    }
+  }
+
+  /**
+   * Get the healthcheck UI elements from the DOM
+   * @returns {object} The healthcheck elements
+   */
+  function getHealthcheckElements() {
+    return {
+      healthcheckContainer: document.getElementById(
+        'extend-healthcheck-container',
+      ),
+      healthcheckButton: document.getElementById('extend-healthcheck-button'),
+      healthcheckButtonLabel: document.getElementById(
+        'extend-healthcheck-button-label',
+      ),
+      healthcheckSpinner: document.getElementById('extend-healthcheck-spinner'),
+      healthcheckAlertContainer: document.getElementById(
+        'extend-healthcheck-alert-container',
+      ),
+      healthcheckAlertBody: document.getElementById(
+        'extend-healthcheck-alert-body',
+      ),
+    }
+  }
+
+  /**
+   * Show the healthcheck container by removing the 'extend-hidden' class
+   * @param {HTMLDivElement} healthcheckContainer
+   */
+  function showHealthcheckContainer(healthcheckContainer) {
+    healthcheckContainer.classList.remove('extend-hidden')
+  }
+
+  /**
+   * Handle a successful healthcheck by showing a success alert
+   * @param {HTMLDivElement} healthcheckAlertContainer
+   * @param {HTMLDivElement} healthcheckAlertBody
+   */
+  function handleHealthcheckSuccess(
+    healthcheckAlertContainer,
+    healthcheckAlertBody,
+  ) {
+    healthcheckAlertContainer.classList.remove('extend-hidden')
+    healthcheckAlertContainer.classList.add('extend-alert-success')
+    healthcheckAlertBody.innerText =
+      'The connection test was successful. The integration is ready to use.'
+  }
+
+  /**
+   * Handle a failed healthcheck by showing an error alert
+   * @param {Response} response
+   * @param {HTMLDivElement} healthcheckAlertContainer
+   * @param {HTMLDivElement} healthcheckAlertBody
+   */
+  function handleHealthcheckError(
+    responseData,
+    healthcheckAlertContainer,
+    healthcheckAlertBody,
+  ) {
+    healthcheckAlertContainer.classList.remove('extend-hidden')
+    healthcheckAlertContainer.classList.add('extend-alert-error')
+    switch (responseData.code) {
+      case 401:
+        healthcheckAlertBody.innerText =
+          'Extend can not reach the Magento server. Please reauthorize the integration.'
+        break
+      case 403:
+        healthcheckAlertBody.innerText =
+          'The Extend credentials stored on the Magento server are invalid. Please recreate your integration.'
+        break
+      case 404:
+        healthcheckAlertBody.innerText =
+          'The integration could not be found by Extend. Please reauthorize the integration.'
+        break
+      default:
+        healthcheckAlertBody.innerText =
+          'The connection test was unsuccessful. Please reauthorize the integration or contact Extend support.'
+        break
+    }
+  }
+
+  /**
+   * Disable the healthcheck button, unfocus it, and replace its label with a spinner
+   * @param {HTMLButtonElement} healthcheckButton
+   * @param {HTMLElement} healthcheckButtonLabel
+   * @param {HTMLDivElement} healthcheckSpinner
+   */
+  function displayHealthcheckButtonLoadingState(
+    healthcheckButton,
+    healthcheckButtonLabel,
+    healthcheckSpinner,
+  ) {
+    healthcheckButton.classList.add('disabled')
+    healthcheckButton.blur()
+    healthcheckButtonLabel.innerText = ''
+    healthcheckSpinner.classList.remove('extend-hidden')
+    healthcheckSpinner.classList.add('extend-spinner')
+  }
+
+  /**
+   * Restore the healthcheck button to its default state
+   * @param {HTMLButtonElement} healthcheckButton
+   * @param {HTMLElement} healthcheckButtonLabel
+   * @param {HTMLDivElement} healthcheckSpinner
+   */
+  function restoreHealthcheckButtonDefaultState(
+    healthcheckButton,
+    healthcheckButtonLabel,
+    healthcheckSpinner,
+  ) {
+    healthcheckButton.classList.remove('disabled')
+    healthcheckButtonLabel.innerText = 'Test Connection'
+    healthcheckSpinner.classList.remove('extend-spinner')
+    healthcheckSpinner.classList.add('extend-hidden')
+  }
+
+  /**
+   * Clear the healthcheck alert from the DOM by hiding it and removing its content and
+   * any classes that determine its appearance
+   * @param {HTMLDivElement} healthcheckAlertContainer
+   * @param {HTMLDivElement} healthcheckAlertBody
+   */
+  function clearHealthcheckAlert(
+    healthcheckAlertContainer,
+    healthcheckAlertBody,
+  ) {
+    healthcheckAlertContainer.classList.add('extend-hidden')
+    healthcheckAlertContainer.classList.remove('extend-alert-success')
+    healthcheckAlertContainer.classList.remove('extend-alert-error')
+    healthcheckAlertBody.innerText = ''
+  }
+
+  /**
    * Render the timeline steps for a given integration to show the activation status.
    * @param {object} integration Selected integration config
    */
@@ -207,6 +414,8 @@ define([], function () {
 
         // Show the activation complete step as success, since there is no further action required
         completeStep.className = successStepClass
+
+        setupHealthcheck()
 
         break
       }

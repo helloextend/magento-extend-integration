@@ -31,6 +31,7 @@ class Integration
         'webhooks_stores_create' => '/webhooks/stores/create',
         'log_error' => '/module/logging',
         'app_uninstall' => '/app/uninstall',
+        'integration_health_check' => '/integration-health-check'
     ];
 
     const EXTEND_SDK_ENDPOINTS = [

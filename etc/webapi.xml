@@ -84,4 +84,10 @@
             <resource ref="Extend_Integration::manage"/>
         </resources>
     </route>
+    <route url="/V1/extend/integration/healthcheck" method="GET">
+        <service class="Extend\Integration\Api\HealthCheckInterface" method="check"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>

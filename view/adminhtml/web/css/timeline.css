@@ -80,6 +80,27 @@
   border-color: rgb(0, 51, 204);
 }
 
+#extend-healthcheck-container {
+  margin-top: 8px;
+}
+
+#extend-healthcheck-container .disabled {
+  border-radius: 4px;
+  background: rgb(201, 209, 220);
+  border-color: rgb(201, 209, 220);
+  color: rgb(107, 120, 135);
+  cursor: not-allowed;
+}
+
+#extend-healthcheck-container .action-primary {
+  min-height: 20px;
+  min-width: 110px;
+}
+
+#extend-healthcheck-container .action-primary:hover label {
+  cursor: pointer;
+}
+
 .extend-timeline-item-state_current > .extend-timeline-item-label {
   font-weight: 700;
 }

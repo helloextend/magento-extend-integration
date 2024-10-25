@@ -100,11 +100,28 @@
         This integration is complete! Navigate to a specific store view to make
         integration modifications for that store.
       </div>
+      <!-- Healthcheck section will initialize in a hidden state until needed -->
+      <div id="extend-healthcheck-container" class="extend-timeline-item-body extend-hidden">
+        <!-- Alert will initialize in a hidden state until needed -->
+        <div id="extend-healthcheck-alert-container" class="extend-alert extend-hidden">
+          <div id="extend-healthcheck-alert-body" class="extend-alert-body">
+            <!-- Use JS to inject specific messaging -->
+          </div>
+        </div>
+        <button
+          id="extend-healthcheck-button"
+          class="action-primary"
+          type="button"
+        >
+          <label id="extend-healthcheck-button-label">Test Connection</label>
+          <div id="extend-healthcheck-spinner" class="extend-hidden"></div>
+        </button>
+      </div>
     </div>
   </div>
 </div>
 
-<?php if($integrations = $this->getIntegrations()): ?>
+<?php if ($integrations = $this->getIntegrations()): ?>
   <script type="text/x-magento-init">
     {
       "#extend-integration-status": {
