@@ -44,12 +44,5 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
         }
     }
   </script>
-  <script>
-    document.querySelectorAll('#super-product-table tbody tr .price-box').forEach((el, i) => {
-      let id = el.getAttribute('data-price-box');
-      if (document.querySelector('.' + id)) {
-        el.closest('tr').after(document.querySelector('.' + id).closest('tr'));
-      }
-    });
-  </script>
+  <script type="text/javascript" src="<?= $block->getViewFileUrl('Extend_Integration::js/view/catalog/product/product-protection-grouped.js') ?>"></script>
 <?php endif; ?>
