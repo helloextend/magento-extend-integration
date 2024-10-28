@@ -74,7 +74,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 
     const activeProductData = {
       referenceId: config[0].selectedProductSku,
-      price: parseInt(config[0].selectedProductPrice * 100).toPrecision(10),
+      price: parseInt((config[0].selectedProductPrice * 100).toPrecision(10)),
       category: config[0].productCategory,
       onAddToCart: handleAddToCartClick,
     }
