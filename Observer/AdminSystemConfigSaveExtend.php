@@ -64,7 +64,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         // The unfortunate part of this solution is that it will fire on any system config save but we can short-circuit immediately
         // if it's not Extend.
         if ($section !== 'extend') {
-          return;
+            return;
         }
 
         // If the checkbox was manually checked in finish-integration.phtml then the value should come in here as a truthy 'on'.
@@ -72,7 +72,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         $activateCurrentStore = $request->getParam('activate_current_store');
 
         if (!$activateCurrentStore) {
-          return;
+            return;
         }
 
         $extendStoreId = $request->getParam('extend_store_id');
@@ -83,22 +83,20 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         $integrationId = $integration->getId();
 
         $storeListForActiveIntegration = $this->storeIntegrationRepository->getListByIntegration($integrationId);
+        $hasIntegration = in_array($currentStore, $storeListForActiveIntegration);
 
-        // This check *should* be unnecessary as it's done on page-load to determine whether the checkbox should be
-        // active but in a race condition case it may prevent unnecessary requests
-        if (in_array($currentStore, $storeListForActiveIntegration)) {
-          return;
+        if (!$hasIntegration) {
+            $this->storeIntegrationRepository->saveStoreToIntegration($integrationId, $currentStore);
         }
 
-        $this->storeIntegrationRepository->saveStoreToIntegration(
-          $integrationId,
-          $currentStore
-        );
+        $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId($currentStore, $integrationId);
 
-        $integrationStore = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId(
-          $currentStore,
-          $integrationId
-        );
+        // Even if the store has an integration, we also need to check if there is an error on the integration
+        // if there is an error we need to re-try the integration, this will allow us to recover from an error state
+        // if there is no error we return early
+        if ($hasIntegration && $storeIntegration->getIntegrationError() === null) {
+            return;
+        }
 
         $oauth = $this->oauthService->loadConsumer($integration->getConsumerId());
         $store = $this->storeManager->getStore($currentStore);
@@ -112,10 +110,10 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
 
         if ($oauthKey && $oauth->getSecret()) {
             [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
-                'magentoStoreUuid' => $integrationStore->getStoreUuid(),
+                'magentoStoreUuid' => $storeIntegration->getStoreUuid(),
                 'magentoStoreId' => $currentStore,
                 'magentoConsumerKey' => $oauthKey,
-                'extendStoreId' => $extendStoreId ? $extendStoreId : $integrationStore->getExtendStoreUuid(),
+                'extendStoreId' => $extendStoreId ? $extendStoreId : $storeIntegration->getExtendStoreUuid(),
                 'storeDomain' => rtrim(
                     str_replace(
                         ['https://', 'http://'],
@@ -137,7 +135,12 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
                 ),
             ]);
 
-            $this->extendIntegrationService->execute($endpoint, $body, $headers);
+            $response = $this->extendIntegrationService->execute($endpoint, $body, $headers, null, true);
+            $this->storeIntegrationRepository->setIntegrationErrorForStoreIdAndIntegrationId(
+                $currentStore,
+                $integrationId,
+                $response ?? null
+            );
         }
     }
 }

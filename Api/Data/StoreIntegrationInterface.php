@@ -18,6 +18,7 @@ interface StoreIntegrationInterface
     const EXTEND_CLIENT_ID = 'client_id';
     const EXTEND_CLIENT_SECRET = 'client_secret';
     const DISABLED = 'disabled';
+    const INTEGRATION_ERROR = 'integration_error';
 
     /**
      * Set store ID
@@ -77,6 +78,15 @@ interface StoreIntegrationInterface
      */
     public function setDisabled(int $disabled): void;
 
+
+    /**
+     * 
+     * Set the extend integration error
+     * @param string $integrationError
+     * @return void
+     */
+    public function setIntegrationError(?string $integrationError): void;
+
     /**
      * Get store ID
      *
@@ -119,4 +129,6 @@ interface StoreIntegrationInterface
      * @return int|null
      */
     public function getDisabled(): ?int;
+
+    public function getIntegrationError(): ?string;
 }

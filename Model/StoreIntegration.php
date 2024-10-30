@@ -87,6 +87,18 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
         $this->setData(self::EXTEND_CLIENT_SECRET, $extendClientSecret);
     }
 
+
+    /**
+     * Set Integration Error
+     * 
+     * @param string|null $integrationError
+     * @return void
+     */
+    public function setIntegrationError(?string $integrationError): void
+    {
+        $this->setData(self::INTEGRATION_ERROR, $integrationError);
+    }
+
     /**
      * @param int $disabled
      * @return void
@@ -159,5 +171,10 @@ class StoreIntegration extends \Magento\Framework\Model\AbstractModel implements
     public function getDisabled(): ?int
     {
         return $this->getData(self::DISABLED);
+    }
+
+    public function getIntegrationError(): ?string
+    {
+        return $this->getData(self::INTEGRATION_ERROR);
     }
 }

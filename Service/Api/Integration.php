@@ -68,10 +68,11 @@ class Integration
      * @param array $data
      * @param array $headers
      * @param null $getBody
+     * @param null $getError
      * @return void|string
      * @throws NoSuchEntityException
      */
-    public function execute(array $endpoint, array $data, array $headers, $getBody = null)
+    public function execute(array $endpoint, array $data, array $headers, $getBody = null, $getError = null)
     {
         try {
             $this->curl->setHeaders($headers);
@@ -102,6 +103,10 @@ class Integration
                     $this->storeManager->getStore()->getId(),
                     'error'
                 );
+
+                if ($getError) {
+                    return 'ERROR: Integration Error with status: ' . $status;
+                }
             }
 
             if ($getBody) {

@@ -284,4 +284,19 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
             $this->storeIntegrationResource->save($integration);
         }
     }
+
+    /**
+     * Set integration error for store id and integration id
+     *
+     * @param string $storeId
+     * @param string $integrationId
+     * @param string $integrationError
+     * @return void
+     */
+    public function setIntegrationErrorForStoreIdAndIntegrationId(string $storeId, string $integrationId, ?string $integrationError): void
+    {
+        $integration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
+        $integration->setIntegrationError($integrationError);
+        $this->storeIntegrationResource->save($integration);
+    }
 }

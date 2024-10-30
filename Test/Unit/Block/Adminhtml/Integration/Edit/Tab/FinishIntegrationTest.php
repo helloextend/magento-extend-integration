@@ -20,140 +20,161 @@ use PHPUnit\Framework\TestCase;
 
 class FinishIntegrationTest extends TestCase
 {
-	/**
-	 * @var FinishIntegration
-	 */
-	private FinishIntegration $finishIntegration;
-
-	/**
-	 * @var \Magento\Backend\Block\Template\Context|\PHPUnit\Framework\MockObject\Stub
-	 */
-	private $context;
-
-	/**
-	 * @var Environment|\PHPUnit\Framework\MockObject\MockObject
-	 */
-	private $environment;
-
-	/**
-	 * @var IntegrationServiceInterface|\PHPUnit\Framework\MockObject\MockObject
-	 */
-	private $integrationService;
+  /**
+   * @var FinishIntegration
+   */
+  private FinishIntegration $finishIntegration;
 
   /**
-	 * @var AccessTokenBuilder|(AccessTokenBuilder&object&\PHPUnit\Framework\MockObject\MockObject)|(AccessTokenBuilder&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
-	 */
-	private $accessTokenBuilder;
+   * @var \Magento\Backend\Block\Template\Context|\PHPUnit\Framework\MockObject\Stub
+   */
+  private $context;
 
   /**
-	 * @var ScopeConfigInterface|\PHPUnit\Framework\MockObject\MockObject
-	 */
+   * @var Environment|\PHPUnit\Framework\MockObject\MockObject
+   */
+  private $environment;
+
+  /**
+   * @var IntegrationServiceInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  private $integrationService;
+
+  /**
+   * @var AccessTokenBuilder|(AccessTokenBuilder&object&\PHPUnit\Framework\MockObject\MockObject)|(AccessTokenBuilder&\PHPUnit\Framework\MockObject\MockObject)|(object&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+   */
+  private $accessTokenBuilder;
+
+  /**
+   * @var ScopeConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
   private ScopeConfigInterface $scopeConfig;
 
   /**
-	 * @var StoreIntegrationRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
-	 */
-	private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
+   * @var StoreIntegrationRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
 
   /**
-	 * @var ActiveEnvironmentURLBuilder|\PHPUnit\Framework\MockObject\MockObject
-	 */
+   * @var ActiveEnvironmentURLBuilder|\PHPUnit\Framework\MockObject\MockObject
+   */
   private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
 
-   /**
-	 * @var RequestInterface|\PHPUnit\Framework\MockObject\MockObject
-	 */
-	private RequestInterface $request;
+  /**
+   * @var RequestInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  private RequestInterface $request;
 
-	/**
-	 * @var array
-	 */
-	private array $data;
+  /**
+   * @var array
+   */
+  private array $data;
 
-	public function setUp(): void
-	{
-		$this->context = $this->createMock(\Magento\Backend\Block\Template\Context::class);
-		$this->environment = $this->createMock(Environment::class);
-		$this->integrationService = $this->createMock(IntegrationServiceInterface::class);
+  public function setUp(): void
+  {
+    $this->context = $this->createMock(\Magento\Backend\Block\Template\Context::class);
+    $this->environment = $this->createMock(Environment::class);
+    $this->integrationService = $this->createMock(IntegrationServiceInterface::class);
     $this->activeEnvironmentURLBuilder = $this->createMock(ActiveEnvironmentURLBuilder::class);
-		$this->accessTokenBuilder = $this->createMock(AccessTokenBuilder::class);
+    $this->accessTokenBuilder = $this->createMock(AccessTokenBuilder::class);
     $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
     $this->storeIntegrationRepository = $this->createMock(StoreIntegrationRepositoryInterface::class);
-		$this->data = [];
+    $this->data = [];
 
     $this->request = $this->createMock(\Magento\Framework\App\RequestInterface::class);
     $this->context->method('getRequest')->willReturn($this->request);
 
-		$this->finishIntegration = new FinishIntegration(
-			$this->context,
-			$this->environment,
-			$this->integrationService,
-			$this->accessTokenBuilder,
+    $this->finishIntegration = new FinishIntegration(
+      $this->context,
+      $this->environment,
+      $this->integrationService,
+      $this->accessTokenBuilder,
       $this->scopeConfig,
       $this->storeIntegrationRepository,
       $this->activeEnvironmentURLBuilder,
-			$this->data
-		);
-	}
+      $this->data
+    );
+  }
 
-	public function testGetActiveIntegrationStatusForInactiveIntegration()
-	{
+  public function testGetActiveIntegrationStatusForInactiveIntegration()
+  {
     $activeIntegration = 1;
     $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
     $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
-			'getId' => 1,
+      'getId' => 1,
       'getStatus' => 0,
-		]);
+    ]);
     $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
     $this->accessTokenBuilder->method('getExtendOAuthClientData')->willReturn(['clientId' => null, 'clientSecret' => null]);
-		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::INACTIVE_INTEGRATION);
-	}
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::INACTIVE_INTEGRATION);
+  }
 
   public function testGetActiveIntegrationStatusWithCurrentStoreSetToCurrentIntegration()
-	{
+  {
     $activeIntegration = 1;
     $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
     $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
-			'getId' => 1,
+      'getId' => 1,
       'getStatus' => 1,
-		]);
+    ]);
     $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
     $this->accessTokenBuilder->method('getExtendOAuthClientData')->willReturn(['clientId' => '89rjh89tyrhug3897y', 'clientSecret' => 'fbhn39ry34rhfsdfi98']);
     $this->storeIntegrationRepository->method('getListByIntegration')->willReturn([1, 4, 5]);
     $this->request->method('getParam')->willReturn(4);
-		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ACTIVE_INTEGRATION_WITH_CURRENT_STORE);
-	}
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ACTIVE_INTEGRATION_WITH_CURRENT_STORE);
+  }
 
   public function testGetActiveIntegrationStatusWithoutCurrentStoreSetToCurrentIntegration()
-	{
+  {
     $activeIntegration = 1;
     $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
     $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
-			'getId' => 1,
+      'getId' => 1,
       'getStatus' => 1,
-		]);
+    ]);
     $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
     $this->accessTokenBuilder->method('getExtendOAuthClientData')->willReturn(['clientId' => '89rjh89tyrhug3897y', 'clientSecret' => 'fbhn39ry34rhfsdfi98']);
     $this->storeIntegrationRepository->method('getListByIntegration')->willReturn([1, 5]);
     $this->request->method('getParam')->willReturn(4);
-		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ACTIVE_INTEGRATION_WITHOUT_CURRENT_STORE);
-	}
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ACTIVE_INTEGRATION_WITHOUT_CURRENT_STORE);
+  }
 
   public function testGetActiveIntegrationStatusWhenThereIsAGeneralException()
-	{
+  {
     $activeIntegration = 1;
     $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
     $this->integrationService->method('get')->with($activeIntegration)->will($this->throwException(new \Exception()));
-		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_SEARCHING_FOR_INTEGRATION);
-	}
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_SEARCHING_FOR_INTEGRATION);
+  }
+
+  public function testGetActiveIntegrationStatusForExtendAccountError()
+  {
+    $activeIntegration = 1;
+    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
+    $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
+      'getId' => 1,
+      'getStatus' => 1,
+    ]);
+    $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
+    $this->accessTokenBuilder->method('getExtendOAuthClientData')->willReturn(['clientId' => '89rjh89tyrhug3897y', 'clientSecret' => 'fbhn39ry34rhfsdfi98']);
+    $this->storeIntegrationRepository->method('getListByIntegration')->willReturn([1, 4, 5]);
+    $this->request->method('getParam')->willReturn(4);
+    $storeIntegration = $this->getMockBuilder(\Extend\Integration\Api\Data\StoreIntegrationInterface::class)
+      ->onlyMethods(['getIntegrationError'])
+      ->disableOriginalConstructor()
+      ->getMockForAbstractClass();
+    $storeIntegration->method('getIntegrationError')->willReturn('integration error: 403');
+    $this->storeIntegrationRepository->method('getByStoreIdAndIntegrationId')->willReturn($storeIntegration);
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_EXTEND_ACCOUNT);
+  }
 
   public function testGetActiveIntegrationStatusWhenIntegrationDoesntExistBecauseItWasDeleted()
-	{
+  {
     $activeIntegration = 1;
     $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
     $this->integrationService->method('get')->with($activeIntegration)->will($this->throwException(new IntegrationException(new Phrase('The integration with ID "1" doesn\'t exist.'))));
-		$this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_SEARCHING_FOR_DELETED_INTEGRATION);
-	}
+    $this->assertEquals($this->finishIntegration->getActiveIntegrationStatusOnStore(), FinishIntegration::ERROR_SEARCHING_FOR_DELETED_INTEGRATION);
+  }
 
   public function testGetExtendStoreUuid()
   {

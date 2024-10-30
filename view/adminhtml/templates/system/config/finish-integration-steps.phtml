@@ -1,0 +1,83 @@
+<?php
+$status = $block->getActiveIntegrationStatusOnStore();
+$showTimeline = $status !== 4 && $status !== 3;
+?>
+<?php if ($showTimeline): ?>
+    <div id="extend-integration-status">
+        <?php if ($status === 5): ?>
+            <div id="extend-alert-container" class="extend-alert extend-alert-error">
+                <div id="extend-alert-body" class="extend-alert-body">
+                    We were unable to find this storeId under your account. Please try again.
+                </div>
+            </div>
+        <? endif; ?>
+        <div
+            id="extend-activation-info-container"
+            class="extend-timeline">
+            <div
+                id="extend-timeline-item-activation_required"
+                class="extend-timeline-item <?php if ($status === 0): ?>extend-timeline-item-state_current<?php endif; ?>">
+                <div class="extend-timeline-item-label">Activate Integration</div>
+
+                <?php if ($status === 0): ?>
+                    <div class="extend-timeline-item-body">
+                        <p>The <strong><?= $this->getCurrentIntegrationName() ?></strong> integration is not yet enabled. Please follow the steps detailed on the <a href="<?= $block->getDefaultScopeUrl() ?>">Extend Settings</a> page to complete
+                            your setup and integration this store with Extend.</p>
+                        <button class="action-primary" name="finish_integration" type="button" onclick="document.location.href='<?= $block->getDefaultScopeUrl() ?>';">
+                            <span><?= __('Finish Integration') ?></span>
+                        </button>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <div
+                id="extend-timeline-item-sync_store"
+                class="extend-timeline-item <?php if ($status < 1): ?>extend-timeline-item-state_upcoming <?php elseif ($status === 1 || $status === 5): ?>extend-timeline-item-state_current <?php endif; ?>">
+                <div class="extend-timeline-item-label">Sync Store with Extend</div>
+                <?php if ($status === 1 || $status === 5): ?>
+                    <div class="extend-timeline-item-body">
+                        <p>The current integration is <strong><?= $this->getCurrentIntegrationName() ?></strong>.</p>
+                        <div>
+                            <input type="checkbox" name="activate_current_store" id="activate_current_store" />
+                            <label for="activate_current_store">Add Store to current Integration</label>
+                        </div>
+                        </br>
+                        <?php if (!$this->isProdEnvironment()): ?>
+                            <div>
+                                <label for="extend_store_id">Extend Store ID to use (leave empty to create a store)</label>
+                                <input type="text" name="extend_store_id" id="extend_store_id" />
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <div id="extend-timeline-item-complete" class="extend-timeline-item <?php if ($status < 2 || $status === 5): ?>extend-timeline-item-state_upcoming<?php else: ?> extend-timeline-item-state_success<?php endif; ?>">
+                <div class="extend-timeline-item-label">Integration Complete</div>
+                <?php if ($status === 2): ?>
+                    <div class="extend-timeline-item-body">
+                        <p>The current integration is <strong><?= $this->getCurrentIntegrationName() ?></strong>.</p>
+                        <div>
+                            <input type="checkbox" name="activate_current_store" id="activate_current_store" checked disabled />
+                            <label for="activate_current_store">Add Store to current Integration</label>
+                        </div>
+                        </br>
+                        <?php if ($this->getExtendStoreUuid()): ?>
+                            <div>
+                                <label for="extend_store_id">Extend Store ID</label>
+                                <input type="text" value="<?= $this->getExtendStoreUuid() ?>" name="extend_store_id" id="extend_store_id" disabled />
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+<?php else: ?>
+    <?php if ($status === 3): ?>
+        <p>The Extend integration could not be found for the given store. Usually in this case an integration was selected and then deleted. Please
+            go to the <a href="<?= $block->getDefaultScopeUrl() ?>">Extend Settings</a> page and select a new integration.
+        </p>
+    <?php elseif ($status === 4): ?>
+        <p>Error retrieving the Extend integration for the given store.</p>
+    <?php endif; ?>
+<?php endif; ?>

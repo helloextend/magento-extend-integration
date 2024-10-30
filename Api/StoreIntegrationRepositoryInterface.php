@@ -110,4 +110,14 @@ interface StoreIntegrationRepositoryInterface
      * @return void
      */
     public function attachClientIdAndSecretToIntegration(string $consumerKey, string $clientId, string $clientSecret): void;
+
+    /**
+     * Set integration error for store id and integration id
+     *
+     * @param string $storeId
+     * @param string $integrationId
+     * @param string $integrationError
+     * @return void
+     */
+    public function setIntegrationErrorForStoreIdAndIntegrationId(string $storeId, string $integrationId, ?string $integrationError): void;
 }

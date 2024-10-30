@@ -28,6 +28,7 @@
         <column xsi:type="varchar" name="client_id" nullable="false" comment="Extend Client ID"/>
         <column xsi:type="text" name="client_secret" nullable="false" comment="Extend Client Secret"/>
         <column xsi:type="tinyint" name="disabled" nullable="true" comment="A store with a prior association, but is currently disabled (unselected in the integration)"/>
+        <column xsi:type="varchar" name="integration_error" nullable="true" comment="Integration error is persisted if there is an error coming back from Extend"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="extend_store_integration_id"/>
         </constraint>
