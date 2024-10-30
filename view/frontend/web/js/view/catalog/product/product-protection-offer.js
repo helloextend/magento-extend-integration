@@ -9,7 +9,8 @@ define([
   'extendSdk',
   'ExtendMagento',
   'stringUtils',
-], function ($, cartUtils, Extend, ExtendMagento, stringUtils) {
+  'currencyUtils',
+], function ($, cartUtils, Extend, ExtendMagento, stringUtils, currencyUtils) {
   'use strict'
 
   const getProductQuantity = function () {
@@ -71,14 +72,17 @@ define([
     })
 
     for (let key in config) {
+      const cents = currencyUtils.Money.fromAmount(
+        config[key].selectedProductPrice,
+        config[key].currencyCode,
+      ).cents
+
       Extend.buttons.render(
         '#product_protection_offer_' +
           stringUtils.sanitizeForElementId(config[key].selectedProductSku),
         {
           referenceId: config[key].selectedProductSku,
-          price: parseInt(
-            (config[key].selectedProductPrice * 100).toPrecision(10),
-          ),
+          price: cents,
           category: config[key].productCategory,
         },
       )
@@ -94,11 +98,14 @@ define([
             stringUtils.sanitizeForElementId(config[0].selectedProductSku),
         )
 
+        const cents = currencyUtils.Money.fromAmount(
+          selectedProduct.selectedProductPrice,
+          config[0].currencyCode,
+        ).cents
+
         const activeProductData = {
           referenceId: selectedProduct.selectedProductSku,
-          price: parseInt(
-            (selectedProduct.selectedProductPrice * 100).toPrecision(10),
-          ),
+          price: cents,
           category: config[0].productCategory,
         }
         if (buttonInstance) {
@@ -172,11 +179,14 @@ define([
               event.preventDefault()
               event.stopPropagation()
 
+              const cents = currencyUtils.Money.fromAmount(
+                selectedProduct.selectedProductPrice,
+                config[0].currencyCode,
+              ).cents
+
               Extend.modal.open({
                 referenceId: selectedProduct.selectedProductSku,
-                price: parseInt(
-                  (selectedProduct.selectedProductPrice * 100).toPrecision(10),
-                ),
+                price: cents,
                 category: config[0].productCategory,
                 onClose: function (plan, product) {
                   if (plan && product) {

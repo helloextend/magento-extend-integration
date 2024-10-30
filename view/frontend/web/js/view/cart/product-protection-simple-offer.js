@@ -3,12 +3,13 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
-  cartUtils,
-  Extend,
-  ExtendMagento,
-  stringUtils,
-) {
+define([
+  'cartUtils',
+  'extendSdk',
+  'ExtendMagento',
+  'stringUtils',
+  'currencyUtils',
+], function (cartUtils, Extend, ExtendMagento, stringUtils, currencyUtils) {
   'use strict'
 
   const getProductQuantity = function (cartItems, product) {
@@ -59,7 +60,10 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
   }
 
   const renderSimpleOffer = function (cartItems, config) {
-    const sku = config[0].selectedProductSku
+    const [data] = config
+    if (!data) return
+
+    const sku = data.selectedProductSku
     const isWarrantyInCart = ExtendMagento.warrantyInCart({
       lineItemSku: sku,
       lineItems: cartItems,
@@ -72,21 +76,26 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
       return
     }
 
+    const cents = currencyUtils.Money.fromAmount(
+      data.selectedProductPrice,
+      data.currencyCode,
+    ).cents
+
     const activeProductData = {
-      referenceId: config[0].selectedProductSku,
-      price: config[0].selectedProductPrice * 100,
-      category: config[0].productCategory,
+      referenceId: data.selectedProductSku,
+      price: cents,
+      category: data.productCategory,
       onAddToCart: handleAddToCartClick,
     }
     Extend.config({
-      storeId: config[0].extendStoreUuid,
-      environment: config[0].activeEnvironment,
-      currency: config[0].currencyCode,
+      storeId: data.extendStoreUuid,
+      environment: data.activeEnvironment,
+      currency: data.currencyCode,
     })
 
     Extend.buttons.renderSimpleOffer(
       '#product_protection_offer_' +
-        stringUtils.sanitizeForElementId(config[0].selectedProductSku),
+        stringUtils.sanitizeForElementId(data.selectedProductSku),
       activeProductData,
     )
   }

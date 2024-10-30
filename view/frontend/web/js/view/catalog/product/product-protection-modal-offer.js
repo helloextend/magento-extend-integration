@@ -3,12 +3,13 @@
  * See Extend-COPYING.txt for license details.
  */
 
-define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
-  cartUtils,
-  Extend,
-  ExtendMagento,
-  stringUtils,
-) {
+define([
+  'cartUtils',
+  'extendSdk',
+  'ExtendMagento',
+  'stringUtils',
+  'currencyUtils',
+], function (cartUtils, Extend, ExtendMagento, stringUtils, currencyUtils) {
   'use strict'
 
   const handleAddToCartClick = function (
@@ -56,8 +57,12 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
       currency: config[0].currencyCode,
     })
 
+    const cents = currencyUtils.Money.fromAmount(
+      config[0].productPrice,
+      config[0].currencyCode,
+    ).cents
+
     const productSku = config[0].productSku
-    const productPrice = config[0].productPrice * 100
     const productCategory = config[0].productCategory
 
     const addToCartButton = document
@@ -71,7 +76,7 @@ define(['cartUtils', 'extendSdk', 'ExtendMagento', 'stringUtils'], function (
 
     if (addToCartButton) {
       const handler = function () {
-        handleAddToCartClick(productSku, productPrice, productCategory)
+        handleAddToCartClick(productSku, cents, productCategory)
       }
 
       addToCartButton.addEventListener('click', handler)

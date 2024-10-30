@@ -2,12 +2,13 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
-  $,
-  cartUtils,
-  Extend,
-  ExtendMagento,
-) {
+define([
+  'jquery',
+  'cartUtils',
+  'extendSdk',
+  'ExtendMagento',
+  'currencyUtils',
+], function ($, cartUtils, Extend, ExtendMagento, currencyUtils) {
   'use strict'
   const minicartSelector = '[data-block="minicart"]'
   const productItemSelector = '[data-role=product-item]'
@@ -76,10 +77,17 @@ define(['jquery', 'cartUtils', 'extendSdk', 'ExtendMagento'], function (
               itemContainerElem.querySelector(itemDetailsSelector)
 
             if (itemDetailsElem) {
+              const currencyCode = Extend.config().currency
+
+              const cents = currencyUtils.Money.fromAmount(
+                cartItem.product_price_value,
+                currencyCode,
+              ).cents
+
               itemDetailsElem.append(simpleOfferElem)
               Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
                 referenceId: cartItem.product_sku,
-                price: cartItem.product_price_value * 100,
+                price: cents,
                 category: categories[cartItem.item_id],
                 onAddToCart: function (opts) {
                   addToCart(opts)

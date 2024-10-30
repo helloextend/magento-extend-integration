@@ -2,7 +2,11 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
-define(['Magento_Customer/js/customer-data'], function (customerData) {
+define([
+  'Magento_Customer/js/customer-data',
+  'extendSdk',
+  'currencyUtils',
+], function (customerData, Extend, currencyUtils) {
   'use strict'
 
   const getCartItems = function () {
@@ -19,11 +23,16 @@ define(['Magento_Customer/js/customer-data'], function (customerData) {
   }
 
   const mapToExtendCartItem = function (magentoCartItem) {
+    const currencyCode = Extend.config().currency
+
     return {
       name: magentoCartItem.product_name,
       sku: magentoCartItem.product_sku,
       qty: magentoCartItem.qty,
-      price: magentoCartItem.product_price_value * 100,
+      price: currencyUtils.Money.fromAmount(
+        magentoCartItem.product_price_value,
+        currencyCode,
+      ).cents,
       item_id: magentoCartItem.product_id,
       options: [],
     }
