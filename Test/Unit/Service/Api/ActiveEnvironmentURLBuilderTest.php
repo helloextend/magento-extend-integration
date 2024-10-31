@@ -19,6 +19,7 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
     private ScopeConfigInterface $scopeConfig;
     private LoggerInterface $logger;
     private IntegrationServiceInterface $integrationService;
+    private Integration $integration;
     private string $integrationId = 'integration-id';
     private string $lowerEnvironmentIntegrationBaseURL = 'https://integ-mage-dev.extend.com';
     private string $lowerEnvIntegrationEndpoint;

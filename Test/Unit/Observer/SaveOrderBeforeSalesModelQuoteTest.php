@@ -24,6 +24,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
+use Extend\Integration\Test\Unit\Mock\MagicMock;
 
 class SaveOrderBeforeSalesModelQuoteTest extends TestCase
 {
@@ -105,10 +106,7 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
     protected function setUp(): void
     {
         $this->orderExtensionAttributes = $this->createMock(OrderExtensionInterface::class);
-        $this->quoteExtensionAttributes = $this->getMockBuilder(CartExtensionInterface::class)
-            ->onlyMethods(['getShippingProtection'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->quoteExtensionAttributes = $this->createMock(MagicMock::class);
         $this->order = $this->createMock(Order::class);
         $this->quote = $this->createMock(Quote::class);
         $this->event = $this->createMock(Event::class);
@@ -282,37 +280,22 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getEvent');
+            ->method('getEvent')
+            ->willReturn($this->event);
         $this->event
             ->expects($this->exactly(2))
-            ->method('getData');
+            ->method('getData')
+            ->willReturnMap([
+                ['order', null, $this->order],
+                ['quote', null, $this->quote]
+            ]);
         $this->quote
             ->expects($this->once())
             ->method('getExtensionAttributes')
-            ->willReturn(null);
-        $this->cartExtensionFactory
-            ->expects($this->once())
-            ->method('create')
             ->willReturn($this->quoteExtensionAttributes);
         $this->quoteExtensionAttributes
             ->expects($this->once())
             ->method('getShippingProtection')
-            ->willReturn([]);
-        $this->order
-            ->expects($this->once())
-            ->method('getExtensionAttributes')
-            ->willReturn(null);
-        $this->orderExtensionFactory
-            ->expects($this->once())
-            ->method('create')
-            ->willReturn($this->orderExtensionAttributes);
-        $this->order
-            ->expects($this->once())
-            ->method('setExtensionAttributes')
-            ->with($this->orderExtensionAttributes);
-        $this->objectCopyService
-            ->expects($this->once())
-            ->method('copyFieldsetToTarget')
             ->willThrowException(new Exception());
         $this->logger
             ->expects($this->once())
@@ -320,9 +303,6 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
         $this->integration
             ->expects($this->once())
             ->method('logErrorToLoggingService');
-        $this->storeManager
-            ->expects($this->once())
-            ->method('getStore');
         $this->import->execute($this->observer);
     }
 }

@@ -139,24 +139,32 @@ class BatchProductObserverHandlerTest extends TestCase
             ->willReturn($this->metadataMock);
 
         $numberOfProducts = count($this->productIdsMock);
-
-        for ($i = 0; $i < $numberOfProducts; $i++) {
+        
+        // Create product mocks and configure them
+        $productMocks = [];
+        foreach ($this->productIdsMock as $i => $productId) {
             $productMock = $this->getMockBuilder(Product::class)
-                ->onlyMethods(['getStoreIds'])
                 ->disableOriginalConstructor()
+                ->onlyMethods(['getStoreIds'])
                 ->getMock();
-            $productMock
-                ->expects($this->any())
-                ->method('getStoreIds')
+                
+            $productMock->method('getStoreIds')
                 ->willReturn([$i + 1]);
-            $this->productRepository
-                ->expects($this->at($i))
-                ->method('getById')
-                ->with($this->productIdsMock[$i])
-                ->willReturn($productMock);
+                
+            $productMocks[$productId] = $productMock;
         }
 
-        $this->integration->expects($this->exactly($numberOfProducts))->method('execute');
+        // Configure productRepository to return appropriate product mock for each ID
+        $this->productRepository
+            ->expects($this->exactly($numberOfProducts))
+            ->method('getById')
+            ->willReturnCallback(function($productId) use ($productMocks) {
+                return $productMocks[$productId] ?? null;
+            });
+
+        $this->integration
+            ->expects($this->exactly($numberOfProducts))
+            ->method('execute');
 
         $this->batchProductObserverHandler->execute(
             $this->integrationEndpoint,

@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\InvoiceExtensionInterface;
 use Magento\Sales\Model\Order\Invoice\Item as InvoiceItem;
 use Magento\Sales\Model\Order\Item as OrderItem;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Item\Collection;
+use Extend\Integration\Test\Unit\Mock\MagicMock;
 
 class ShippingProtectionTest extends TestCase
 {
@@ -149,7 +150,7 @@ class ShippingProtectionTest extends TestCase
         'setOmitSp'
       ])
       ->getMock();
-    $this->extensionAttributesMock = $this->createStub(InvoiceExtensionInterface::class);
+    $this->extensionAttributesMock = $this->createMock(MagicMock::class);
     $this->invoiceMock->method('getExtensionAttributes')
       ->willReturn($this->extensionAttributesMock);
     $this->invoiceMock->method('getGrandTotal')->willReturn($this->invoiceGrandTotal);

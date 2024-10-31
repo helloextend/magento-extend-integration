@@ -15,8 +15,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
 use Magento\Sales\Model\ResourceModel\Order\Shipment\Collection as ShipmentsCollection;
 use Extend\Integration\Model\ShippingProtectionTotal;
-use Magento\Sales\Api\Data\OrderItemInterface;
-use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Extend\Integration\Test\Unit\Mock\MagicMock;
 
 class ShippingProtectionTest extends TestCase
 {
@@ -113,10 +112,6 @@ class ShippingProtectionTest extends TestCase
    * @var float
    */
   private $shippingProtectionTax;
-  /**
-   * @var float
-   */
-  private $preExistingCreditmemoShippingProtectionTax;
 
   protected function setUp(): void
   {
@@ -129,7 +124,6 @@ class ShippingProtectionTest extends TestCase
     $this->creditmemoStartingTaxAmount = 125.00;
     $this->preExistingCreditmemoId = 123;
     $this->preExistingCreditmemoShippingProtectionprice = 8.22;
-    $this->preExistingCreditmemoShippingProtectionTax = 1.11;
 
     // create mock constructor args for the tested class
     $this->shippingProtectionTotalRepositoryMock = $this->createStub(ShippingProtectionTotalRepositoryInterface::class);
@@ -167,7 +161,7 @@ class ShippingProtectionTest extends TestCase
       ->onlyMethods(['getOrder', 'getExtensionAttributes', 'setGrandTotal', 'setBaseGrandTotal', 'getGrandTotal', 'getBaseGrandTotal', 'getTaxAmount', 'getBaseTaxAmount','setTaxAmount', 'setBaseTaxAmount', 'setExtensionAttributes', 'setData', 'isLast'])
       ->addMethods(['setShippingProtection', 'setBaseShippingProtection', 'getShippingProtection', 'getBaseShippingProtection', 'setShippingProtectionTax', 'getShippingProtectionTax', 'setOmitSp'])
       ->getMock();
-    $this->extensionAttributesMock = $this->createStub(CreditmemoExtensionInterface::class);
+    $this->extensionAttributesMock = $this->createMock(MagicMock::class);
     $this->creditmemoMock->method('getExtensionAttributes')
       ->willReturn($this->extensionAttributesMock);
     $this->creditmemoMock->method('getGrandTotal')->willReturn($this->creditmemoStartingGrandTotal);

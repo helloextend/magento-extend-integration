@@ -10,8 +10,8 @@ use Extend\Integration\Api\Data\ShippingProtectionInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Plugin\Paypal\Model\Nvp;
 use Extend\Integration\Service\Extend;
+use Extend\Integration\Test\Unit\Mock\MagicMock;
 use Magento\Checkout\Model\Session;
-use Magento\Framework\DataObject;
 use Magento\Paypal\Model\Api\AbstractApi;
 use Magento\Quote\Api\Data\CartExtensionFactory;
 use Magento\Quote\Api\Data\CartExtensionInterface;
@@ -68,13 +68,22 @@ class NvpTest extends TestCase
      */
     private $shippingProtection;
 
+    /**
+     * @var Quote
+     */
+    private $quote;
+
+    /**
+     * @var array
+     */
+    private $request;
+
     protected function setUp(): void
     {
         $this->shippingProtectionTotalRepository = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
         $this->cartExtensionFactory = $this->createMock(CartExtensionFactory::class);
         $this->extend = $this->createMock(Extend::class);
         $this->_checkoutSession = $this->createMock(Session::class);
-        $this->abstractApi = $this->createMock(AbstractApi::class);
 
         $this->nvp = new Nvp(
             $this->shippingProtectionTotalRepository,
@@ -92,11 +101,10 @@ class NvpTest extends TestCase
             'TAXAMT' => 7.00
         ];
 
-        $this->quoteExtensionAttributes = $this->createMock(CartExtensionInterface::class);
+        $this->quoteExtensionAttributes = $this->createMock(MagicMock::class);
         $this->shippingProtection = $this->createConfiguredMock(ShippingProtectionInterface::class, ['getBase' => 1.2]);
 
         $this->badQuote = $this->createConfiguredMock(Quote::class, ['getStoreId' => 1]);
-        $this->quoteWithoutSp = $this->createConfiguredMock(Quote::class, ['getId' => 1]);
         $this->quote = $this->createConfiguredMock(Quote::class, ['getId' => 1]);
     }
 
