@@ -440,45 +440,6 @@ define([], function () {
   }
 
   /**
-   * LEGACY: This will be removed when MINT-2720 is released
-   * TODO: [MINT-2855] Remove
-   * @param {object} integration Selected integration config
-   */
-  function setActivationStatusLegacy(integration) {
-    const extendIntegrationEnvironment =
-      document.getElementById(extendEnvSelectId)
-
-    const extendActivationStatus = document.getElementById(
-      'extend_activation_status',
-    )
-    if (extendActivationStatus) {
-      extendActivationStatus.remove()
-    }
-
-    document.getElementById('how_to_activate').style.display = 'block'
-    document.getElementById('row_extend_integration_enable').style.display =
-      'table-row'
-    let statusDiv = document.createElement('div')
-    statusDiv.setAttribute('id', 'extend_activation_status')
-    extendIntegrationEnvironment.after(statusDiv)
-    if (integration.activationStatus === '1') {
-      statusDiv.classList.add('active')
-      statusDiv.innerHTML = '&#9989 '
-      document.getElementById('how_to_activate').style.display = 'none'
-    } else if (integration.activationStatus === '0') {
-      statusDiv.classList.add('inactive')
-      statusDiv.innerHTML = '&#10060 '
-      document.getElementById('row_extend_integration_enable').style.display =
-        'none'
-      document.getElementById('extend_integration_enable').value = '0'
-    }
-    document.getElementById('active_integration_title').innerText =
-      extendIntegrationEnvironment.options[
-        extendIntegrationEnvironment.selectedIndex
-      ].innerHTML
-  }
-
-  /**
    * Main entry point that runs on page load
    */
   return function (config) {
@@ -497,9 +458,6 @@ define([], function () {
     // Initial render for default selected integration
     if (integration.integrationName) {
       renderSteps(integration)
-    } else {
-      // TODO: [MINT-2855] Remove
-      setActivationStatusLegacy(integration)
     }
 
     // Re-render when the selected integration changes
@@ -512,9 +470,6 @@ define([], function () {
 
       if (selectedIntegration.integrationName) {
         renderSteps(selectedIntegration)
-      } else {
-        // TODO: [MINT-2855] Remove
-        setActivationStatusLegacy(selectedIntegration)
       }
     })
   }

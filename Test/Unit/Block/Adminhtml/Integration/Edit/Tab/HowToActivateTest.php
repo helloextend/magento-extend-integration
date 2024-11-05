@@ -131,7 +131,6 @@ class HowToActivateTest extends TestCase
 		$this->activationStatusData = [
 			[
         'integration_id' => 1,
-        'activation_status' => 1,
         'current_step' => 'complete',
         'identity_link_url' => 'https://merchants.extend.com/magento?oauth_consumer_key=prodConsumerKey&success_call_back='.$this->callbackUrl,
         'integration_name' => 'Extend Integration - Prod',
@@ -140,7 +139,6 @@ class HowToActivateTest extends TestCase
       ],
 			[
         'integration_id' => 2,
-        'activation_status' => 0,
         'current_step' => 'activation_required',
         'identity_link_url' => 'https://merchants.demo.extend.com/magento?oauth_consumer_key=demoConsumerKey&success_call_back='.$this->callbackUrl,
         'integration_name' => 'Extend Integration - Demo',
@@ -163,7 +161,7 @@ class HowToActivateTest extends TestCase
 		$this->integrationService->expects($this->exactly(2))->method('get')
 			->willReturnOnConsecutiveCalls($this->integrationModel1, $this->integrationModel2);
 
-    $this->accessTokenBuilder->expects(($this->exactly(4)))
+    $this->accessTokenBuilder->expects(($this->exactly(2)))
       ->method('getExtendOAuthClientData')
       ->willReturnOnConsecutiveCalls(
         $this->integration1OauthClientData,

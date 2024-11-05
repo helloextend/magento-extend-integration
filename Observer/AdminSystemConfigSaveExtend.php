@@ -67,7 +67,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
             return;
         }
 
-        // If the checkbox was manually checked in finish-integration.phtml then the value should come in here as a truthy 'on'.
+        // If the checkbox was manually checked in finish-integration-steps.phtml then the value should come in here as a truthy 'on'.
         // It will be null in follow-up cases where the input is disabled/checked and no value was changed
         $activateCurrentStore = $request->getParam('activate_current_store');
 
