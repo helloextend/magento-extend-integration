@@ -37,7 +37,9 @@ define([
       if (qtyElem) {
         const itemContainerElem = qtyElem.closest(productItemSelector)
         if (itemContainerElem) {
-          const simpleOfferElemId = `extend-minicart-simple-offer-${cartItem.item_id}`
+          const simpleOfferElemId =
+            'extend-minicart-simple-offer-' + cartItem.item_id
+
           let simpleOfferElem = itemContainerElem.querySelector(
             `#${simpleOfferElemId}`,
           )
