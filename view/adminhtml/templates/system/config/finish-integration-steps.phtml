@@ -44,7 +44,7 @@ $showTimeline = $status !== 4 && $status !== 3;
                         <?php if (!$this->isProdEnvironment()): ?>
                             <div>
                                 <label for="extend_store_id">Extend Store ID to use (leave empty to create a store)</label>
-                                <input type="text" name="extend_store_id" id="extend_store_id" />
+                                <input type="text" name="extend_store_id" id="extend_store_id" maxlength="36" />
                             </div>
                         <?php endif; ?>
                     </div>
@@ -64,7 +64,7 @@ $showTimeline = $status !== 4 && $status !== 3;
                         <?php if ($this->getExtendStoreUuid()): ?>
                             <div>
                                 <label for="extend_store_id">Extend Store ID</label>
-                                <input type="text" value="<?= $this->getExtendStoreUuid() ?>" name="extend_store_id" id="extend_store_id" disabled />
+                                <input type="text" value="<?= $this->getExtendStoreUuid() ?>" name="extend_store_id" id="extend_store_id" maxlength="36" disabled />
                             </div>
                         <?php endif; ?>
                     </div>
