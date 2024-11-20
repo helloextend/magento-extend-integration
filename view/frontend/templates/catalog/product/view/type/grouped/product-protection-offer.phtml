@@ -8,7 +8,9 @@
 
 $viewModel = $block->getData('viewModel');
 $categoryModel = $block->getData('categoryModel');
-$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled();
+$currencyCode = $viewModel->getCurrencyCode();
+$isCurrencySupported = $viewModel->isCurrencySupported();
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled() && $isCurrencySupported;
 ?>
 
 <?php if ($shouldRender) : ?>
@@ -37,7 +39,8 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                         "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
                         "selectedProductSku": "<?= $product->getSku(); ?>",
                         "selectedProductPrice": "<?= $product->getPrice(); ?>",
-                        "productCategory": "<?= $categoryName; ?>"
+                        "productCategory": "<?= $categoryName; ?>",
+                        "currencyCode": "<?= $currencyCode ?>"
                     }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
                 <?php endforeach; ?>
             ]

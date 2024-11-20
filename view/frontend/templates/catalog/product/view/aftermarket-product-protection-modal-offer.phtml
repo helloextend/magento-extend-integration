@@ -7,7 +7,10 @@ $activeEnvironment = $viewModel->getActiveEnvironment();
 $leadToken = $escaper->escapeHtml($escaper->escapeJs($viewModel->getLeadTokenFromUrl()));
 $viewModel = $block->getData('viewModel');
 
-$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionPostPurchaseLeadModalOfferEnabled();
+$currencyCode = $viewModel->getCurrencyCode();
+$isCurrencySupported = $viewModel->isCurrencySupported();
+
+$shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionPostPurchaseLeadModalOfferEnabled() && $isCurrencySupported;
 ?>
 
 <?php if ($shouldRender) : ?>
@@ -18,7 +21,8 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                   {
                       "extendStoreUuid": "<?= $extendStoreUuid ?>",
                       "activeEnvironment": "<?= $activeEnvironment ?>",
-                      "leadToken": "<?= /* @noEscape */ $leadToken ?>"
+                      "leadToken": "<?= /* @noEscape */ $leadToken ?>",
+                      "currencyCode": "<?= $currencyCode ?>"
                   }
               ]
           }
