@@ -25,6 +25,7 @@ define([
         lineItems: cartItems,
       })
       if (
+        cartItem.product_type === 'grouped' ||
         cartItem.product_sku === 'extend-protection-plan' ||
         cartItem.product_sku === 'xtd-pp-pln' ||
         isWarrantyInCart
