@@ -25,7 +25,6 @@ define([
         lineItems: cartItems,
       })
       if (
-        cartItem.product_type === 'grouped' ||
         cartItem.product_sku === 'extend-protection-plan' ||
         cartItem.product_sku === 'xtd-pp-pln' ||
         isWarrantyInCart
@@ -143,6 +142,22 @@ define([
     }
   }
 
+  /**
+   * We are limited on event types to listen for updates in the minicart and use `contentUpdated`.
+   * We debounce the handleUpdate function to avoid making multiple requests in quick succession as the minicart is updated,
+   * which will throw an error on the sdk when attempting to renderSimpleOffer with the same elemId.
+   * https://helloextend.atlassian.net/browse/MINT-3100
+   */
+  const debounce = (func, wait) => {
+    let timeout
+    return function (...args) {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => func.apply(this, args), wait)
+    }
+  }
+
+  const debouncedHandleUpdate = debounce(handleUpdate, 1000) // Adjust the wait time as needed
+
   return function (config) {
     const extendConfig = {
       storeId: config[0].extendStoreUuid,
@@ -151,6 +166,6 @@ define([
     }
     Extend.config(extendConfig)
 
-    $(minicartSelector).on('contentUpdated', handleUpdate)
+    $(minicartSelector).on('contentUpdated', debouncedHandleUpdate)
   }
 })
