@@ -13,12 +13,24 @@ define([
 ], function ($, cartUtils, Extend, ExtendMagento, stringUtils, currencyUtils) {
   'use strict'
 
-  const getProductQuantity = function () {
+  const getProductQuantity = function (productId) {
     let quantity = 1
 
-    const quantityInput = document.querySelector('.input-text.qty')
-
-    if (quantityInput) quantity = parseInt(quantityInput.value)
+    if (productId) {
+      // for grouped products, a productId will be specified when this is called.
+      // there will be one quantity input for each product on the page, accessible via
+      // its name: `super_group[${productId}]`
+      const quantityInput = document.getElementsByName(
+        `super_group[${productId}]`,
+      )
+      if (quantityInput && quantityInput.length === 1) {
+        quantity = parseInt(quantityInput[0].value)
+      }
+    } else {
+      // otherwise, for simple/standard products, there should just be a single quantity input. use its value.
+      const quantityInput = document.querySelector('.input-text.qty')
+      if (quantityInput) quantity = parseInt(quantityInput.value)
+    }
 
     return quantity
   }
@@ -124,20 +136,20 @@ define([
     document
       .getElementById('product-addtocart-button')
       .addEventListener('click', function (event) {
-        const buttonInstance = Extend.buttons.instance(
-          '#product_protection_offer_' +
-            stringUtils.sanitizeForElementId(config[0].selectedProductSku),
-        )
+        for (let key in config) {
+          const buttonInstance = Extend.buttons.instance(
+            '#product_protection_offer_' +
+              stringUtils.sanitizeForElementId(config[key].selectedProductSku),
+          )
 
-        if (buttonInstance) {
-          if (config.length === 1) {
+          if (buttonInstance) {
             let selectedProduct
 
             if (
               buttonInstance.getActiveProduct().id ===
-              config[0].selectedProductSku
+              config[key].selectedProductSku
             ) {
-              selectedProduct = config[0]
+              selectedProduct = config[key]
             } else {
               selectedProduct = getActiveProductConfig()
             }
@@ -145,8 +157,10 @@ define([
             const cartItems = cartUtils
               .getCartItems()
               .map(cartUtils.mapToExtendCartItem)
-            const quantity = getProductQuantity()
 
+            const quantity = getProductQuantity(
+              config.length > 1 ? selectedProduct.selectedProductId : undefined,
+            )
             const selectedPlan = buttonInstance.getPlanSelection()
 
             // If a plan is selected, add it to the cart

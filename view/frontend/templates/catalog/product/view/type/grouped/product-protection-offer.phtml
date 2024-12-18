@@ -13,11 +13,11 @@ $isCurrencySupported = $viewModel->isCurrencySupported();
 $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductCatalogPageModalOfferEnabled() && $isCurrencySupported;
 ?>
 
-<?php if ($shouldRender) : ?>
+<?php if ($shouldRender): ?>
   <table id="product_protection_offers">
-    <?php foreach ($block->getAssociatedProducts() as $product) : ?>
+    <?php foreach ($block->getAssociatedProducts() as $product): ?>
       <tr>
-        <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= preg_replace('/[^a-zA-Z0-9-_|]/', '',  $product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
+        <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= preg_replace('/[^a-zA-Z0-9-_|]/', '', $product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
       </tr>
     <?php endforeach; ?>
   </table>
@@ -25,7 +25,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
     {
         "#product_protection_offers": {
             "productProtectionOffer": [
-                <?php foreach ($block->getAssociatedProducts() as $key => $product) : ?>
+                <?php foreach ($block->getAssociatedProducts() as $key => $product): ?>
                     <?
                       $categoryName = '';
                       $categories = $product->getCategoryIds();
@@ -38,6 +38,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                         "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
                         "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
                         "selectedProductSku": "<?= $product->getSku(); ?>",
+                        "selectedProductId": "<?= $product->getId(); ?>",
                         "selectedProductPrice": "<?= $product->getPrice(); ?>",
                         "productCategory": "<?= $categoryName; ?>",
                         "currencyCode": "<?= $currencyCode ?>"
