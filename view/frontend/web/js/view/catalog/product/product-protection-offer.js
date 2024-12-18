@@ -188,8 +188,9 @@ define([
                 offerId,
                 quantity,
               }).then(cartUtils.refreshMiniCart)
-              // If no plan is selected, open the offer modal
-            } else {
+              // If no plan is selected and the product type is not 'grouped' (i.e. only one
+              // product config is present), open the offer modal
+            } else if (config.length === 1) {
               event.preventDefault()
               event.stopPropagation()
 
