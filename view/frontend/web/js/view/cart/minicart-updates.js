@@ -32,7 +32,7 @@ define([
         return
       }
       const qtyElem = document.getElementById(
-        `cart-item-${cartItem.item_id}-qty`,
+        'cart-item-' + cartItem.item_id + '-qty',
       )
       if (qtyElem) {
         const itemContainerElem = qtyElem.closest(productItemSelector)
@@ -41,7 +41,7 @@ define([
             'extend-minicart-simple-offer-' + cartItem.item_id
 
           let simpleOfferElem = itemContainerElem.querySelector(
-            `#${simpleOfferElemId}`,
+            '#' + simpleOfferElemId,
           )
 
           if (simpleOfferElem) {
@@ -87,7 +87,7 @@ define([
               ).cents
 
               itemDetailsElem.append(simpleOfferElem)
-              Extend.buttons.renderSimpleOffer(`#${simpleOfferElemId}`, {
+              Extend.buttons.renderSimpleOffer('#' + simpleOfferElemId, {
                 referenceId: cartItem.product_sku,
                 price: cents,
                 category: categories[cartItem.item_id],

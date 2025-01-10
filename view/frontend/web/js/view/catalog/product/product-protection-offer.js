@@ -21,7 +21,7 @@ define([
       // there will be one quantity input for each product on the page, accessible via
       // its name: `super_group[${productId}]`
       const quantityInput = document.getElementsByName(
-        `super_group[${productId}]`,
+        'super_group[' + productId + ']',
       )
       if (quantityInput && quantityInput.length === 1) {
         quantity = parseInt(quantityInput[0].value)

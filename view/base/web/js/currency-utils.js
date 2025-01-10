@@ -15,7 +15,7 @@ define(['extendSdk'], function (Extend) {
     const numeric = typeof value === 'string' ? parseFloat(value) : value
 
     return Number(
-      `${Math.round(Number(`${numeric}e${decimals}`))}e-${decimals}`,
+      Math.round(Number(numeric + 'e' + decimals)) + 'e-' + decimals,
     )
   }
 
@@ -52,7 +52,7 @@ define(['extendSdk'], function (Extend) {
 
       const currency = Money.currencies[currencyCode]
       if (!currency) {
-        throw new Error(`Invalid currency ${currencyCode}`)
+        throw new Error('Invalid currency ' + currencyCode)
       }
       const numeric = typeof amount === 'string' ? parseFloat(amount) : amount
 
@@ -74,7 +74,7 @@ define(['extendSdk'], function (Extend) {
       this.cents = cents
       const currency = Money.currencies[currencyCode]
       if (!currency) {
-        throw new Error(`Invalid currency ${currencyCode}`)
+        throw new Error('Invalid currency ' + currencyCode)
       }
       this.currency = currency
     }

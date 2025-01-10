@@ -13,13 +13,15 @@ define([], function () {
   const STEP_ACTIVATION_COMPLETE = 'complete'
   const extendEnvSelectId = 'extend_integration_environment'
   const timelineClass = 'extend-timeline-item'
-  const completeStepClass = `${timelineClass} extend-timeline-item-state_complete`
-  const currentStepClass = `${timelineClass} extend-timeline-item-state_current`
-  const upcomingStepClass = `${timelineClass} extend-timeline-item-state_upcoming`
-  const successStepClass = `${timelineClass} extend-timeline-item-state_success`
+  const completeStepClass =
+    timelineClass + ' extend-timeline-item-state_complete'
+  const currentStepClass = timelineClass + ' extend-timeline-item-state_current'
+  const upcomingStepClass =
+    timelineClass + ' extend-timeline-item-state_upcoming'
+  const successStepClass = timelineClass + ' extend-timeline-item-state_success'
 
   function getElementForStep(step) {
-    return document.getElementById(`extend-timeline-item-${step}`)
+    return document.getElementById('extend-timeline-item-' + step)
   }
 
   /**
@@ -28,7 +30,7 @@ define([], function () {
    * @returns Previous connection attempt cache key
    */
   function getPrevConnectAttemptKey(integrationId) {
-    return `extend_${integrationId}_prev_connection_attempt_at`
+    return 'extend_' + integrationId + '_prev_connection_attempt_at'
   }
 
   /**
@@ -47,7 +49,7 @@ define([], function () {
     // If there is no localStorage, we can leverage the the date of when the integration was activated
     // Since this is set by the server, it will be coming through as UTC
     if (integration.oauthActivatedAt) {
-      return new Date(`${integration.oauthActivatedAt}Z`)
+      return new Date(integration.oauthActivatedAt + 'Z')
     }
 
     return null
