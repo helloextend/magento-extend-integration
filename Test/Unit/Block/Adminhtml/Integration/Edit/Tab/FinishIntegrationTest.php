@@ -198,38 +198,4 @@ class FinishIntegrationTest extends TestCase
     $this->storeIntegrationRepository->method('getByStoreIdAndIntegrationId')->will($this->throwException(new \Exception()));
     $this->assertEquals($this->finishIntegration->getExtendStoreUuid(), null);
   }
-
-  public function testIsProdEnvironmentTruthy()
-  {
-    $activeIntegration = 1;
-    $integrationModel = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
-      ->addMethods(['getEndpoint'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $integrationModel
-      ->expects($this->once())
-      ->method('getEndpoint')
-      ->willReturn('https://integ-mage.extend.com');
-    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
-    $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
-    $this->activeEnvironmentURLBuilder->method('getEnvironmentFromURL')->willReturn('prod');
-    $this->assertEquals($this->finishIntegration->isProdEnvironment(), true);
-  }
-
-  public function testIsProdEnvironmentFalsey()
-  {
-    $activeIntegration = 1;
-    $integrationModel = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
-      ->addMethods(['getEndpoint'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $integrationModel
-      ->expects($this->once())
-      ->method('getEndpoint')
-      ->willReturn('https://integ-mage-stage.extend.com');
-    $this->scopeConfig->method('getValue')->willReturn($activeIntegration);
-    $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
-    $this->activeEnvironmentURLBuilder->method('getEnvironmentFromURL')->willReturn('stage');
-    $this->assertEquals($this->finishIntegration->isProdEnvironment(), false);
-  }
 }

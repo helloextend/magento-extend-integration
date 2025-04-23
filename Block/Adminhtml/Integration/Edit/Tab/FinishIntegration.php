@@ -185,19 +185,6 @@ class FinishIntegration extends Field
     }
 
     /**
-     * Fetches the name of the currently selected integration
-     *
-     * @return string
-     */
-    public function isProdEnvironment(): bool
-    {
-        $activeIntegration = $this->scopeConfig->getValue(Integration::INTEGRATION_ENVIRONMENT_CONFIG);
-        $integration = $this->integrationService->get($activeIntegration);
-        $env = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
-        return $env === 'prod';
-    }
-
-    /**
      * Determines whether the passed in integration is enabled and we've done the handshake with Extend
      * to initialize the integration.
      *
