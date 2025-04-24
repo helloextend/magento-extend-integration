@@ -7,14 +7,20 @@
 namespace Extend\Integration\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class AdditionalConfigVars implements \Magento\Checkout\Model\ConfigProviderInterface
 {
     private ScopeConfigInterface $scopeConfig;
+    private StoreManagerInterface $storeManager;
 
-    public function __construct(ScopeConfigInterface $scopeConfig)
-    {
+    public function __construct(
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
+    ) {
         $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -23,7 +29,9 @@ class AdditionalConfigVars implements \Magento\Checkout\Model\ConfigProviderInte
     public function getConfig()
     {
         $config['extendEnable'] = $this->scopeConfig->getValue(
-            \Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION
+            \Extend\Integration\Service\Extend::ENABLE_SHIPPING_PROTECTION,
+            ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
         );
         return $config;
     }
