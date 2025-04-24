@@ -125,6 +125,10 @@ define([
         })
 
         magentoQuote.shippingMethod.subscribe(function (shippingMethod) {
+          if (!shippingMethod) {
+            return
+          }
+
           if (shippingMethod.method_code === 'pickup') {
             // If we don't destroy the instance then the next time we reload the _instance property will
             // short-circuit the render and no offer will appear. This happens if you select in-store pickup
