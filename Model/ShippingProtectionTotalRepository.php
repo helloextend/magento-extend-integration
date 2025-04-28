@@ -16,6 +16,7 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ShippingProtectionTotalRepository implements
     \Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface
@@ -34,26 +35,56 @@ class ShippingProtectionTotalRepository implements
      * @var ShippingProtectionTotalCollectionFactory
      */
     private ShippingProtectionTotalCollectionFactory $shippingProtectionTotalCollection;
+
+    /**
+     * @var Session
+     */
     private Session $checkoutSession;
+
+    /**
+     * @var ShippingProtectionFactory
+     */
     private ShippingProtectionFactory $shippingProtectionFactory;
 
     /**
+     * @var SerializerInterface
+     */
+    private SerializerInterface $serializer;
+
+    /**
+     * @param ShippingProtectionFactory $shippingProtectionFactory
      * @param ShippingProtectionTotalFactory $shippingProtectionTotalFactory
      * @param ShippingProtectionTotalResource $shippingProtectionTotalResource
      * @param ShippingProtectionTotalCollectionFactory $shippingProtectionTotalCollection
+     * @param Session $checkoutSession
+     * @param SerializerInterface $serializer
      */
     public function __construct(
         ShippingProtectionFactory $shippingProtectionFactory,
         ShippingProtectionTotalFactory $shippingProtectionTotalFactory,
         ShippingProtectionTotalResource $shippingProtectionTotalResource,
         ShippingProtectionTotalCollectionFactory $shippingProtectionTotalCollection,
-        Session $checkoutSession
+        Session $checkoutSession,
+        SerializerInterface $serializer
     ) {
         $this->shippingProtectionTotalFactory = $shippingProtectionTotalFactory;
         $this->shippingProtectionTotalResource = $shippingProtectionTotalResource;
         $this->shippingProtectionTotalCollection = $shippingProtectionTotalCollection;
         $this->checkoutSession = $checkoutSession;
         $this->shippingProtectionFactory = $shippingProtectionFactory;
+        $this->serializer = $serializer;
+    }
+
+    /**
+     * Get session cache key for an entity
+     *
+     * @param int $entityId
+     * @param int $entityTypeId
+     * @return string
+     */
+    private function getSessionCacheKey(int $entityId, int $entityTypeId): string
+    {
+        return 'shipping_protection_' . $entityId . '_' . $entityTypeId;
     }
 
     /**
@@ -65,12 +96,36 @@ class ShippingProtectionTotalRepository implements
      */
     public function get($entityId, $entityTypeId): ShippingProtectionTotal
     {
+        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+
+        // Check if the result is in the session cache
+        if ($this->checkoutSession->hasData($sessionCacheKey)) {
+            $serializedData = $this->checkoutSession->getData($sessionCacheKey);
+            $totalData = $this->serializer->unserialize($serializedData);
+
+            if ($totalData && !empty($totalData)) {
+                $total = $this->shippingProtectionTotalFactory->create();
+                $total->setData($totalData);
+                return $total;
+            }
+        }
+
+        // Fetch from database
         $collection = $this->shippingProtectionTotalCollection->create();
         $firstItem = $collection
             ->addFieldToFilter('entity_id', $entityId)
             ->addFieldToFilter('entity_type_id', $entityTypeId)
             ->load()
             ->getFirstItem();
+
+        // Only cache if we have data
+        if ($firstItem && $firstItem->getId()) {
+            // Cache in session for persistence across requests
+            $this->checkoutSession->setData(
+                $sessionCacheKey,
+                $this->serializer->serialize($firstItem->getData())
+            );
+        }
 
         return $firstItem;
     }
@@ -135,6 +190,13 @@ class ShippingProtectionTotalRepository implements
 
         $this->shippingProtectionTotalResource->save($shippingProtectionTotal);
 
+        // Update session cache
+        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+        $this->checkoutSession->setData(
+            $sessionCacheKey,
+            $this->serializer->serialize($shippingProtectionTotal->getData())
+        );
+
         return $shippingProtectionTotal;
     }
 
@@ -192,6 +254,15 @@ class ShippingProtectionTotalRepository implements
     {
         $shippingProtectionTotal = $this->getById($shippingProtectionTotalId);
         $this->shippingProtectionTotalResource->delete($shippingProtectionTotal);
+
+        // Clear cache for this entity using its entity ID and type directly
+        $entityId = $shippingProtectionTotal->getEntityId();
+        $entityTypeId = $shippingProtectionTotal->getEntityTypeId();
+        if ($entityId && $entityTypeId) {
+            // Clear session cache
+            $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+            $this->checkoutSession->unsetData($sessionCacheKey);
+        }
     }
 
     /**
@@ -200,11 +271,16 @@ class ShippingProtectionTotalRepository implements
     public function delete(): void
     {
         $entityId = $this->checkoutSession->getQuote()->getId();
+        $entityTypeId = ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID;
         $shippingProtection = $this->get(
             $entityId,
-            ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+            $entityTypeId
         );
         $this->shippingProtectionTotalResource->delete($shippingProtection);
+
+        // Clear session cache
+        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+        $this->checkoutSession->unsetData($sessionCacheKey);
     }
 
     /**
@@ -320,6 +396,7 @@ class ShippingProtectionTotalRepository implements
      * @param float|null $basePrice
      * @param string|null $baseCurrency
      * @param float|null $spTax
+     * @param string|null $offerType
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
