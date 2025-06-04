@@ -86,6 +86,13 @@ class OrderPlugin
         if (!$this->extend->isEnabled())
             return $result;
 
+        // If order entity ID is null, skip shipping protection processing
+        // This can happen during "Authorize and Capture" payment flows where
+        // invoice creation occurs before order persistence is complete
+        if ($order->getEntityId() === null) {
+            return $result;
+        }
+
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {
             $orderExtensionAttributes = $this->orderExtensionFactory->create();
@@ -149,6 +156,13 @@ class OrderPlugin
     ) {
         if (!$this->extend->isEnabled())
             return $result;
+
+        // If order entity ID is null, skip shipping protection processing
+        // This can happen during "Authorize and Capture" payment flows where
+        // creditmemo creation occurs before order persistence is complete
+        if ($order->getEntityId() === null) {
+            return $result;
+        }
 
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {

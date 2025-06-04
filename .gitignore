@@ -69,3 +69,8 @@ atlassian*
 .DS_Store
 
 .phpunit.result.cache
+
+# cursor - Note: Once we have team alignment, we may allow for a few rules to be committed to the repo
+.agent/*
+.cursor/*
+.cursorrules

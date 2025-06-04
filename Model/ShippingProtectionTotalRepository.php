@@ -90,36 +90,46 @@ class ShippingProtectionTotalRepository implements
     /**
      * Get Shipping Protection total record by entity ID and entity type
      *
-     * @param int $entityId
+     * @param int|null $entityId
      * @param int $entityTypeId
      * @return ShippingProtectionTotal
      */
-    public function get($entityId, $entityTypeId): ShippingProtectionTotal
+    public function get(?int $entityId, int $entityTypeId): ShippingProtectionTotal
     {
-        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+        // Only use session cache if entityId is valid
+        // During payment capture flows, entityId might be null before order is persisted
+        if ($entityId !== null && is_int($entityId)) {
+            $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
 
-        // Check if the result is in the session cache
-        if ($this->checkoutSession->hasData($sessionCacheKey)) {
-            $serializedData = $this->checkoutSession->getData($sessionCacheKey);
-            $totalData = $this->serializer->unserialize($serializedData);
+            // Check if the result is in the session cache
+            if ($this->checkoutSession->hasData($sessionCacheKey)) {
+                $serializedData = $this->checkoutSession->getData($sessionCacheKey);
+                $totalData = $this->serializer->unserialize($serializedData);
 
-            if ($totalData && !empty($totalData)) {
-                $total = $this->shippingProtectionTotalFactory->create();
-                $total->setData($totalData);
-                return $total;
+                if ($totalData && !empty($totalData)) {
+                    $total = $this->shippingProtectionTotalFactory->create();
+                    $total->setData($totalData);
+                    return $total;
+                }
             }
         }
 
         // Fetch from database
         $collection = $this->shippingProtectionTotalCollection->create();
+
+        // Only filter by entity_id if it's not null
+        if ($entityId !== null) {
+            $collection->addFieldToFilter('entity_id', $entityId);
+        }
+
         $firstItem = $collection
-            ->addFieldToFilter('entity_id', $entityId)
             ->addFieldToFilter('entity_type_id', $entityTypeId)
             ->load()
             ->getFirstItem();
 
-        // Only cache if we have data
-        if ($firstItem && $firstItem->getId()) {
+        // Only cache if we have valid data and valid entityId
+        if ($firstItem && $firstItem->getId() && $entityId !== null && is_int($entityId)) {
+            $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
             // Cache in session for persistence across requests
             $this->checkoutSession->setData(
                 $sessionCacheKey,

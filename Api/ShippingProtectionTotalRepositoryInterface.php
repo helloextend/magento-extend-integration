@@ -20,11 +20,11 @@ interface ShippingProtectionTotalRepositoryInterface
     /**
      * Get Shipping Protection total record by entity ID and entity type
      *
-     * @param int $entityId
+     * @param int|null $entityId
      * @param int $entityTypeId
      * @return ShippingProtectionTotal
      */
-    public function get(int $entityId, int $entityTypeId): ShippingProtectionTotal;
+    public function get(?int $entityId, int $entityTypeId): ShippingProtectionTotal;
 
     /**
      * Get Shipping Protection total by record ID
