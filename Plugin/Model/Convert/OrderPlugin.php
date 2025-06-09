@@ -17,6 +17,7 @@ use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Framework\DataObject\Copy;
 use Magento\Sales\Model\Convert\Order;
+use Psr\Log\LoggerInterface;
 
 class OrderPlugin
 {
@@ -41,8 +42,9 @@ class OrderPlugin
     private ShippingProtectionTotalRepository $shippingProtectionTotalRepository;
     private Http $http;
     private ShippingProtectionFactory $shippingProtectionFactory;
-  private CreditmemoExtensionFactory $creditmemoExtensionFactory;
+    private CreditmemoExtensionFactory $creditmemoExtensionFactory;
     private Extend $extend;
+    private LoggerInterface $logger;
 
     /**
      * @param InvoiceExtensionFactory $invoiceExtensionFactory
@@ -58,7 +60,8 @@ class OrderPlugin
         Http $http,
         ShippingProtectionFactory $shippingProtectionFactory,
         CreditmemoExtensionFactory $creditmemoExtensionFactory,
-        Extend $extend
+        Extend $extend,
+        LoggerInterface $logger
     ) {
         $this->invoiceExtensionFactory = $invoiceExtensionFactory;
         $this->objectCopyService = $objectCopyService;
@@ -68,6 +71,7 @@ class OrderPlugin
         $this->shippingProtectionFactory = $shippingProtectionFactory;
         $this->creditmemoExtensionFactory = $creditmemoExtensionFactory;
         $this->extend = $extend;
+        $this->logger = $logger;
     }
 
     /**
@@ -86,23 +90,14 @@ class OrderPlugin
         if (!$this->extend->isEnabled())
             return $result;
 
-        // If order entity ID is null, skip shipping protection processing
-        // This can happen during "Authorize and Capture" payment flows where
-        // invoice creation occurs before order persistence is complete
-        if ($order->getEntityId() === null) {
-            return $result;
-        }
-
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {
             $orderExtensionAttributes = $this->orderExtensionFactory->create();
         }
         if ($orderExtensionAttributes->getShippingProtection() === null) {
-            $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
-                $order->getEntityId(),
-                ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID
-            );
-            if ($shippingProtectionTotalData->getData()) {
+            $shippingProtectionTotalData = $this->getShippingProtectionTotalData($order);
+
+            if ($shippingProtectionTotalData && $shippingProtectionTotalData->getData()) {
                 $shippingProtection = $this->shippingProtectionFactory->create();
                 $shippingProtection->setBase(
                     $shippingProtectionTotalData->getShippingProtectionBasePrice()
@@ -157,23 +152,14 @@ class OrderPlugin
         if (!$this->extend->isEnabled())
             return $result;
 
-        // If order entity ID is null, skip shipping protection processing
-        // This can happen during "Authorize and Capture" payment flows where
-        // creditmemo creation occurs before order persistence is complete
-        if ($order->getEntityId() === null) {
-            return $result;
-        }
-
         $orderExtensionAttributes = $order->getExtensionAttributes();
         if ($orderExtensionAttributes === null) {
             $orderExtensionAttributes = $this->orderExtensionFactory->create();
         }
         if ($orderExtensionAttributes->getShippingProtection() === null) {
-            $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
-                $order->getEntityId(),
-                ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID
-            );
-            if ($shippingProtectionTotalData->getData()) {
+            $shippingProtectionTotalData = $this->getShippingProtectionTotalData($order);
+
+            if ($shippingProtectionTotalData && $shippingProtectionTotalData->getData()) {
                 $shippingProtection = $this->shippingProtectionFactory->create();
                 $shippingProtection->setBase(
                     $shippingProtectionTotalData->getShippingProtectionBasePrice()
@@ -246,5 +232,50 @@ class OrderPlugin
             );
         }
         return $result;
+    }
+
+    /**
+     * Get shipping protection total data for an order
+     *
+     * Attempts to retrieve shipping protection data first by ORDER entity type (if order is persisted),
+     * then falls back to QUOTE entity type to handle "Authorize and Capture" payment flows where
+     * invoice/creditmemo creation happens before order shipping protection data is saved.
+     *
+     * @param \Magento\Sales\Model\Order $order
+     * @return \Extend\Integration\Model\ShippingProtectionTotal|null
+     */
+    private function getShippingProtectionTotalData(\Magento\Sales\Model\Order $order)
+    {
+        $shippingProtectionTotalData = null;
+
+        // try to retrieve an SP total data using the ORDER entity type first (available if order is persisted)
+        if ($order->getEntityId() !== null) {
+          try {
+            $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
+                $order->getEntityId(),
+                ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID
+            );
+          } catch (\Exception $e) {
+            // Log the error and continue with fallback lookup below
+            $this->logger->error('Error retrieving shipping protection total data for order with entity id ' . $order->getEntityId() . ': ' . $e->getMessage());
+          }
+        }
+
+        // fall back to lookup based on the QUOTE entity type, if order is not found or not persisted yet.
+        // this handles "Authorize and Capture" payment action flows where conversion to invoice happens before the
+        // order is persisted and shipping protection data is saved to it.
+        if ((!$shippingProtectionTotalData || !$shippingProtectionTotalData->getData()) && $order->getQuoteId()) {
+          try {
+            $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
+                $order->getQuoteId(),
+                ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+            );
+          } catch (\Exception $e) {
+            // Log the error and continue returning null so as to not break the flow
+            $this->logger->error('Error retrieving shipping protection total data for order with quote id ' . $order->getQuoteId() . ': ' . $e->getMessage());
+          }
+        }
+
+        return $shippingProtectionTotalData;
     }
 }
