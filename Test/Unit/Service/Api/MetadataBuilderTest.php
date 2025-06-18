@@ -19,6 +19,7 @@ use Magento\Integration\Api\IntegrationServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Model\Oauth\Consumer;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Psr\Log\LoggerInterface;
 
 class MetadataBuilderTest extends TestCase
 {
@@ -71,8 +72,10 @@ class MetadataBuilderTest extends TestCase
         $this->storeIntegrationRepository
             ->expects($this->any())
             ->method('getByStoreIdAndActiveEnvironment')
-            ->with($this->magentoStoreIdMocks[0])
-            ->willReturn($this->storeIntegration);
+            ->willReturnMap([
+                [$this->magentoStoreIdMocks[0], $this->storeIntegration],
+                [0, $this->storeIntegration],
+            ]);
 
         $this->accessTokenBuilder = $this->getMockBuilder(AccessTokenBuilder::class)
             ->onlyMethods(['getAccessToken'])
@@ -130,6 +133,8 @@ class MetadataBuilderTest extends TestCase
             ->method('getVersion')
             ->willReturn($this->magentoVersion);
 
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->objectManager = new ObjectManager($this);
         $this->metadataBuilder = $this->objectManager->getObject(MetadataBuilder::class, [
             'identityService' => $this->identityService,
@@ -140,6 +145,7 @@ class MetadataBuilderTest extends TestCase
             'oauthService' => $this->oauthService,
             'integrationService' => $this->integrationService,
             'scopeConfig' => $this->scopeConfig,
+            'logger' => $this->logger,
         ]);
     }
 
@@ -198,5 +204,27 @@ class MetadataBuilderTest extends TestCase
         $this->assertEquals($expectedBody['webhook_id'], $actualBody['webhook_id']);
         $this->assertEquals($expectedBody['topic'], $actualBody['topic']);
         $this->assertEquals($expectedBody['data'], $actualBody['data']);
+    }
+
+    public function testExecuteWithNullInStoreIdsIsHandledGracefully(): void
+    {
+        $storeIdsWithNull = [$this->magentoStoreIdMocks[0], null, 0];
+        $topic = 'topic';
+        $integrationEndpoint = [
+            'path' => '/webhooks/' . $topic,
+        ];
+        $data = [
+            'key' => 'value',
+        ];
+
+        [, $actualBody] = $this->metadataBuilder->execute(
+            $storeIdsWithNull,
+            $integrationEndpoint,
+            $data
+        );
+
+        $this->assertArrayHasKey('magento_store_uuids', $actualBody);
+        $this->assertCount(2, $actualBody['magento_store_uuids']);
+        $this->assertEquals($this->storeUUID, $actualBody['magento_store_uuids'][0]);
     }
 }

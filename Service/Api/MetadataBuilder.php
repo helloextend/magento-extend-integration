@@ -55,14 +55,17 @@ class MetadataBuilder
     }
 
     /**
-     * @param int[] $storeIds
+     * @param array $storeIds
      * @param array $integrationEndpoint
      * @param array $data
      * @return array
      * @throws NoSuchEntityException
      */
-    public function execute($storeIds, $integrationEndpoint, $data): array
+    public function execute(array $storeIds, array $integrationEndpoint, array $data): array
     {
+        // storeIds are typed as int|null upstream, so we need to filter out null values
+        $storeIds = array_filter($storeIds, fn ($storeId) => $storeId !== null);
+
         $headers = [];
         $body = [];
 
@@ -104,8 +107,8 @@ class MetadataBuilder
         foreach ($storeIds as $storeId) {
             $body['magento_store_uuids'][] =
                 $this->storeIntegrationRepository
-                ->getByStoreIdAndActiveEnvironment($storeId)
-                ->getStoreUuid();
+                    ->getByStoreIdAndActiveEnvironment($storeId)
+                    ->getStoreUuid();
         }
 
         return [$headers, $body];
