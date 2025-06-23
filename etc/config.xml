@@ -7,7 +7,7 @@
     <default>
         <extend>
             <integration>
-                <enable>1</enable>
+                <enable>0</enable>
             </integration>
         </extend>
         <extend_plans>
