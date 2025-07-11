@@ -32,5 +32,5 @@ interface HealthCheckResponseInterface
      * Get response message from Extend server's healthcheck response or error message
      * @return string|null
      */
-    public function getMessage(): string|null;
+    public function getMessage(): ?string;
 }

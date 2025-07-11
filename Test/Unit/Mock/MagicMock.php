@@ -13,7 +13,7 @@ use Extend\Integration\Api\Data\ShippingProtectionInterface;
  * Because PHPUnit v10+ deprecates the use of addMethods, and otherwise complains that
  * the magic methods do not exist on the class, this interface can be used to create
  * a mock that will return the expected values for the magic methods.
- * 
+ *
  * @link https://github.com/sebastianbergmann/phpunit/issues/5320#issuecomment-2368024251
  */
 interface MagicMock
@@ -26,7 +26,7 @@ interface MagicMock
     /**
      * This method can be used with a willReturnCallback to return a specific value
      * for a given method that may not be defined on this interface.
-     * 
+     *
      * @return T
      * @example
      * $mock = $this->createMock(MagicMock::class);
@@ -48,7 +48,7 @@ interface MagicMock
     /**
      * @return ShippingProtection|ShippingProtectionInterface|array|null
      */
-    public function getShippingProtection(): ShippingProtection|ShippingProtectionInterface|array|null;
+    public function getShippingProtection();
 
     /**
      * @return bool
@@ -59,4 +59,4 @@ interface MagicMock
      * @return bool
      */
     public function getSpgSpRemovedFromCreditMemo(): bool;
-} 
+}
