@@ -22,7 +22,7 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
     private IntegrationService $integrationService;
 
     public function __construct(
-        IntegrationService $integrationService,
+        IntegrationService $integrationService
     ) {
         $this->integrationService = $integrationService;
     }
