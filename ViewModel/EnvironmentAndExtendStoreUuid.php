@@ -43,6 +43,9 @@ class EnvironmentAndExtendStoreUuid implements
     /** @var Http */
     private $request;
 
+    /** @var Extend */
+    private $extendService;
+
     /**
      * EnvironmentAndExtendStoreUuid constructor
      *
@@ -52,6 +55,7 @@ class EnvironmentAndExtendStoreUuid implements
      * @param ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
      * @param LoggerInterface $logger
      * @param Http $request
+     * @param Extend $extendService
      */
     public function __construct(
         StoreIntegrationRepositoryInterface $storeIntegrationRepository,
@@ -59,7 +63,8 @@ class EnvironmentAndExtendStoreUuid implements
         ScopeConfigInterface $scopeConfig,
         ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
         LoggerInterface $logger,
-        Http $request
+        Http $request,
+        Extend $extendService
     ) {
         $this->storeIntegrationRepository = $storeIntegrationRepository;
         $this->storeManager = $storeManager;
@@ -67,6 +72,7 @@ class EnvironmentAndExtendStoreUuid implements
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
         $this->logger = $logger;
         $this->request = $request;
+        $this->extendService = $extendService;
     }
 
     /**
@@ -125,17 +131,19 @@ class EnvironmentAndExtendStoreUuid implements
      */
     public function isExtendProductProtectionEnabled(): bool
     {
-        return $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
+        return $this->extendService->isEnabled()
+            && $this->getScopedConfigValue(Extend::ENABLE_PRODUCT_PROTECTION) === '1';
     }
 
     /**
-     * Determine if Extend Product Protection is currently enabled
+     * Determine if Extend Shipping Protection is currently enabled
      *
      * @return bool
      */
     public function isExtendShippingProtectionEnabled(): bool
     {
-        return $this->getScopedConfigValue(Extend::ENABLE_SHIPPING_PROTECTION) === '1';
+        return $this->extendService->isEnabled()
+            && $this->getScopedConfigValue(Extend::ENABLE_SHIPPING_PROTECTION) === '1';
     }
 
     /**
@@ -145,7 +153,7 @@ class EnvironmentAndExtendStoreUuid implements
      */
     public function isCartBalancingEnabled(): bool
     {
-        return $this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING) === '1';
+        return $this->extendService->isEnabled() && $this->getScopedConfigValue(Extend::ENABLE_CART_BALANCING) === '1';
     }
 
     /**

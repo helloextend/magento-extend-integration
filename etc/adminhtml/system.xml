@@ -28,7 +28,6 @@
                 <field id="enable" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
                     <label>Enable Extend</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <backend_model>Extend\Integration\Model\Config\Backend\Enable</backend_model>
                 </field>
                 <group id="finish_integration" translate="label" type="text" sortOrder="30" showInStore="1">
                     <frontend_model>Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\FinishIntegration</frontend_model>

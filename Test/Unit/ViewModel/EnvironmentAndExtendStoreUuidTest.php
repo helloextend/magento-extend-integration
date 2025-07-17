@@ -47,6 +47,9 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
     /** @var Currency */
     private $currencyMock;
 
+    /** @var Extend */
+    private $extendServiceMock;
+
     /** @var string */
     private $defaultCurrency = 'USD';
 
@@ -58,6 +61,7 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
         $this->activeEnvironmentURLBuilderMock = $this->createStub(ActiveEnvironmentURLBuilder::class);
         $this->loggerMock = $this->createStub(LoggerInterface::class);
         $this->requestMock = $this->createStub(Http::class);
+        $this->extendServiceMock = $this->createStub(Extend::class);
 
         $this->storeMock = $this->createStub(Store::class);
         $this->currencyMock = $this->createStub(Currency::class);
@@ -72,7 +76,8 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
             $this->scopeConfigMock,
             $this->activeEnvironmentURLBuilderMock,
             $this->loggerMock,
-            $this->requestMock
+            $this->requestMock,
+            $this->extendServiceMock
         );
     }
 
@@ -98,5 +103,95 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
     {
         $this->currencyMock->method('getCode')->willReturnOnConsecutiveCalls('JPY', 'JPY');
         $this->assertFalse($this->environmentAndExtendStoreUuid->isCurrencySupported());
+    }
+
+    public function testIsExtendProductProtectionEnabledReturnsTrueWhenBothExtendAndProductProtectionEnabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_PRODUCT_PROTECTION)
+            ->willReturn('1');
+
+        $this->assertTrue($this->environmentAndExtendStoreUuid->isExtendProductProtectionEnabled());
+    }
+
+    public function testIsExtendProductProtectionEnabledReturnsFalseWhenExtendDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(false);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_PRODUCT_PROTECTION)
+            ->willReturn('1');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isExtendProductProtectionEnabled());
+    }
+
+    public function testIsExtendProductProtectionEnabledReturnsFalseWhenProductProtectionDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_PRODUCT_PROTECTION)
+            ->willReturn('0');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isExtendProductProtectionEnabled());
+    }
+
+    public function testIsExtendShippingProtectionEnabledReturnsTrueWhenBothExtendAndShippingProtectionEnabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_SHIPPING_PROTECTION)
+            ->willReturn('1');
+
+        $this->assertTrue($this->environmentAndExtendStoreUuid->isExtendShippingProtectionEnabled());
+    }
+
+    public function testIsExtendShippingProtectionEnabledReturnsFalseWhenExtendDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(false);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_SHIPPING_PROTECTION)
+            ->willReturn('1');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isExtendShippingProtectionEnabled());
+    }
+
+    public function testIsExtendShippingProtectionEnabledReturnsFalseWhenShippingProtectionDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_SHIPPING_PROTECTION)
+            ->willReturn('0');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isExtendShippingProtectionEnabled());
+    }
+
+    public function testIsCartBalancingEnabledReturnsTrueWhenBothExtendAndCartBalancingEnabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_CART_BALANCING)
+            ->willReturn('1');
+
+        $this->assertTrue($this->environmentAndExtendStoreUuid->isCartBalancingEnabled());
+    }
+
+    public function testIsCartBalancingEnabledReturnsFalseWhenExtendDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(false);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_CART_BALANCING)
+            ->willReturn('1');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isCartBalancingEnabled());
+    }
+
+    public function testIsCartBalancingEnabledReturnsFalseWhenCartBalancingDisabled()
+    {
+        $this->extendServiceMock->method('isEnabled')->willReturn(true);
+        $this->scopeConfigMock->method('getValue')
+            ->with(Extend::ENABLE_CART_BALANCING)
+            ->willReturn('0');
+
+        $this->assertFalse($this->environmentAndExtendStoreUuid->isCartBalancingEnabled());
     }
 }
