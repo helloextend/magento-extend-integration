@@ -19,16 +19,28 @@ use Magento\Integration\Model\IntegrationService;
  */
 class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchRevertableInterface
 {
+    /**
+     * @var IntegrationService
+     */
     private IntegrationService $integrationService;
 
+    /**
+     * Constructor
+     *
+     * @param IntegrationService $integrationService
+     */
     public function __construct(
-        IntegrationService $integrationService,
+        IntegrationService $integrationService
     ) {
         $this->integrationService = $integrationService;
     }
 
     /**
+     * Get patch dependencies
+     *
      * This patch depends on the ExtendProductPatch because the integrations updated here are created there.
+     *
+     * @return array
      */
     public static function getDependencies()
     {
@@ -38,7 +50,10 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
     }
 
     /**
+     * Get patch aliases
+     *
      * @inheritDoc
+     * @return array
      */
     public function getAliases()
     {
@@ -46,8 +61,11 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
     }
 
     /**
+     * Apply patch
+     *
      * @inheritDoc
      * @throws SetupException
+     * @return void
      */
     public function apply()
     {
@@ -64,7 +82,8 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
         } catch (Exception $exception) {
             throw new SetupException(
                 new Phrase(
-                    'There was a problem applying the Extend Integration Patch to make default Extend integrations editable and deletable: %1',
+                    'There was a problem applying the Extend Integration Patch to make ' .
+                    'default Extend integrations editable and deletable: %1',
                     [$exception->getMessage()]
                 )
             );
@@ -72,13 +91,17 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
     }
 
     /**
+     * Revert patch
+     *
      * @inheritDoc
      * @throws FileSystemException|SetupException
+     * @return void
      */
     public function revert()
     {
         try {
-            // for rollback, we need to set the setup_type of the default Extend integrations to 1 to make them non-mutable
+            // for rollback, we need to set the setup_type of the default Extend integrations
+            // to 1 to make them non-mutable
             $prodIntegration = $this->integrationService
                 ->findByName('Extend Integration - Production')
                 ->setSetupType(1);
@@ -90,7 +113,8 @@ class MakeDefaultExtendIntegrationsMutable implements DataPatchInterface, PatchR
         } catch (Exception $exception) {
             throw new SetupException(
                 new Phrase(
-                    'There was a problem reverting the Extend Integration Patch to make default Extend integrations editable and deletable: %1',
+                    'There was a problem reverting the Extend Integration Patch to make ' .
+                    'default Extend integrations editable and deletable: %1',
                     [$exception->getMessage()]
                 )
             );

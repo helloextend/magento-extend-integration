@@ -24,7 +24,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
 use Magento\Framework\Registry;
-use Extend\Integration\Test\Unit\Mock\MagicMock;
+use Extend\Integration\Test\Unit\Mock\MagicMockInterface;
 
 class InvoiceSaveAfterTest extends TestCase
 {
@@ -113,10 +113,10 @@ class InvoiceSaveAfterTest extends TestCase
         $this->orderMock = $this->createMock(Order::class);
         $this->invoice = $this->getMockBuilder(Invoice::class)
             ->addMethods(
-              ['getOmitSp']
+                ['getOmitSp']
             )
             ->onlyMethods(
-              ['getOrder', 'getId', 'getExtensionAttributes']
+                ['getOrder', 'getId', 'getExtensionAttributes']
             )
             ->disableOriginalConstructor()
             ->getMock();
@@ -131,7 +131,7 @@ class InvoiceSaveAfterTest extends TestCase
             ->method('getInvoice')
             ->willReturn($this->invoice);
         $this->shippingProtection = $this->createMock(ShippingProtectionInterface::class);
-        $this->invoiceExtension = $this->createMock(MagicMock::class);
+        $this->invoiceExtension = $this->createMock(MagicMockInterface::class);
         $this->store = $this->createMock(Store::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->extendService = $this->createMock(ExtendService::class);

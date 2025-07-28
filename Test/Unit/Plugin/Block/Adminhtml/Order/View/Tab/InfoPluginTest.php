@@ -25,253 +25,252 @@ class InfoPluginTest extends TestCase
   /**
    * @var string
    */
-  private $mockTransactionId = 'order-id';
+    private $mockTransactionId = 'order-id';
 
   /**
    * @var int
    */
-  private $mockStoreId = 1;
+    private $mockStoreId = 1;
 
   /**
    * @var int
    */
-  private $mockIntegrationId = 1;
+    private $mockIntegrationId = 1;
 
   /**
    * @var string
    */
-  private $mockMerchantPortalBaseURL = 'https://test.com/';
+    private $mockMerchantPortalBaseURL = 'https://test.com/';
 
   /**
    * @var string
    */
-  private $mockIdentityLinkUrl;
+    private $mockIdentityLinkUrl;
 
   /**
    * @var (OrderItemInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $mockOrderItem;
+    private $mockOrderItem;
 
   /**
    * @var (Order&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $order;
+    private $order;
 
   /**
    * @var (Info&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $subject;
+    private $subject;
 
   /**
    * @var (StoreIntegrationInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $storeIntegration;
+    private $storeIntegration;
 
   /**
    * @var (StoreIntegrationRepositoryInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $integrationStoresRepository;
+    private $integrationStoresRepository;
 
   /**
    * @var (Integration&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $integration;
+    private $integration;
 
   /**
    * @var (IntegrationServiceInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $integrationService;
+    private $integrationService;
 
   /**
    * @var (LoggerInterface&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $logger;
+    private $logger;
 
   /**
    * @var (ExtendIntegrationService&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $extendIntegrationService;
+    private $extendIntegrationService;
 
   /**
    * @var InfoPlugin
    */
-  private $infoPlugin;
+    private $infoPlugin;
 
+    public function setUp(): void
+    {
+        $this->mockOrderItem = $this->getMockBuilder(OrderItemInterface::class)
+        ->setMethods(['getSku'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->order = $this->getMockBuilder(Order::class)
+        ->setMethods(['getStoreId', 'getIncrementId', 'getItems'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->order
+        ->expects($this->any())
+        ->method('getStoreId')
+        ->willReturn($this->mockStoreId);
+        $this->order
+        ->expects($this->any())
+        ->method('getIncrementId')
+        ->willReturn($this->mockTransactionId);
+        $this->order
+        ->expects($this->any())
+        ->method('getItems')
+        ->willReturn([$this->mockOrderItem]);
+        $this->subject = $this->getMockBuilder(Info::class)
+        ->setMethods(['getOrder'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->subject
+        ->expects($this->any())
+        ->method('getOrder')
+        ->willReturn($this->order);
+        $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
+        ->onlyMethods(['getIntegrationId'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->storeIntegration
+        ->expects($this->any())
+        ->method('getIntegrationId')
+        ->willReturn($this->mockIntegrationId);
+        $this->integrationStoresRepository = $this->getMockBuilder(StoreIntegrationRepositoryInterface::class)
+        ->onlyMethods(['getByStoreIdAndActiveEnvironment'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->integrationStoresRepository
+        ->expects($this->any())
+        ->method('getByStoreIdAndActiveEnvironment')
+        ->with($this->mockStoreId)
+        ->willReturn($this->storeIntegration);
+        $this->integration = $this->getMockBuilder(Integration::class)
+        ->onlyMethods(['getData'])
+        ->disableOriginalConstructor()
+        ->getMock();
+        $this->mockIdentityLinkUrl = $this->mockMerchantPortalBaseURL . 'magento';
+        $this->integration
+        ->expects($this->any())
+        ->method('getData')
+        ->with(Integration::IDENTITY_LINK_URL)
+        ->willReturn($this->mockIdentityLinkUrl);
+        $this->integrationService = $this->getMockBuilder(IntegrationServiceInterface::class)
+        ->onlyMethods(['get'])
+        ->disableOriginalConstructor()
+        ->getMockForAbstractClass();
+        $this->integrationService
+        ->expects($this->any())
+        ->method('get')
+        ->with($this->mockIntegrationId)
+        ->willReturn($this->integration);
+        $this->logger = $this->getMockBuilder(LoggerInterface::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+        $this->extendIntegrationService = $this->getMockBuilder(ExtendIntegrationService::class)
+        ->onlyMethods(['logErrorToLoggingService'])
+        ->disableOriginalConstructor()
+        ->getMock();
+        $this->infoPlugin = new InfoPlugin(
+            $this->integrationStoresRepository,
+            $this->integrationService,
+            $this->logger,
+            $this->extendIntegrationService
+        );
+    }
 
-  public function setUp(): void
-  {
-    $this->mockOrderItem = $this->getMockBuilder(OrderItemInterface::class)
-      ->setMethods(['getSku'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->order = $this->getMockBuilder(Order::class)
-      ->setMethods(['getStoreId', 'getIncrementId', 'getItems'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->order
-      ->expects($this->any())
-      ->method('getStoreId')
-      ->willReturn($this->mockStoreId);
-    $this->order
-      ->expects($this->any())
-      ->method('getIncrementId')
-      ->willReturn($this->mockTransactionId);
-    $this->order
-      ->expects($this->any())
-      ->method('getItems')
-      ->willReturn([$this->mockOrderItem]);
-    $this->subject = $this->getMockBuilder(Info::class)
-      ->setMethods(['getOrder'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->subject
-      ->expects($this->any())
-      ->method('getOrder')
-      ->willReturn($this->order);
-    $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
-      ->onlyMethods(['getIntegrationId'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->storeIntegration
-      ->expects($this->any())
-      ->method('getIntegrationId')
-      ->willReturn($this->mockIntegrationId);
-    $this->integrationStoresRepository = $this->getMockBuilder(StoreIntegrationRepositoryInterface::class)
-      ->onlyMethods(['getByStoreIdAndActiveEnvironment'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->integrationStoresRepository
-      ->expects($this->any())
-      ->method('getByStoreIdAndActiveEnvironment')
-      ->with($this->mockStoreId)
-      ->willReturn($this->storeIntegration);
-    $this->integration = $this->getMockBuilder(Integration::class)
-      ->onlyMethods(['getData'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->mockIdentityLinkUrl = $this->mockMerchantPortalBaseURL . 'magento';
-    $this->integration
-      ->expects($this->any())
-      ->method('getData')
-      ->with(Integration::IDENTITY_LINK_URL)
-      ->willReturn($this->mockIdentityLinkUrl);
-    $this->integrationService = $this->getMockBuilder(IntegrationServiceInterface::class)
-      ->onlyMethods(['get'])
-      ->disableOriginalConstructor()
-      ->getMockForAbstractClass();
-    $this->integrationService
-      ->expects($this->any())
-      ->method('get')
-      ->with($this->mockIntegrationId)
-      ->willReturn($this->integration);
-    $this->logger = $this->getMockBuilder(LoggerInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->extendIntegrationService = $this->getMockBuilder(ExtendIntegrationService::class)
-      ->onlyMethods(['logErrorToLoggingService'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->infoPlugin = new InfoPlugin(
-      $this->integrationStoresRepository,
-      $this->integrationService,
-      $this->logger,
-      $this->extendIntegrationService
-    );
-  }
+    public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsExtendPlans()
+    {
+        $this->mockOrderItem
+        ->expects($this->any())
+        ->method('getSku')
+        ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
 
-  public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsExtendPlans()
-  {
-    $this->mockOrderItem
-      ->expects($this->any())
-      ->method('getSku')
-      ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
+        $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, '');
 
-    $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, '');
+        $this->assertStringContainsString(
+            'View Contract(s) in Extend',
+            $postMethodHTML
+        );
 
-    $this->assertStringContainsString(
-      'View Contract(s) in Extend',
-      $postMethodHTML
-    );
+        $this->assertStringContainsString(
+            $this->mockMerchantPortalBaseURL,
+            $postMethodHTML
+        );
 
-    $this->assertStringContainsString(
-      $this->mockMerchantPortalBaseURL,
-      $postMethodHTML
-    );
+        $this->assertStringNotContainsString(
+            'magento',
+            $postMethodHTML
+        );
 
-    $this->assertStringNotContainsString(
-      'magento',
-      $postMethodHTML,
-    );
+        $this->assertStringContainsString(
+            $this->mockTransactionId,
+            $postMethodHTML
+        );
+    }
 
-    $this->assertStringContainsString(
-      $this->mockTransactionId,
-      $postMethodHTML
-    );
-  }
+    public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsLegacyExtendPlans()
+    {
+        $this->mockOrderItem
+        ->expects($this->any())
+        ->method('getSku')
+        ->willReturn(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
 
-  public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsLegacyExtendPlans()
-  {
-    $this->mockOrderItem
-      ->expects($this->any())
-      ->method('getSku')
-      ->willReturn(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
+        $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, '');
 
-    $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, '');
+        $this->assertStringContainsString(
+            'View Contract(s) in Extend',
+            $postMethodHTML
+        );
 
-    $this->assertStringContainsString(
-      'View Contract(s) in Extend',
-      $postMethodHTML
-    );
+        $this->assertStringContainsString(
+            $this->mockMerchantPortalBaseURL,
+            $postMethodHTML
+        );
 
-    $this->assertStringContainsString(
-      $this->mockMerchantPortalBaseURL,
-      $postMethodHTML
-    );
+        $this->assertStringNotContainsString(
+            'magento',
+            $postMethodHTML
+        );
 
-    $this->assertStringNotContainsString(
-      'magento',
-      $postMethodHTML,
-    );
+        $this->assertStringContainsString(
+            $this->mockTransactionId,
+            $postMethodHTML
+        );
+    }
 
-    $this->assertStringContainsString(
-      $this->mockTransactionId,
-      $postMethodHTML
-    );
-  }
+    public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenOrderDoesNotContainExtendPlans()
+    {
+        $this->mockOrderItem
+        ->expects($this->any())
+        ->method('getSku')
+        ->willReturn('sku');
 
-  public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenOrderDoesNotContainExtendPlans()
-  {
-    $this->mockOrderItem
-      ->expects($this->any())
-      ->method('getSku')
-      ->willReturn('sku');
+        $preMethodHTML = '';
 
-    $preMethodHTML = '';
+        $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, $preMethodHTML);
 
-    $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, $preMethodHTML);
+        $this->assertEquals($preMethodHTML, $postMethodHTML);
+    }
 
-    $this->assertEquals($preMethodHTML, $postMethodHTML);
-  }
+    public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenExceptionIsThrownWhileFetchingDataForLink()
+    {
+        $this->mockOrderItem
+        ->expects($this->any())
+        ->method('getSku')
+        ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
 
-  public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenExceptionIsThrownWhileFetchingDataForLink()
-  {
-    $this->mockOrderItem
-      ->expects($this->any())
-      ->method('getSku')
-      ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
+        $this->integrationStoresRepository
+        ->expects($this->any())
+        ->method('getByStoreIdAndActiveEnvironment')
+        ->with($this->mockStoreId)
+        ->willThrowException(new Exception());
+        $this->logger->expects($this->once())->method('warning');
+        $this->extendIntegrationService->expects($this->once())->method('logErrorToLoggingService');
 
-    $this->integrationStoresRepository
-      ->expects($this->any())
-      ->method('getByStoreIdAndActiveEnvironment')
-      ->with($this->mockStoreId)
-      ->willThrowException(new Exception());
-    $this->logger->expects($this->once())->method('warning');
-    $this->extendIntegrationService->expects($this->once())->method('logErrorToLoggingService');
+        $preMethodHTML = '';
 
-    $preMethodHTML = '';
+        $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, $preMethodHTML);
 
-    $postMethodHTML = $this->infoPlugin->afterGetItemsHtml($this->subject, $preMethodHTML);
-
-    $this->assertEquals($preMethodHTML, $postMethodHTML);
-  }
+        $this->assertEquals($preMethodHTML, $postMethodHTML);
+    }
 }

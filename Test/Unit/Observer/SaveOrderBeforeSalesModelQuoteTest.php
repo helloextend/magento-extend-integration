@@ -24,7 +24,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
-use Extend\Integration\Test\Unit\Mock\MagicMock;
+use Extend\Integration\Test\Unit\Mock\MagicMockInterface;
 
 class SaveOrderBeforeSalesModelQuoteTest extends TestCase
 {
@@ -106,7 +106,7 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
     protected function setUp(): void
     {
         $this->orderExtensionAttributes = $this->createMock(OrderExtensionInterface::class);
-        $this->quoteExtensionAttributes = $this->createMock(MagicMock::class);
+        $this->quoteExtensionAttributes = $this->createMock(MagicMockInterface::class);
         $this->order = $this->createMock(Order::class);
         $this->quote = $this->createMock(Quote::class);
         $this->event = $this->createMock(Event::class);

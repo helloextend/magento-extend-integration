@@ -10,7 +10,7 @@ use Extend\Integration\Api\Data\ShippingProtectionInterface;
 use Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface;
 use Extend\Integration\Plugin\Paypal\Model\Nvp;
 use Extend\Integration\Service\Extend;
-use Extend\Integration\Test\Unit\Mock\MagicMock;
+use Extend\Integration\Test\Unit\Mock\MagicMockInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Paypal\Model\Api\AbstractApi;
 use Magento\Quote\Api\Data\CartExtensionFactory;
@@ -101,7 +101,7 @@ class NvpTest extends TestCase
             'TAXAMT' => 7.00
         ];
 
-        $this->quoteExtensionAttributes = $this->createMock(MagicMock::class);
+        $this->quoteExtensionAttributes = $this->createMock(MagicMockInterface::class);
         $this->shippingProtection = $this->createConfiguredMock(ShippingProtectionInterface::class, ['getBase' => 1.2]);
 
         $this->badQuote = $this->createConfiguredMock(Quote::class, ['getStoreId' => 1]);

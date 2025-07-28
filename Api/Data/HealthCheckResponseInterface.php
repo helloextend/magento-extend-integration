@@ -10,6 +10,7 @@ interface HealthCheckResponseInterface
 {
     /**
      * Set response code from Extend server's healthcheck response, or 500 if an error occurred
+     *
      * @param int $code
      * @return void
      */
@@ -17,6 +18,7 @@ interface HealthCheckResponseInterface
 
     /**
      * Set response message from Extend server's healthcheck response or error message
+     *
      * @param string $message
      * @return void
      */
@@ -24,13 +26,15 @@ interface HealthCheckResponseInterface
 
     /**
      * Get response code from Extend server's healthcheck response, or 500 if an error occurred
+     *
      * @return int
      */
     public function getCode(): int;
 
     /**
      * Get response message from Extend server's healthcheck response or error message
-     * @return string|null
+     *
+     * @return ?string
      */
-    public function getMessage(): string|null;
+    public function getMessage(): ?string;
 }

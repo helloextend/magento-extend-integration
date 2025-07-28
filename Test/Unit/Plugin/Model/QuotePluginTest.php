@@ -49,7 +49,7 @@ class QuotePluginTest extends TestCase
         $this->quoteMock = $this->getMockBuilder(Quote::class)
             ->disableOriginalConstructor()
             ->addMethods(['setTotalsCollectedFlag'])
-            ->onlyMethods(['getAllVisibleItems', 'getItemById', 'removeItem',])
+            ->onlyMethods(['getAllVisibleItems', 'getItemById', 'removeItem'])
             ->getMock();
         $this->quoteMock->method('setTotalsCollectedFlag')->willReturn($this->quoteMock);
         $this->quoteMock->method('removeItem')->willReturn($this->quoteMock);
@@ -491,7 +491,6 @@ class QuotePluginTest extends TestCase
         $this->testSubject->beforeCollectTotals($this->quoteMock);
     }
 
-
   /* ========================================== beforeAddItem ========================================== */
 
     // extend is not enabled -> do nothing
@@ -617,7 +616,6 @@ class QuotePluginTest extends TestCase
         $this->testSubject->beforeAddItem($this->quoteMock, $newWarrantyQuoteItem2yr);
         $this->assertEqualsCanonicalizing([$existingWarrantyQuoteItem1yr->getId()], $actualArgs);
     }
-
 
   /* =================================================================================================== */
   /* ========================== helper methods for setting up test conditions ========================== */

@@ -26,7 +26,7 @@ use Magento\Tax\Model\Calculation;
 use Magento\Quote\Model\Quote\Address\RateRequest;
 use Extend\Integration\Model\Quote\Total\ShippingProtection;
 use Extend\Integration\Model\ShippingProtectionTotal;
-use Extend\Integration\Test\Unit\Mock\MagicMock;
+use Extend\Integration\Test\Unit\Mock\MagicMockInterface;
 
 class ShippingProtectionTest extends TestCase
 {
@@ -137,7 +137,7 @@ class ShippingProtectionTest extends TestCase
         $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
         $this->scopeMock = $this->createStub(ScopeInterface::class);
         $this->serializerMock = $this->createStub(SerializerInterface::class);
-        $this->cartExtensionMock = $this->createMock(MagicMock::class);
+        $this->cartExtensionMock = $this->createMock(MagicMockInterface::class);
         $this->storeMock = $this->createStub(Store::class);
         $this->storeManagerMock->method('getStore')->willReturn($this->storeMock);
         $this->calculationMock = $this->createStub(Calculation::class);
@@ -468,7 +468,6 @@ class ShippingProtectionTest extends TestCase
     {
         $this->shippingProtectionMock->expects($this->any())->method('getBase')->willReturn(0.0);
     }
-
 
     private function setShippingProtection(): void
     {

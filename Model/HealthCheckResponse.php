@@ -6,10 +6,19 @@ use Extend\Integration\Api\Data\HealthCheckResponseInterface;
 
 class HealthCheckResponse implements HealthCheckResponseInterface
 {
+    /**
+     * @var int
+     */
     private int $code;
+
+    /**
+     * @var ?string
+     */
     private ?string $message = null;
 
     /**
+     * Get response code
+     *
      * @return int
      */
     public function getCode(): int
@@ -18,14 +27,18 @@ class HealthCheckResponse implements HealthCheckResponseInterface
     }
 
     /**
-     * @return string|null
+     * Get response message
+     *
+     * @return ?string
      */
-    public function getMessage(): string|null
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
     /**
+     * Set response code
+     *
      * @param int $code
      * @return void
      */
@@ -35,6 +48,8 @@ class HealthCheckResponse implements HealthCheckResponseInterface
     }
 
     /**
+     * Set response message
+     *
      * @param string $message
      * @return void
      */
