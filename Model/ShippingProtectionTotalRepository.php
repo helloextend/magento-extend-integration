@@ -22,6 +22,10 @@ class ShippingProtectionTotalRepository implements
     \Extend\Integration\Api\ShippingProtectionTotalRepositoryInterface
 {
     /**
+     * Sentinel value used to cache negative results (when no SP data exists for an entity)
+     */
+    private const NEGATIVE_CACHE_SENTINEL = ['_extend_no_sp_data' => true];
+    /**
      * @var ShippingProtectionTotalFactory
      */
     private ShippingProtectionTotalFactory $shippingProtectionTotalFactory;
@@ -88,7 +92,24 @@ class ShippingProtectionTotalRepository implements
     }
 
     /**
-     * Get Shipping Protection total record by entity ID and entity type
+     * Invalidate cache for a specific entity. This needs to execute whenever the SP state changes,
+     * whether due to a new SP entity where previously there was none, or due to a change in the SP quote ID,
+     * or due to a given SP record being deleted.
+     *
+     * @param int $entityId
+     * @param int $entityTypeId
+     * @return void
+     */
+    private function invalidateCacheForEntity(int $entityId, int $entityTypeId): void
+    {
+        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+        $this->checkoutSession->unsetData($sessionCacheKey);
+    }
+
+    /**
+     * Get Shipping Protection total record by entity ID and entity type. Uses a session-based cache
+     * when possible that also caches negative results via a sentinel value because for some merchants
+     * this table will be quite large and expensive to query.
      *
      * @param int|null $entityId
      * @param int $entityTypeId
@@ -107,6 +128,13 @@ class ShippingProtectionTotalRepository implements
                 $totalData = $this->serializer->unserialize($serializedData);
 
                 if ($totalData && !empty($totalData)) {
+                    // Check if this is a negative cache entry (sentinel value)
+                    if (isset($totalData['_extend_no_sp_data'])) {
+                        // Return empty SP total for cached negative result
+                        return $this->shippingProtectionTotalFactory->create();
+                    }
+
+                    // Positive cache hit - reconstruct SP total from cached data
                     $total = $this->shippingProtectionTotalFactory->create();
                     $total->setData($totalData);
                     return $total;
@@ -127,14 +155,23 @@ class ShippingProtectionTotalRepository implements
             ->load()
             ->getFirstItem();
 
-        // Only cache if we have valid data and valid entityId
-        if ($firstItem && $firstItem->getId() && $entityId !== null && is_int($entityId)) {
+        // Cache results for valid entity IDs - both positive and negative
+        if ($entityId !== null && is_int($entityId)) {
             $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
-            // Cache in session for persistence across requests
-            $this->checkoutSession->setData(
-                $sessionCacheKey,
-                $this->serializer->serialize($firstItem->getData())
-            );
+
+            if ($firstItem && $firstItem->getId()) {
+                // Cache positive result (SP data found)
+                $this->checkoutSession->setData(
+                    $sessionCacheKey,
+                    $this->serializer->serialize($firstItem->getData())
+                );
+            } else {
+                // Cache negative result (no SP data found) using sentinel value
+                $this->checkoutSession->setData(
+                    $sessionCacheKey,
+                    $this->serializer->serialize(self::NEGATIVE_CACHE_SENTINEL)
+                );
+            }
         }
 
         return $firstItem;
@@ -183,8 +220,10 @@ class ShippingProtectionTotalRepository implements
         ?float $spTaxAmt,
         ?string $offerType
     ): ShippingProtectionTotal {
-        //need to make $entityId and $entityTypeId optional for SDK ajax call
-        if (!($shippingProtectionTotal = $this->get($entityId, $entityTypeId))) {
+        $shippingProtectionTotal = $this->get($entityId, $entityTypeId);
+        $existingSpQuoteId = $shippingProtectionTotal->getId() ? $shippingProtectionTotal->getSpQuoteId() : null;
+
+        if (!$shippingProtectionTotal->getId()) {
             $shippingProtectionTotal = $this->shippingProtectionTotalFactory->create();
         }
 
@@ -200,8 +239,14 @@ class ShippingProtectionTotalRepository implements
 
         $this->shippingProtectionTotalResource->save($shippingProtectionTotal);
 
-        // Update session cache
+        // Clear cache if SP state changes, either due to a new SP entity where previously there was none,
+        // or due to a change in the SP quote ID.
         $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
+        if ($existingSpQuoteId !== $spQuoteId) {
+            $this->invalidateCacheForEntity($entityId, $entityTypeId);
+        }
+
+        // Update session cache with new positive result
         $this->checkoutSession->setData(
             $sessionCacheKey,
             $this->serializer->serialize($shippingProtectionTotal->getData())
@@ -263,15 +308,14 @@ class ShippingProtectionTotalRepository implements
     public function deleteById(int $shippingProtectionTotalId)
     {
         $shippingProtectionTotal = $this->getById($shippingProtectionTotalId);
-        $this->shippingProtectionTotalResource->delete($shippingProtectionTotal);
-
-        // Clear cache for this entity using its entity ID and type directly
         $entityId = $shippingProtectionTotal->getEntityId();
         $entityTypeId = $shippingProtectionTotal->getEntityTypeId();
+
+        $this->shippingProtectionTotalResource->delete($shippingProtectionTotal);
+
+        // Invalidate cache after deletion
         if ($entityId && $entityTypeId) {
-            // Clear session cache
-            $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
-            $this->checkoutSession->unsetData($sessionCacheKey);
+            $this->invalidateCacheForEntity($entityId, $entityTypeId);
         }
     }
 
@@ -282,15 +326,15 @@ class ShippingProtectionTotalRepository implements
     {
         $entityId = $this->checkoutSession->getQuote()->getId();
         $entityTypeId = ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID;
+
         $shippingProtection = $this->get(
             $entityId,
             $entityTypeId
         );
         $this->shippingProtectionTotalResource->delete($shippingProtection);
 
-        // Clear session cache
-        $sessionCacheKey = $this->getSessionCacheKey($entityId, $entityTypeId);
-        $this->checkoutSession->unsetData($sessionCacheKey);
+        // Invalidate cache after deletion
+        $this->invalidateCacheForEntity($entityId, $entityTypeId);
     }
 
     /**
