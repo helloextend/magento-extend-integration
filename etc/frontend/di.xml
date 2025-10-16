@@ -25,4 +25,7 @@
     <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
         <plugin name="shippingProtectionCheckoutPlugin" type="Extend\Integration\Plugin\Checkout\LayoutProcessorPlugin" sortOrder="101"/>
     </type>
+    <type name="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable">
+        <plugin name="extendAddSkuInfo" type="Extend\Integration\Plugin\ConfigurableProduct\Block\Product\View\Type\Configurable\AddSkuInfo" sortOrder="100"/>
+    </type>
 </config>

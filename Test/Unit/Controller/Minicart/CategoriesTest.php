@@ -9,11 +9,13 @@ namespace Extend\Integration\Test\Unit\Controller\Minicart;
 use PHPUnit\Framework\TestCase;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Extend\Integration\Controller\Minicart\Categories;
@@ -31,6 +33,11 @@ class CategoriesTest extends TestCase
     protected $categoryRepository;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * @var JsonFactory
      */
     protected $resultJsonFactory;
@@ -42,17 +49,26 @@ class CategoriesTest extends TestCase
 
     protected function setUp(): void
     {
-        $context = $this->createStub(Context::class);
+        // Create a mock request that returns null for getParam (simulating no product_ids parameter)
+        $request = $this->createMock(RequestInterface::class);
+        $request->method('getParam')->willReturn(null);
+
+        // Create a mock context that provides the request
+        $context = $this->createMock(Context::class);
+        $context->method('getRequest')->willReturn($request);
+
         $this->resultJsonFactory = $this->createStub(JsonFactory::class);
         $this->checkoutSession = $this->createStub(CheckoutSession::class);
         $this->categoryRepository = $this->createStub(CategoryRepositoryInterface::class);
+        $this->productRepository = $this->createStub(ProductRepositoryInterface::class);
 
         $this->categories = new Categories(
-          $context,
-          $this->resultJsonFactory,
-          $this->checkoutSession,
-          $this->categoryRepository
-      );
+            $context,
+            $this->resultJsonFactory,
+            $this->checkoutSession,
+            $this->categoryRepository,
+            $this->productRepository
+        );
     }
 
     public function testGetCategories()
@@ -123,7 +139,8 @@ class CategoriesTest extends TestCase
         $this->assertEquals([], $this->categories->execute());
     }
 
-    public function testGetCategoriesWhereItemProductDoesNotExist() {
+    public function testGetCategoriesWhereItemProductDoesNotExist()
+    {
         $quoteItemMock = $this->getMockBuilder(Item::class)
           ->disableOriginalConstructor()
           ->onlyMethods(['getProduct'])

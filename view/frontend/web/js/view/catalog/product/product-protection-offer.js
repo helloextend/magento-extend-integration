@@ -70,7 +70,7 @@ define([
       ).val()
       if (selectedId && selectedId !== '') {
         selectedProductSku =
-          spConfig && spConfig.skus ? spConfig.skus[selectedId] : null
+          spConfig && spConfig.sku ? spConfig.sku[selectedId] : null
       }
     }
     return { selectedProductSku, selectedProductPrice }
