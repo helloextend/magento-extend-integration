@@ -24,6 +24,10 @@
                 <value id="extend-dev-images" type="host">shipping-offers-static-images-bucket-dev.s3.amazonaws.com</value>
                 <value id="extend-demo-images" type="host">shipping-offers-static-images-bucket-demo.s3.amazonaws.com</value>
                 <value id="extend-static-assets" type="host">helloextend-static-assets.s3.amazonaws.com</value>
+                <value id="extend-offers-prod" type="host">extendcoreoffersprod-offersthemelogobucketeb21afa-1lr7le13dvgtp.s3.amazonaws.com</value>
+                <value id="extend-offers-demo" type="host">extendcoreoffersdemo-offersthemelogobucketeb21afa-19jnurg0a0o17.s3.amazonaws.com</value>
+                <value id="extend-offers-dev" type="host">extendcoreoffersdev-offersthemelogobucketeb21afaa-2ttuvks0mzbd.s3.amazonaws.com</value>
+                <value id="extend-offers-stage" type="host">extendcoreoffersstage-offersthemelogobucketeb21af-1f81w2c7u5t7p.s3.amazonaws.com</value>
                 <value id="fallback-image" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/learnMoreModal-default-1654273334107-learnMoreModal.backgroundImageUrl_Generic_WomanwithBox2.jpg</value>
                 <value id="sp-offer-extend-logo" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/shippingProtectionCartOffer-default-1720746621507-extend_svg_cart.svg</value>
             </values>
