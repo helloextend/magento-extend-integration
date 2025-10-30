@@ -305,17 +305,17 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws LocalizedException
      */
     private function upsert(
-        int $quantity = null,
-        string $cartId = null,
-        string $cartItemId = null,
-        string $productId = null,
-        string $planId = null,
-        int $price = null,
-        int $term = null,
-        string $coverageType = null,
-        string $leadToken = null,
-        string $listPrice = null,
-        string $orderOfferPlanId = null
+        ?int $quantity = null,
+        ?string $cartId = null,
+        ?string $cartItemId = null,
+        ?string $productId = null,
+        ?string $planId = null,
+        ?int $price = null,
+        ?int $term = null,
+        ?string $coverageType = null,
+        ?string $leadToken = null,
+        ?string $listPrice = null,
+        ?string $orderOfferPlanId = null
     ): void {
         try {
             if ($price === 0) {
@@ -485,16 +485,16 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws LocalizedException
      */
     public function upsertSession(
-        int $quantity = null,
-        string $cartItemId = null,
-        string $productId = null,
-        string $planId = null,
-        int $price = null,
-        int $term = null,
-        string $coverageType = null,
-        string $leadToken = null,
-        string $listPrice = null,
-        string $orderOfferPlanId = null
+        ?int $quantity = null,
+        ?string $cartItemId = null,
+        ?string $productId = null,
+        ?string $planId = null,
+        ?int $price = null,
+        ?int $term = null,
+        ?string $coverageType = null,
+        ?string $leadToken = null,
+        ?string $listPrice = null,
+        ?string $orderOfferPlanId = null
     ): void {
         $this->upsert(
             $quantity,
@@ -530,17 +530,17 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @throws LocalizedException
      */
     public function upsertCartId(
-        int $quantity = null,
-        string $cartId = null,
-        string $cartItemId = null,
-        string $productId = null,
-        string $planId = null,
-        int $price = null,
-        int $term = null,
-        string $coverageType = null,
-        string $leadToken = null,
-        string $listPrice = null,
-        string $orderOfferPlanId = null
+        ?int $quantity = null,
+        ?string $cartId = null,
+        ?string $cartItemId = null,
+        ?string $productId = null,
+        ?string $planId = null,
+        ?int $price = null,
+        ?int $term = null,
+        ?string $coverageType = null,
+        ?string $leadToken = null,
+        ?string $listPrice = null,
+        ?string $orderOfferPlanId = null
     ): void {
         $this->upsert(
             $quantity,

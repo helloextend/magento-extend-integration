@@ -274,10 +274,10 @@ class ShippingProtectionTotalRepository implements
         string $spQuoteId,
         float $price,
         string $currency,
-        float $basePrice = null,
-        string $baseCurrency = null,
-        float $spTax = null,
-        string $offerType = null
+        ?float $basePrice = null,
+        ?string $baseCurrency = null,
+        ?float $spTax = null,
+        ?string $offerType = null
     ): void {
         if ($offerType === 'SAFE_PACKAGE') {
           $price = 0.0;

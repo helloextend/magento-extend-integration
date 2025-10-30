@@ -33,7 +33,7 @@ class EnableProductProtection extends \Magento\Config\Block\System\Config\Form\F
         \Magento\Framework\Module\Manager $manager,
         StoreManagerInterface $storeManager,
         array $data = [],
-        SecureHtmlRenderer $secureRenderer = null
+        ?SecureHtmlRenderer $secureRenderer = null
     ) {
         parent::__construct($context, $data, $secureRenderer);
         $this->scopeConfig = $scopeConfig;

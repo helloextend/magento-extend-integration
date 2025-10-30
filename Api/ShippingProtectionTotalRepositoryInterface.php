@@ -65,7 +65,7 @@ interface ShippingProtectionTotalRepositoryInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveBySdk(string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null, string $offerType = null): void;
+    public function saveBySdk(string $spQuoteId, float $price, string $currency, ?float $basePrice = null, ?string $baseCurrency = null, ?float $spTax = null, ?string $offerType = null): void;
 
     /**
      * Delete Shipping Protection total by record ID
@@ -118,5 +118,5 @@ interface ShippingProtectionTotalRepositoryInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, float $basePrice = null, string $baseCurrency = null, float $spTax = null): void;
+    public function saveByApi(string $cartId, string $spQuoteId, float $price, string $currency, ?float $basePrice = null, ?string $baseCurrency = null, ?float $spTax = null): void;
 }

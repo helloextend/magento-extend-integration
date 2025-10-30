@@ -688,10 +688,10 @@ class QuotePluginTest extends TestCase
     private function createQuoteItemMock(
         int $qty,
         string $productSku,
-        string $correspondingMerchantProductSku = null,
-        int $customPrice = null,
-        string $leadToken = null,
-        int $leadQty = null
+        ?string $correspondingMerchantProductSku = null,
+        ?int $customPrice = null,
+        ?string $leadToken = null,
+        ?int $leadQty = null
     ): Item | MockObject {
         $quoteItemMock = $this->getMockBuilder(Item::class)
             ->disableOriginalConstructor()
@@ -767,7 +767,7 @@ class QuotePluginTest extends TestCase
     /**
      * Expect Quote\Item::setQty to be called on the item provided with the config provided
      */
-    private function expectSetQtyToBeCalledOnQuoteItemTimesWith(Item | MockObject $quoteItem, int $times, int $newQty = null)
+    private function expectSetQtyToBeCalledOnQuoteItemTimesWith(Item | MockObject $quoteItem, int $times, ?int $newQty = null)
     {
         if (isset($newQty)) {
             $quoteItem->expects($this->exactly($times))->method('setQty')->with($newQty);

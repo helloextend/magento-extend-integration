@@ -141,7 +141,7 @@ class AccessTokenBuilder
 	 *
 	 * @return array{clientId: string|null, clientSecret: string|null, accessToken: string|null}
 	 */
-    public function getExtendOAuthClientData(int $integrationId = null): array
+    public function getExtendOAuthClientData(?int $integrationId = null): array
     {
 
         if (!$integrationId) {

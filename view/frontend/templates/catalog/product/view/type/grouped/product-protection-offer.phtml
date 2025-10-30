@@ -5,6 +5,7 @@
  */
 
 /** @var $block Magento\GroupedProduct\Block\Product\View\Type\Grouped */
+/** @var $escaper \Magento\Framework\Escaper */
 
 $viewModel = $block->getData('viewModel');
 $categoryModel = $block->getData('categoryModel');
@@ -17,7 +18,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
   <table id="product_protection_offers">
     <?php foreach ($block->getAssociatedProducts() as $product): ?>
       <tr>
-        <td class="product-protection-offer product-id-<?= $product->getEntityId(); ?>" id="product_protection_offer_<?= preg_replace('/[^a-zA-Z0-9-_|]/', '', $product->getSku()); ?>" colspan="3" style="border-top: 0 !important"></td>
+        <td class="product-protection-offer product-id-<?= $escaper->escapeHtml($product->getEntityId()); ?>" id="product_protection_offer_<?= $escaper->escapeHtml(preg_replace('/[^a-zA-Z0-9-_|]/', '', $product->getSku())); ?>" colspan="3" style="border-top: 0 !important"></td>
       </tr>
     <?php endforeach; ?>
   </table>
@@ -26,7 +27,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
         "#product_protection_offers": {
             "productProtectionOffer": [
                 <?php foreach ($block->getAssociatedProducts() as $key => $product): ?>
-                    <?
+                    <?php
                       $categoryName = '';
                       $categories = $product->getCategoryIds();
 
@@ -35,18 +36,18 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                       }
                     ?>
                     {
-                        "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
-                        "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                        "selectedProductSku": "<?= $product->getSku(); ?>",
-                        "selectedProductId": "<?= $product->getId(); ?>",
-                        "selectedProductPrice": "<?= $product->getPrice(); ?>",
-                        "productCategory": "<?= $categoryName; ?>",
-                        "currencyCode": "<?= $currencyCode ?>"
+                        "extendStoreUuid": "<?= $escaper->escapeJs($block->getData('viewModel')->getExtendStoreUuid()) ?>",
+                        "activeEnvironment": "<?= $escaper->escapeJs($block->getData('viewModel')->getActiveEnvironment()) ?>",
+                        "selectedProductSku": "<?= $escaper->escapeJs($product->getSku()); ?>",
+                        "selectedProductId": "<?= $escaper->escapeJs($product->getId()); ?>",
+                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getPrice()); ?>",
+                        "productCategory": "<?= $escaper->escapeJs($categoryName); ?>",
+                        "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                     }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
                 <?php endforeach; ?>
             ]
         }
     }
   </script>
-  <script type="text/javascript" src="<?= $block->getViewFileUrl('Extend_Integration::js/view/catalog/product/product-protection-grouped.js') ?>"></script>
+  <script src="<?= $escaper->escapeUrl($block->getViewFileUrl('Extend_Integration::js/view/catalog/product/product-protection-grouped.js')) ?>"></script>
 <?php endif; ?>

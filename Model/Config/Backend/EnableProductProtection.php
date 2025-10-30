@@ -25,8 +25,8 @@ class EnableProductProtection extends Value
         AttributeSetInstaller $attributeSetInstaller,
         ProductInstaller $productInstaller,
         WriterInterface $writer,
-        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
+        ?\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        ?\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null
     ) {
         parent::__construct(
             $context,

@@ -2,7 +2,7 @@
   "name": "helloextend/integration",
   "description": "A Magento module to sell product and shipping protection in your store to increase revenues and drive customer loyalty.",
   "require": {
-    "php": "^7.4||^8.0",
+    "php": "^7.4||^8.0||^8.1||^8.2||^8.3||^8.4",
     "magento/module-integration": "^100.4.2"
   },
   "suggest": {},

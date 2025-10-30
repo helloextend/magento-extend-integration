@@ -164,16 +164,16 @@ interface ProductProtectionInterface
      * @throws LocalizedException
      */
     public function upsertSession(
-        int $quantity = null,
-        string $cartItemId = null,
-        string $productId = null,
-        string $planId = null,
-        int $price = null,
-        int $term = null,
-        string $coverageType = null,
-        string $leadToken = null,
-        string $listPrice = null,
-        string $orderOfferPlanId = null
+        ?int $quantity = null,
+        ?string $cartItemId = null,
+        ?string $productId = null,
+        ?string $planId = null,
+        ?int $price = null,
+        ?int $term = null,
+        ?string $coverageType = null,
+        ?string $leadToken = null,
+        ?string $listPrice = null,
+        ?string $orderOfferPlanId = null
     ): void;
 
     /**
@@ -195,16 +195,16 @@ interface ProductProtectionInterface
      * @throws LocalizedException
      */
     public function upsertCartId(
-        int $quantity = null,
-        string $cartId = null,
-        string $cartItemId = null,
-        string $productId = null,
-        string $planId = null,
-        int $price = null,
-        int $term = null,
-        string $coverageType = null,
-        string $leadToken = null,
-        string $listPrice = null,
-        string $orderOfferPlanId = null
+        ?int $quantity = null,
+        ?string $cartId = null,
+        ?string $cartItemId = null,
+        ?string $productId = null,
+        ?string $planId = null,
+        ?int $price = null,
+        ?int $term = null,
+        ?string $coverageType = null,
+        ?string $leadToken = null,
+        ?string $listPrice = null,
+        ?string $orderOfferPlanId = null
     ): void;
 }
