@@ -6,6 +6,8 @@
 
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /** @var \Extend\Integration\Block\Adminhtml\Sales\Order\Creditmemo\Totals $block */
+/** @var $escaper \Magento\Framework\Escaper */
+
 $shippingProtectionPrice = $block->getShippingProtection();
 if ($block->isSpgSpRemovedFromCreditMemo()) {
   $shippingProtectionPrice = '';
@@ -15,34 +17,36 @@ if ($block->isSpgSpRemovedFromCreditMemo()) {
 <?php if ($block->getOriginalShippingProtection() > 0 || $block->isSpSpg()): ?>
     <tr>
         <td class="label">
-            <?= $block->escapeHtml(__('Shipping Protection')) ?>
+            <?= $escaper->escapeHtml(__('Shipping Protection')) ?>
             <div id="shipping_protection_adv"></div>
             <div class="sp-buttons-container" id="extend_sp_buttons_container">
                 <?php if ($block->isSpSpg()): ?>
-                    <button name="spg-add" type="button" class="zero" id="extend_sp_buttons_container__spg_add"><?=__('Add to Refund')?></button>
-                    <button name="spg-remove" type="button" class="full" id="extend_sp_buttons_container__spg_remove"><?=__('Remove from Refund')?></button>
+                    <button name="spg-add" type="button" class="zero" id="extend_sp_buttons_container__spg_add"><?= $escaper->escapeHtml(__('Add to Refund')) ?></button>
+                    <button name="spg-remove" type="button" class="full" id="extend_sp_buttons_container__spg_remove"><?= $escaper->escapeHtml(__('Remove from Refund')) ?></button>
                 <?php else: ?>
-                    <button name="full" type="button" class="full" id="extend_sp_buttons_container__full"><?=__('Full')?></button>
-                    <button name="zero" type="button" class="zero" id="extend_sp_buttons_container__zero"><?=__('0')?></button>
+                    <button name="full" type="button" class="full" id="extend_sp_buttons_container__full"><?= $escaper->escapeHtml(__('Full')) ?></button>
+                    <button name="zero" type="button" class="zero" id="extend_sp_buttons_container__zero"><?= $escaper->escapeHtml(__('0')) ?></button>
                 <?php endif; ?>
             </div>
         </td>
         <td>
             <input type="text"
                 name="creditmemo[shipping_protection]"
-                data-full="<?= /* @noEscape */ $block->getOriginalShippingProtection() ?>"
-                value="<?= /* @noEscape */ $shippingProtectionPrice ?>"
+                data-full="<?= $escaper->escapeHtmlAttr($block->getOriginalShippingProtection()) ?>"
+                value="<?= $escaper->escapeHtmlAttr($shippingProtectionPrice) ?>"
                 class="input-text admin__control-text not-negative-amount"
                 readonly="readonly"
                 id="shipping_protection"/>
-            <?php $scriptString = <<<script
+            <?php
+            $validationMessage = $escaper->escapeJs(__('Please enter a positive number in this field.'));
+            $scriptString = <<<script
                 require(['prototype'], function(){
 
                 //<![CDATA[
                 Validation.addAllThese([
                     [
                         'not-negative-amount',
-                        '{$block->escapeJs(__('Please enter a positive number in this field.'))}',
+                        '{$validationMessage}',
                         function (v) {
                             if (v.length)
                                 return /^\s*\d+([,.]\d+)*\s*%?\s*$/.test(v);

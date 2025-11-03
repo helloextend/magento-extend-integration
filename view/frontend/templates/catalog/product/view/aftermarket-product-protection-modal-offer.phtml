@@ -1,12 +1,12 @@
 <?php
+/** @var $block \Magento\Framework\View\Element\Template */
+/** @var $escaper \Magento\Framework\Escaper */
+
 $viewModel = $block->getData('viewModel');
 
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
-
-$leadToken = $escaper->escapeHtml($escaper->escapeJs($viewModel->getLeadTokenFromUrl()));
-$viewModel = $block->getData('viewModel');
-
+$leadToken = $viewModel->getLeadTokenFromUrl();
 $currencyCode = $viewModel->getCurrencyCode();
 $isCurrencySupported = $viewModel->isCurrencySupported();
 
@@ -19,10 +19,10 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
           "*": {
               "aftermarketProductProtectionModalOffer": [
                   {
-                      "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                      "activeEnvironment": "<?= $activeEnvironment ?>",
-                      "leadToken": "<?= /* @noEscape */ $leadToken ?>",
-                      "currencyCode": "<?= $currencyCode ?>"
+                      "extendStoreUuid": "<?= $escaper->escapeJs($extendStoreUuid) ?>",
+                      "activeEnvironment": "<?= $escaper->escapeJs($activeEnvironment) ?>",
+                      "leadToken": "<?= $escaper->escapeJs($leadToken) ?>",
+                      "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                   }
               ]
           }

@@ -5,6 +5,7 @@
  */
 
 /** @var $block \Magento\Catalog\Block\Product\View */
+/** @var $escaper \Magento\Framework\Escaper */
 
 $viewModel = $block->getData('viewModel');
 $categoryModel = $block->getData('categoryModel');
@@ -28,18 +29,18 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
 ?>
 
 <?php if ($shouldRender) : ?>
-  <div class="product-protection-offer" id="product_protection_offer_<?= $sanitizedProductSku ?>"></div>
+  <div class="product-protection-offer" id="product_protection_offer_<?= $escaper->escapeHtml($sanitizedProductSku) ?>"></div>
   <script type="text/x-magento-init">
     {
-          "#product_protection_offer_<?= $sanitizedProductSku ?>": {
+          "#product_protection_offer_<?= $escaper->escapeJs($sanitizedProductSku) ?>": {
               "productProtectionOffer": [
                   {
-                      "extendStoreUuid": "<?= $block->getData('viewModel')->getExtendStoreUuid() ?>",
-                      "activeEnvironment": "<?= $block->getData('viewModel')->getActiveEnvironment() ?>",
-                      "selectedProductSku": "<?= $block->getProduct()->getSku(); ?>",
-                      "selectedProductPrice": "<?= $block->getProduct()->getPrice(); ?>",
-                      "productCategory": "<?= $categoryName; ?>",
-                      "currencyCode": "<?= $currencyCode ?>"
+                      "extendStoreUuid": "<?= $escaper->escapeJs($block->getData('viewModel')->getExtendStoreUuid()) ?>",
+                      "activeEnvironment": "<?= $escaper->escapeJs($block->getData('viewModel')->getActiveEnvironment()) ?>",
+                      "selectedProductSku": "<?= $escaper->escapeJs($block->getProduct()->getSku()); ?>",
+                      "selectedProductPrice": "<?= $escaper->escapeJs($block->getProduct()->getPrice()); ?>",
+                      "productCategory": "<?= $escaper->escapeJs($categoryName); ?>",
+                      "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                   }
               ]
           }

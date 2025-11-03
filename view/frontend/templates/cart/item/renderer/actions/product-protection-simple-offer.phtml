@@ -1,4 +1,6 @@
 <?php
+/** @var $block \Magento\Checkout\Block\Cart\Item\Renderer\Actions\Generic */
+/** @var $escaper \Magento\Framework\Escaper */
 
 /** @var \Magento\Quote\Model\Quote\Item $_item */
 $item = $block->getItem();
@@ -33,23 +35,23 @@ $sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
 
 <?php if ($shouldRender) : ?>
   <div>
-    <div class="product-protection-offer" id="product_protection_offer_<?= $sanitizedProductSku ?>"></div>
+    <div class="product-protection-offer" id="product_protection_offer_<?= $escaper->escapeHtml($sanitizedProductSku) ?>"></div>
   </div>
   <script type="text/x-magento-init">
     {
-        "#product_protection_offer_<?= $sanitizedProductSku ?>": {
+        "#product_protection_offer_<?= $escaper->escapeJs($sanitizedProductSku) ?>": {
             "simpleProductProtectionOffer": [
                {
-                        "extendStoreUuid": "<?= $block
+                        "extendStoreUuid": "<?= $escaper->escapeJs($block
                                               ->getData('viewModel')
-                                              ->getExtendStoreUuid() ?>",
-                        "activeEnvironment": "<?= $block
+                                              ->getExtendStoreUuid()) ?>",
+                        "activeEnvironment": "<?= $escaper->escapeJs($block
                                                 ->getData('viewModel')
-                                                ->getActiveEnvironment() ?>",
-                        "selectedProductSku": "<?= $product->getSku() ?>",
-                        "selectedProductPrice": "<?= $product->getPrice() ?>",
-                        "productCategory": "<?= $categoryName ?>",
-                        "currencyCode": "<?= $currencyCode ?>"
+                                                ->getActiveEnvironment()) ?>",
+                        "selectedProductSku": "<?= $escaper->escapeJs($product->getSku()) ?>",
+                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getPrice()) ?>",
+                        "productCategory": "<?= $escaper->escapeJs($categoryName) ?>",
+                        "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                     }
             ]
         }

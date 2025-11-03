@@ -3,6 +3,10 @@
  * Copyright Extend (c) 2023. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
+
+/** @var $block \Magento\Framework\View\Element\Template */
+/** @var $escaper \Magento\Framework\Escaper */
+
 $viewModel = $block->getData('viewModel');
 $extendStoreUuid = $viewModel->getExtendStoreUuid();
 $activeEnvironment = $viewModel->getActiveEnvironment();
@@ -18,9 +22,9 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
         "#extendMinicartSimpleOffer": {
             "minicartSimpleOffer": [
                 {
-                    "extendStoreUuid": "<?= $extendStoreUuid ?>",
-                    "activeEnvironment": "<?= $activeEnvironment ?>",
-                    "currencyCode": "<?= $currencyCode ?>"
+                    "extendStoreUuid": "<?= $escaper->escapeJs($extendStoreUuid) ?>",
+                    "activeEnvironment": "<?= $escaper->escapeJs($activeEnvironment) ?>",
+                    "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                 }
             ]
         }

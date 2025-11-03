@@ -6,6 +6,7 @@
 
 /** @var Magento\Framework\View\Element\Template $block */
 /** @var Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid $viewModel */
+/** @var $escaper \Magento\Framework\Escaper */
 
 $viewModel = $block->getData('viewModel');
 
@@ -23,9 +24,9 @@ $shouldRender = $viewModel->isExtendShippingProtectionEnabled();
       "*": {
         "spQuoteConfig": [
           {
-            "environment": "<?= $environment ?>",
-            "storeId": "<?= $storeId ?>",
-            "currencyCode": "<?= $currencyCode ?>",
+            "environment": "<?= $escaper->escapeJs($environment) ?>",
+            "storeId": "<?= $escaper->escapeJs($storeId) ?>",
+            "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>",
             "isCurrencySupported": <?= json_encode($isCurrencySupported) ?>
           }
         ]

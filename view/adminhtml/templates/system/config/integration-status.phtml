@@ -1,3 +1,7 @@
+<?php
+/** @var $block \Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\HowToActivate */
+/** @var $escaper \Magento\Framework\Escaper */
+?>
 <div id="extend-integration-status">
   <!-- Alert will initialize in a hidden state until needed -->
   <div id="extend-alert-container" class="extend-alert extend-hidden">
@@ -19,7 +23,7 @@
         <ul>
           <li>
             Go to
-            <a href="<?= /* @noEscape */ $this->getIntegrationUrl(); ?>"
+            <a href="<?= $escaper->escapeUrl($block->getIntegrationUrl()); ?>"
               >integration settings</a
             >.
           </li>
@@ -121,19 +125,19 @@
   </div>
 </div>
 
-<?php if ($integrations = $this->getIntegrations()): ?>
+<?php if ($integrations = $block->getIntegrations()): ?>
   <script type="text/x-magento-init">
     {
       "#extend-integration-status": {
         "activationStatus": [
           <?php foreach ($integrations as $key => $integration): ?>
             {
-              "currentStep": "<?=$integration['current_step']?>",
-              "identityLinkUrl": "<?=$integration['identity_link_url']?>",
-              "integrationId": "<?=$integration['integration_id']?>",
-              "integrationName": "<?=$integration['integration_name']?>",
-              "oauthActivatedAt": "<?=$integration['oauth_activated_at']?>",
-              "prevActivationFailed": "<?=$integration['prev_activation_failed']?>"
+              "currentStep": "<?= $escaper->escapeJs($integration['current_step']) ?>",
+              "identityLinkUrl": "<?= $escaper->escapeJs($integration['identity_link_url']) ?>",
+              "integrationId": "<?= $escaper->escapeJs($integration['integration_id']) ?>",
+              "integrationName": "<?= $escaper->escapeJs($integration['integration_name']) ?>",
+              "oauthActivatedAt": "<?= $escaper->escapeJs($integration['oauth_activated_at']) ?>",
+              "prevActivationFailed": "<?= $escaper->escapeJs($integration['prev_activation_failed']) ?>"
             }<?= array_key_last($integrations) === $key ? '' : ',' ?>
           <?php endforeach; ?>
         ]
