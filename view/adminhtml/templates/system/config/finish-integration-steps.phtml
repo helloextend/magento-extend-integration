@@ -27,7 +27,7 @@ $showTimeline = $status !== 4 && $status !== 3;
                         <p>The <strong><?= $escaper->escapeHtml($block->getCurrentIntegrationName()) ?></strong> integration is not yet enabled. Please follow the steps detailed on the <a href="<?= $escaper->escapeUrl($block->getDefaultScopeUrl()) ?>">Extend Settings</a> page to complete
                             your setup and integration this store with Extend.</p>
                         <button class="action-primary" name="finish_integration" type="button" onclick="document.location.href='<?= $escaper->escapeJs($block->getDefaultScopeUrl()) ?>';">
-                            <span><?= __('Finish Integration') ?></span>
+                            <span><?= $escaper->escapeHtml(__('Finish Integration')) ?></span>
                         </button>
                     </div>
                 <?php endif; ?>

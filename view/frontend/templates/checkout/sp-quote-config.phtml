@@ -27,7 +27,7 @@ $shouldRender = $viewModel->isExtendShippingProtectionEnabled();
             "environment": "<?= $escaper->escapeJs($environment) ?>",
             "storeId": "<?= $escaper->escapeJs($storeId) ?>",
             "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>",
-            "isCurrencySupported": <?= json_encode($isCurrencySupported) ?>
+            "isCurrencySupported": <?= /* @noEscape */ json_encode($isCurrencySupported) ?>
           }
         ]
       }
