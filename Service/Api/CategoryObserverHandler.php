@@ -60,14 +60,14 @@ class CategoryObserverHandler extends BaseObserverHandler
             $categoryId = $category->getId();
             if (!isset($categoryId)) {
                 throw new LocalizedException(
-                  new Phrase('The observed category is missing an id, which is required by the Extend Integration Service.')
+                    new Phrase('The observed category is missing an id, which is required by the Extend Integration Service.')
                 );
             }
 
             $categoryName = $category->getName();
             if (!isset($categoryName)) {
                 throw new LocalizedException(
-                  new Phrase('The observed category is missing a name, which is required by the Extend Integration Service.')
+                    new Phrase('The observed category is missing a name, which is required by the Extend Integration Service.')
                 );
             }
 
@@ -109,7 +109,12 @@ class CategoryObserverHandler extends BaseObserverHandler
         } catch (Exception $exception) {
             // silently handle errors
             $this->logger->error('Extend Category Observer encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error',
+                $exception
+            );
         }
     }
 }

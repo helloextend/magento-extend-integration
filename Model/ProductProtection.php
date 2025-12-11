@@ -459,7 +459,8 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
             $this->integration->logErrorToLoggingService(
                 $exception->getMessage(),
                 $this->storeManager->getStore()->getId(),
-                'error'
+                'error',
+                $exception
             );
             // this is handled by magento error handler
             throw $exception;

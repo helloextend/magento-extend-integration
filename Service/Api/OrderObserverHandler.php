@@ -56,7 +56,8 @@ class OrderObserverHandler extends BaseObserverHandler
             $this->integration->logErrorToLoggingService(
                 $exception->getMessage(),
                 $this->storeManager->getStore()->getId(),
-                'error'
+                'error',
+                $exception
             );
         }
     }

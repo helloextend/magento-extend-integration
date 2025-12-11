@@ -69,19 +69,19 @@ abstract class BaseExtendObserver implements ObserverInterface
             if ($shouldExecute) {
                 $this->_execute($observer);
             }
-        }  catch (Exception $exception) {
+        } catch (Exception $exception) {
             // silently handle errors
-            $errorMessage = 'The ' . $observer->getName() . ' observer encountered the following error: ' .
-                $exception->getMessage();
+            $errorMessage = 'The ' . $observer->getName() . ' observer encountered an error';
 
-            $this->logger->error($errorMessage);
+            $this->logger->error($errorMessage . ': ' . $exception->getMessage());
 
             $storeId = $this->storeManager->getStore()->getId();
 
             $this->extendIntegrationService->logErrorToLoggingService(
                 $errorMessage,
                 $storeId,
-                'error'
+                'error',
+                $exception
             );
         }
     }

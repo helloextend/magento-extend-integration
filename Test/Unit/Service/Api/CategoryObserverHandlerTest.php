@@ -184,7 +184,7 @@ class CategoryObserverHandlerTest extends TestCase
         $this->integration
             ->expects($this->once())
             ->method('logErrorToLoggingService')
-            ->with($thrownExceptionMessage, $this->storeId, 'error');
+            ->with($thrownExceptionMessage, $this->storeId, 'error', $this->isInstanceOf('\\Exception'));
 
         $this->integration
             ->expects($this->never())
@@ -215,7 +215,7 @@ class CategoryObserverHandlerTest extends TestCase
         $this->integration
             ->expects($this->once())
             ->method('logErrorToLoggingService')
-            ->with($thrownExceptionMessage, $this->storeId, 'error');
+            ->with($thrownExceptionMessage, $this->storeId, 'error', $this->isInstanceOf('\\Exception'));
 
         $this->integration
             ->expects($this->never())
@@ -302,7 +302,7 @@ class CategoryObserverHandlerTest extends TestCase
         $this->integration
             ->expects($this->once())
             ->method('logErrorToLoggingService')
-            ->with($thrownExceptionMessage, $this->storeId, 'error');
+            ->with($thrownExceptionMessage, $this->storeId, 'error', $this->isInstanceOf('\\Exception'));
 
         $this->metadataBuilder
             ->expects($this->never())
@@ -359,7 +359,7 @@ class CategoryObserverHandlerTest extends TestCase
         $this->integration
             ->expects($this->once())
             ->method('logErrorToLoggingService')
-            ->with($thrownExceptionMessage, $this->storeId, 'error');
+            ->with($thrownExceptionMessage, $this->storeId, 'error', $this->isInstanceOf('\\Exception'));
 
         $this->categoryObserverHandler->execute($this->integrationEndpointArray, $this->category, []);
     }

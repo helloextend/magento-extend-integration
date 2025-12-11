@@ -52,7 +52,12 @@ class ProductObserverHandler extends BaseObserverHandler
         } catch (\Exception $exception) {
             // silently handle errors
             $this->logger->error('Extend Product Observer encountered the following error: ' . $exception->getMessage());
-            $this->integration->logErrorToLoggingService($exception->getMessage(), $this->storeManager->getStore()->getId(), 'error');
+            $this->integration->logErrorToLoggingService(
+                $exception->getMessage(),
+                $this->storeManager->getStore()->getId(),
+                'error',
+                $exception
+            );
         }
     }
 }

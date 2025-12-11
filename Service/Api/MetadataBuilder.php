@@ -19,7 +19,6 @@ use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Psr\Log\LoggerInterface;
 
-
 class MetadataBuilder
 {
     private IdentityService $identityService;
@@ -93,9 +92,12 @@ class MetadataBuilder
                     ->getByStoreIdAndActiveEnvironment($storeIds[0])
                     ->getStoreUuid();
             }
+        } catch (NoSuchEntityException $exception) {
+            // Store integration not found - expected for stores that haven't completed Extend setup
+            $this->logger->warning('Store integration not configured: ' . $exception->getMessage() . '\n' . $exception->getTraceAsString());
         } catch (Exception $exception) {
-            // silently fails
-            $this->logger->error('The follow error was reported while trying to add additional metadata headers: ' . $exception->getMessage());
+            // Unexpected error building metadata headers
+            $this->logger->error('Error building metadata headers: ' . $exception->getMessage() . '\n' . $exception->getTraceAsString());
         }
 
 
@@ -105,10 +107,15 @@ class MetadataBuilder
         $body['data'] = $data;
 
         foreach ($storeIds as $storeId) {
-            $body['magento_store_uuids'][] =
-                $this->storeIntegrationRepository
-                    ->getByStoreIdAndActiveEnvironment($storeId)
-                    ->getStoreUuid();
+            try {
+                $body['magento_store_uuids'][] =
+                    $this->storeIntegrationRepository
+                        ->getByStoreIdAndActiveEnvironment($storeId)
+                        ->getStoreUuid();
+            } catch (NoSuchEntityException $exception) {
+                // Store integration not found - skip this store and log as warning
+                $this->logger->warning('Store integration not configured for store ID ' . $storeId . ', skipping from webhook payload. Stack trace: ' . $exception->getTraceAsString());
+            }
         }
 
         return [$headers, $body];
