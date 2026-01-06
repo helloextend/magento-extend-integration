@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 /*
- * Copyright Extend (c) 2023. All rights reserved.
+ * Copyright Extend (c) 2026. All rights reserved.
  * See Extend-COPYING.txt for license details.
  */
 
