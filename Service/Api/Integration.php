@@ -136,7 +136,7 @@ class Integration
      * @param \Throwable|null $exception
      * @return void
      */
-    public function logErrorToLoggingService($message, $storeId, $logLevel, \Throwable $exception = null)
+    public function logErrorToLoggingService($message, $storeId, $logLevel, ?\Throwable $exception = null)
     {
         try {
             $headers = [
