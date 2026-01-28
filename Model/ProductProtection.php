@@ -667,9 +667,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
      * @param $term
      * @param $productId
      * @param $planId
+     * @param $coverageType
      * @param $listPrice
      * @param $orderOfferPlanId
-     * @param $coverageType
      * @return void
      * @throws LocalizedException
      */
@@ -682,9 +682,9 @@ class ProductProtection extends \Magento\Framework\Model\AbstractModel implement
         $term,
         $productId,
         $planId,
+        $coverageType,
         $listPrice,
-        $orderOfferPlanId,
-        $coverageType
+        $orderOfferPlanId
     ) {
         $optionValues = [
             self::PLAN_TYPE_CODE => $coverageType,
