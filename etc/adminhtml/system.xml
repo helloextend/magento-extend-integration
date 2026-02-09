@@ -55,7 +55,6 @@
                     <label>Enable Shipping Protection</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <frontend_model>Extend\Integration\Model\Config\Frontend\EnableShippingProtection</frontend_model>
-                    <comment>Disabling Shipping Protection may render existing orders' totals inaccurate if the order was purchased with Shipping Protection.</comment>
                 </field>
                 <field id="shipping_protection_tax_class" translate="label" type="select" sortOrder="20" showInDefault="1" canRestore="1">
                     <label>Tax Class Config</label>
