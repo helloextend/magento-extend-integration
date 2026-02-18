@@ -617,6 +617,31 @@ class QuotePluginTest extends TestCase
         $this->assertEqualsCanonicalizing([$existingWarrantyQuoteItem1yr->getId()], $actualArgs);
     }
 
+    // extend is enabled and the same warranty item is being reused (same ID already in cart)
+    // -> the reused item should be excluded from existing warranties, early return, no crash
+    // This is the bug fix for MINT-5221: when ProductProtection::upsert() reuses an existing
+    // warranty item, the same object appeared on both sides of the calculation causing a
+    // negative target qty and "Undefined array key 0" error.
+    public function testBeforeAddItemDoesNotCrashWhenReusingSameWarrantyItem()
+    {
+        $merchantQuoteItem = $this->createQuoteItemMock(1, 'merchant_product_A');
+        // The same warranty object is both "already in cart" and "being added".
+        // This simulates ProductProtection::upsert() reusing an existing item with updated qty.
+        $reusedWarrantyItem = $this->createQuoteItemMock(2, Extend::WARRANTY_PRODUCT_SKU, 'merchant_product_A', 599);
+        $this->setTestConditions([
+          'extend_enabled' => true,
+          'existing_quote_items' => [
+            $merchantQuoteItem,
+            $reusedWarrantyItem
+          ]
+        ]);
+        $this->expectSetQtyToBeCalledOnQuoteItemTimesWith($merchantQuoteItem, 0);
+        $this->expectSetQtyToBeCalledOnQuoteItemTimesWith($reusedWarrantyItem, 0);
+        $this->expectRemoveItemToBeCalledTimes(0);
+        $this->expectSetTotalsCollectedFlagToBeCalledTimes(0);
+        $this->testSubject->beforeAddItem($this->quoteMock, $reusedWarrantyItem);
+    }
+
   /* =================================================================================================== */
   /* ========================== helper methods for setting up test conditions ========================== */
   /* =================================================================================================== */
@@ -683,7 +708,7 @@ class QuotePluginTest extends TestCase
      * @param int|null $customPrice
      * @param string|null $leadToken
      * @param int|null $leadQty
-     * @return Item | MockObject
+     * @return Item|MockObject
      */
     private function createQuoteItemMock(
         int $qty,
@@ -692,7 +717,7 @@ class QuotePluginTest extends TestCase
         ?int $customPrice = null,
         ?string $leadToken = null,
         ?int $leadQty = null
-    ): Item | MockObject {
+    ) {
         $quoteItemMock = $this->getMockBuilder(Item::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getSku', 'getQty', 'getId', 'getOptionByCode', 'setQty'])
@@ -723,9 +748,9 @@ class QuotePluginTest extends TestCase
     /**
      * Create a mock quote item option with the given value.
      * @param string $value
-     * @return Option | MockObject
+     * @return Option|MockObject
      */
-    private function createQuoteItemOptionMock(string $value): Option | MockObject
+    private function createQuoteItemOptionMock(string $value)
     {
         $quoteItemOptionMock = $this->createStub(Option::class);
         $quoteItemOptionMock->method('getValue')->willReturn($value);
@@ -766,8 +791,9 @@ class QuotePluginTest extends TestCase
 
     /**
      * Expect Quote\Item::setQty to be called on the item provided with the config provided
+     * @param Item|MockObject $quoteItem
      */
-    private function expectSetQtyToBeCalledOnQuoteItemTimesWith(Item | MockObject $quoteItem, int $times, ?int $newQty = null)
+    private function expectSetQtyToBeCalledOnQuoteItemTimesWith($quoteItem, int $times, ?int $newQty = null)
     {
         if (isset($newQty)) {
             $quoteItem->expects($this->exactly($times))->method('setQty')->with($newQty);

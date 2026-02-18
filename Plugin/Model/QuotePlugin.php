@@ -134,6 +134,15 @@ class QuotePlugin
      * If the item being added is an Extend warranty, ensure the quantity being added is
      * privileged against any existing warranties in the quote that are for the same product.
      *
+     * Example of what this is useful: the user adds a product and warranty to the cart, they then add
+     * a second different warranty with the same product to the cart. Depending on the order magento processes
+     * these items, by the time the second warranty reaches beforeAddItem the beforeCollectTotals function
+     * may have already eagerly balanced the first warranty to the product quantity. This means that we need to reduce
+     * the quantity of the first warranty before adding the second warranty to ensure that the total warranty quantity
+     * does not exceed the product quantity when the quote is saved. If left unbalanced, beforeCollectTotals would attempt
+     * to remove items during the save, which can cause database constraint errors because order of items received
+     * warranty/product is not guaranteed to the beforeCollectTotals function.
+     *
      * @param Quote $subject
      * @param Item $item the item being added to the quote
      * @return void
@@ -161,6 +170,19 @@ class QuotePlugin
 
             $existingExtendProductsForMerchantQuoteItem = $this
                 ->getMatchingWarrantyProductQuoteItemsForMerchantProductQuoteItem($subject, $correspondingMerchantQuoteItem);
+
+            // Exclude the item being added if it's being reused (same ID already in cart).
+            // When ProductProtection::upsert() reuses an existing warranty item, the same
+            // object appears in both the "item being added" and "existing warranties" lists,
+            // which causes double-counting and a negative target qty.
+            // Example of how this would happen: adding the same warranty/product to cart twice in a row
+            // to an empty cart on a PDP page. Any imbalance will be subsequently handled by beforeCollectTotals
+            $existingExtendProductsForMerchantQuoteItem = array_values(array_filter(
+                $existingExtendProductsForMerchantQuoteItem,
+                function ($existingItem) use ($item) {
+                    return !$item->getId() || $existingItem->getId() !== $item->getId();
+                }
+            ));
 
             if (!count($existingExtendProductsForMerchantQuoteItem)) {
                 return;
