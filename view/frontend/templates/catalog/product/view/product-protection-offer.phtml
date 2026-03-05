@@ -38,7 +38,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                       "extendStoreUuid": "<?= $escaper->escapeJs($block->getData('viewModel')->getExtendStoreUuid()) ?>",
                       "activeEnvironment": "<?= $escaper->escapeJs($block->getData('viewModel')->getActiveEnvironment()) ?>",
                       "selectedProductSku": "<?= $escaper->escapeJs($block->getProduct()->getSku()); ?>",
-                      "selectedProductPrice": "<?= $escaper->escapeJs($block->getProduct()->getPrice()); ?>",
+                      "selectedProductPrice": "<?= $escaper->escapeJs($block->getProduct()->getFinalPrice()); ?>",
                       "productCategory": "<?= $escaper->escapeJs($categoryName); ?>",
                       "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                   }

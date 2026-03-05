@@ -49,7 +49,7 @@ $sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
                                                 ->getData('viewModel')
                                                 ->getActiveEnvironment()) ?>",
                         "selectedProductSku": "<?= $escaper->escapeJs($product->getSku()) ?>",
-                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getPrice()) ?>",
+                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getFinalPrice()) ?>",
                         "productCategory": "<?= $escaper->escapeJs($categoryName) ?>",
                         "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                     }

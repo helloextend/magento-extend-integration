@@ -13,7 +13,7 @@ $product = $block->getProduct();
 $productSku = $product->getSku();
 /** sanitizing to prevent whitespace and other abnormal characters from being used in a div id */
 $sanitizedProductSku = preg_replace('/[^a-zA-Z0-9-_|]/', '',  $productSku);
-$productPrice = $product->getPrice();
+$productPrice = $product->getFinalPrice();
 
 $categoryName = '';
 $categories = $product->getCategoryIds();

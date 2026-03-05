@@ -40,7 +40,7 @@ $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->is
                         "activeEnvironment": "<?= $escaper->escapeJs($block->getData('viewModel')->getActiveEnvironment()) ?>",
                         "selectedProductSku": "<?= $escaper->escapeJs($product->getSku()); ?>",
                         "selectedProductId": "<?= $escaper->escapeJs($product->getId()); ?>",
-                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getPrice()); ?>",
+                        "selectedProductPrice": "<?= $escaper->escapeJs($product->getFinalPrice()); ?>",
                         "productCategory": "<?= $escaper->escapeJs($categoryName); ?>",
                         "currencyCode": "<?= $escaper->escapeJs($currencyCode) ?>"
                     }<?= array_key_last($block->getAssociatedProducts()) === $key ? '' : ',' ?>
