@@ -89,6 +89,21 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
             return $this;
         }
 
+        if ($quote->isVirtual()) {
+            $spRecord = $this->shippingProtectionTotalRepository->get(
+                $quote->getId(),
+                ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
+            );
+            if ($spRecord && $spRecord->getId()) {
+                $this->shippingProtectionTotalRepository->deleteById($spRecord->getId());
+            }
+            $extensionAttributes = $quote->getExtensionAttributes();
+            if ($extensionAttributes) {
+                $extensionAttributes->setShippingProtection(null);
+            }
+            return $this;
+        }
+
         $extensionAttributes = $quote->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->cartExtensionFactory->create();
@@ -156,6 +171,10 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
         \Magento\Quote\Model\Quote $quote,
         \Magento\Quote\Model\Quote\Address\Total $total
     ) {
+        if ($quote->isVirtual()) {
+            return [];
+        }
+
         $extensionAttributes = $quote->getExtensionAttributes();
         if ($extensionAttributes === null) {
             $extensionAttributes = $this->cartExtensionFactory->create();
