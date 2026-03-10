@@ -97,10 +97,6 @@ class ShippingProtection extends \Magento\Quote\Model\Quote\Address\Total\Abstra
             if ($spRecord && $spRecord->getId()) {
                 $this->shippingProtectionTotalRepository->deleteById($spRecord->getId());
             }
-            $extensionAttributes = $quote->getExtensionAttributes();
-            if ($extensionAttributes) {
-                $extensionAttributes->setShippingProtection(null);
-            }
             return $this;
         }
 

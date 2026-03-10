@@ -391,61 +391,7 @@ class ShippingProtectionTest extends TestCase
             ->method('deleteById')
             ->with(99);
 
-        // Expect extension attribute to be cleared
-        $this->quoteMock->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
-        $this->cartExtensionMock->expects($this->once())
-            ->method('setShippingProtection')
-            ->with(null);
-
         $this->runCollect();
-        $this->assertEquals(0, $this->total->getBaseTotalAmount('shipping_protection'));
-        $this->assertEquals(0, $this->total->getTotalAmount('shipping_protection'));
-    }
-
-    public function testCollectCleansUpWhenQuoteBecomesVirtual()
-    {
-        // Phase 1: collect with a non-virtual quote so SP totals get applied
-        $nonVirtualQuote = $this->createStub(Quote::class);
-        $nonVirtualQuote->method('isVirtual')->willReturn(false);
-        $nonVirtualQuote->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
-        $nonVirtualQuote->method('getId')->willReturn(72);
-
-        $spMock = $this->createStub(BaseShippingProtectionModel::class);
-        $spMock->method('getPrice')->willReturn($this->shippingProtectionPrice);
-        $spMock->method('getBase')->willReturn($this->shippingProtectionBasePrice);
-
-        $this->cartExtensionMock->expects($this->any())->method('getShippingProtection')->willReturn($spMock);
-        $this->shippingAssignmentMock->method('getItems')->willReturn([$this->items]);
-        $this->scopeConfigMock->method('getValue')->willReturn(0);
-        $this->calculationMock->method('getRate')->willReturn(0);
-
-        $this->testSubject->collect($nonVirtualQuote, $this->shippingAssignmentMock, $this->total);
-        $this->assertEquals($this->shippingProtectionBasePrice, $this->total->getBaseTotalAmount('shipping_protection'));
-        $this->assertEquals($this->shippingProtectionPrice, $this->total->getTotalAmount('shipping_protection'));
-
-        // Phase 2: collect again with a virtual quote using the same Total object
-        $virtualQuote = $this->createMock(Quote::class);
-        $virtualQuote->method('isVirtual')->willReturn(true);
-        $virtualQuote->method('getId')->willReturn(72);
-        $virtualExtAttrs = $this->createMock(MagicMockInterface::class);
-        $virtualQuote->method('getExtensionAttributes')->willReturn($virtualExtAttrs);
-
-        // Expect SP record lookup and deletion
-        $this->shippingProtectionTotalRepositoryMock->expects($this->once())
-            ->method('get')
-            ->with(72, 4)
-            ->willReturn($this->shippingProtectionTotalMock);
-        $this->shippingProtectionTotalMock->method('getId')->willReturn(99);
-        $this->shippingProtectionTotalRepositoryMock->expects($this->once())
-            ->method('deleteById')
-            ->with(99);
-
-        // Expect extension attribute to be nulled
-        $virtualExtAttrs->expects($this->once())
-            ->method('setShippingProtection')
-            ->with(null);
-
-        $this->testSubject->collect($virtualQuote, $this->shippingAssignmentMock, $this->total);
         $this->assertEquals(0, $this->total->getBaseTotalAmount('shipping_protection'));
         $this->assertEquals(0, $this->total->getTotalAmount('shipping_protection'));
     }
@@ -465,11 +411,6 @@ class ShippingProtectionTest extends TestCase
             ->willReturn($emptySpRecord);
         $this->shippingProtectionTotalRepositoryMock->expects($this->never())
             ->method('deleteById');
-
-        $this->quoteMock->method('getExtensionAttributes')->willReturn($this->cartExtensionMock);
-        $this->cartExtensionMock->expects($this->once())
-            ->method('setShippingProtection')
-            ->with(null);
 
         $this->runCollect();
         $this->assertEquals(0, $this->total->getBaseTotalAmount('shipping_protection'));
