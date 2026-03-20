@@ -19,5 +19,5 @@ class ExtendOrders extends Base
     /**
      * @var string
      */
-    protected $fileName = '/var/log/extend-orders.log';
+    protected $fileName = '/var/log/extend/orders.log';
 }

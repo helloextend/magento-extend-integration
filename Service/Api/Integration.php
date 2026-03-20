@@ -114,7 +114,7 @@ class Integration
             }
 
             if ($getBody) {
-                return $response;
+                return $responseBody;
             }
         } catch (\Exception $exception) {
             $this->logger->critical($exception->getMessage());

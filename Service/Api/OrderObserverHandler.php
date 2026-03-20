@@ -6,11 +6,14 @@
 
 namespace Extend\Integration\Service\Api;
 
+use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Extend\Integration\Logger\ExtendOrders as ExtendOrdersLogger;
 use Extend\Integration\Model\Config\Source\OrderLogLevel;
+use Extend\Integration\Model\ProductProtection;
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Extend as ExtendService;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order;
 use Psr\log\LoggerInterface;
@@ -27,33 +30,72 @@ class OrderObserverHandler extends BaseObserverHandler
      */
     private ExtendService $extendService;
 
+    /**
+     * @var StoreIntegrationRepositoryInterface
+     */
+    private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
+
+    /**
+     * @var QuoteItemCollectionFactory
+     */
+    private QuoteItemCollectionFactory $quoteItemCollectionFactory;
+
     public function __construct(
         LoggerInterface $logger,
         Integration $integration,
         StoreManagerInterface $storeManager,
         MetadataBuilder $metadataBuilder,
         ExtendOrdersLogger $extendOrdersLogger,
-        ExtendService $extendService
+        ExtendService $extendService,
+        StoreIntegrationRepositoryInterface $storeIntegrationRepository,
+        QuoteItemCollectionFactory $quoteItemCollectionFactory
     ) {
         parent::__construct($logger, $integration, $storeManager, $metadataBuilder);
         $this->extendOrdersLogger = $extendOrdersLogger;
         $this->extendService = $extendService;
+        $this->storeIntegrationRepository = $storeIntegrationRepository;
+        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
     }
 
     /**
      * @param Order $order
+     * @param string|null $extendStoreId
      * @return array
      */
-    private function buildOrderLogData(Order $order): array
+    private function buildOrderLogData(Order $order, ?string $extendStoreId): array
     {
+        $extendItemQuoteIds = [];
+        foreach ($order->getAllVisibleItems() as $item) {
+            if (ExtendService::isProductionProtectionSku($item->getSku())) {
+                $extendItemQuoteIds[$item->getQuoteItemId()] = $item->getItemId();
+            }
+        }
+
+        $planIdsByOrderItemId = [];
+        if (!empty($extendItemQuoteIds)) {
+            $quoteItems = $this->quoteItemCollectionFactory->create()
+                ->addFieldToFilter('item_id', ['in' => array_keys($extendItemQuoteIds)]);
+            foreach ($quoteItems as $quoteItem) {
+                $planIdOption = $quoteItem->getOptionByCode(ProductProtection::PLAN_ID_CODE);
+                if ($planIdOption) {
+                    $orderItemId = $extendItemQuoteIds[$quoteItem->getId()];
+                    $planIdsByOrderItemId[$orderItemId] = $planIdOption->getValue();
+                }
+            }
+        }
+
         $items = [];
         foreach ($order->getAllVisibleItems() as $item) {
-            $items[] = [
+            $itemData = [
                 'sku' => $item->getSku(),
                 'name' => $item->getName(),
                 'qty_ordered' => $item->getQtyOrdered(),
                 'price' => $item->getPrice(),
             ];
+            if (isset($planIdsByOrderItemId[$item->getItemId()])) {
+                $itemData['plan_id'] = $planIdsByOrderItemId[$item->getItemId()];
+            }
+            $items[] = $itemData;
         }
 
         return [
@@ -64,7 +106,7 @@ class OrderObserverHandler extends BaseObserverHandler
             'customer_name' => trim($order->getCustomerFirstname() . ' ' . $order->getCustomerLastname()),
             'grand_total' => $order->getGrandTotal(),
             'currency' => $order->getOrderCurrencyCode(),
-            'store_id' => $order->getStoreId(),
+            'extend_store_id' => $extendStoreId,
             'items' => $items,
         ];
     }
@@ -85,6 +127,7 @@ class OrderObserverHandler extends BaseObserverHandler
 
         try {
             $orderStatus = $order->getStatus();
+            $extendStoreId = $this->storeIntegrationRepository->getByStoreIdAndActiveEnvironment((int)$order->getStoreId())->getExtendStoreUuid();
             $orderArray = [
                 'order_id' => $orderId,
                 'order_status' => $orderStatus,
@@ -94,7 +137,7 @@ class OrderObserverHandler extends BaseObserverHandler
             if ($loggingEnabled && in_array($logLevel, [OrderLogLevel::PAYLOADS_AND_ERRORS, OrderLogLevel::VERBOSE], true)) {
                 $this->extendOrdersLogger->info('Extend order webhook dispatching', array_merge(
                     ['endpoint' => $endpoint, 'additional_fields' => $additionalFields],
-                    $this->buildOrderLogData($order)
+                    $this->buildOrderLogData($order, $extendStoreId)
                 ));
             }
 
@@ -107,6 +150,8 @@ class OrderObserverHandler extends BaseObserverHandler
             if ($loggingEnabled && $logLevel === OrderLogLevel::VERBOSE) {
                 $this->extendOrdersLogger->info('Extend order webhook request body', [
                     'endpoint' => $endpoint,
+                    'order_id' => $orderId,
+                    'extend_store_id' => $extendStoreId,
                     'request_body' => $body,
                 ]);
             }
@@ -117,6 +162,7 @@ class OrderObserverHandler extends BaseObserverHandler
                 $this->extendOrdersLogger->info('Extend order webhook API response', [
                     'endpoint' => $endpoint,
                     'order_id' => $orderId,
+                    'extend_store_id' => $extendStoreId,
                     'response' => $responseBody,
                 ]);
             }
