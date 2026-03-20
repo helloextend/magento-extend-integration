@@ -41,6 +41,35 @@ class OrderObserverHandler extends BaseObserverHandler
     }
 
     /**
+     * @param Order $order
+     * @return array
+     */
+    private function buildOrderLogData(Order $order): array
+    {
+        $items = [];
+        foreach ($order->getAllVisibleItems() as $item) {
+            $items[] = [
+                'sku' => $item->getSku(),
+                'name' => $item->getName(),
+                'qty_ordered' => $item->getQtyOrdered(),
+                'price' => $item->getPrice(),
+            ];
+        }
+
+        return [
+            'order_id' => $order->getId(),
+            'increment_id' => $order->getIncrementId(),
+            'order_status' => $order->getStatus(),
+            'customer_email' => $order->getCustomerEmail(),
+            'customer_name' => trim($order->getCustomerFirstname() . ' ' . $order->getCustomerLastname()),
+            'grand_total' => $order->getGrandTotal(),
+            'currency' => $order->getOrderCurrencyCode(),
+            'store_id' => $order->getStoreId(),
+            'items' => $items,
+        ];
+    }
+
+    /**
      * @param array $integrationEndpoint
      * @param Order $order
      * @param array $additionalFields
@@ -62,13 +91,11 @@ class OrderObserverHandler extends BaseObserverHandler
                 'additional_fields' => $additionalFields,
             ];
 
-            if ($loggingEnabled && $logLevel === OrderLogLevel::PAYLOADS_AND_ERRORS) {
-                $this->extendOrdersLogger->info('Extend order webhook dispatching', [
-                    'endpoint' => $endpoint,
-                    'order_id' => $orderId,
-                    'order_status' => $orderStatus,
-                    'additional_fields' => $additionalFields,
-                ]);
+            if ($loggingEnabled && in_array($logLevel, [OrderLogLevel::PAYLOADS_AND_ERRORS, OrderLogLevel::VERBOSE], true)) {
+                $this->extendOrdersLogger->info('Extend order webhook dispatching', array_merge(
+                    ['endpoint' => $endpoint, 'additional_fields' => $additionalFields],
+                    $this->buildOrderLogData($order)
+                ));
             }
 
             [$headers, $body] = $this->metadataBuilder->execute(
@@ -78,11 +105,8 @@ class OrderObserverHandler extends BaseObserverHandler
             );
 
             if ($loggingEnabled && $logLevel === OrderLogLevel::VERBOSE) {
-                $this->extendOrdersLogger->info('Extend order webhook dispatching', [
+                $this->extendOrdersLogger->info('Extend order webhook request body', [
                     'endpoint' => $endpoint,
-                    'order_id' => $orderId,
-                    'order_status' => $orderStatus,
-                    'additional_fields' => $additionalFields,
                     'request_body' => $body,
                 ]);
             }
