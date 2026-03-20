@@ -9,6 +9,10 @@
             <integration>
                 <enable>0</enable>
             </integration>
+            <order_logging>
+                <enable>0</enable>
+                <log_level>errors_only</log_level>
+            </order_logging>
         </extend>
         <extend_plans>
             <shipping_protection>

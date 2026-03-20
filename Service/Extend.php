@@ -57,6 +57,9 @@ class Extend
 
     public const SHIPPING_PROTECTION_TAX_CLASS = 'extend_plans/shipping_protection/shipping_protection_tax_class';
 
+    public const ORDER_LOGGING_ENABLE = 'extend/order_logging/enable';
+    public const ORDER_LOGGING_LEVEL = 'extend/order_logging/log_level';
+
     /**
      * Lead token url param
      */
@@ -97,6 +100,22 @@ class Extend
     public static function isProductionProtectionSku(string $sku): bool
     {
         return $sku === self::WARRANTY_PRODUCT_SKU || $sku === self::WARRANTY_PRODUCT_LEGACY_SKU;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOrderLoggingEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->getValue(self::ORDER_LOGGING_ENABLE);
+    }
+
+    /**
+     * @return string
+     */
+    public function getOrderLogLevel(): string
+    {
+        return (string)$this->scopeConfig->getValue(self::ORDER_LOGGING_LEVEL);
     }
 
     /**

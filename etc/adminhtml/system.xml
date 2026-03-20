@@ -43,6 +43,22 @@
                     <frontend_model>Extend\Integration\Model\Config\Frontend\CreateDemoIntegration</frontend_model>
                 </field>
             </group>
+            <group id="order_logging" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Logging</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Order Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Logs order webhook activity to var/log/extend-orders.log</comment>
+                </field>
+                <field id="log_level" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Log Level</label>
+                    <source_model>Extend\Integration\Model\Config\Source\OrderLogLevel</source_model>
+                    <comment>Errors Only: log exceptions. Order Payloads and Errors: also log order data on each webhook. Verbose: also log full API request and response bodies.</comment>
+                    <depends>
+                        <field id="extend/order_logging/enable">1</field>
+                    </depends>
+                </field>
+            </group>
         </section>
         <section id="extend_plans" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <class>separator-top</class>

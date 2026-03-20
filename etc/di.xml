@@ -63,4 +63,17 @@
     <type name="Magento\Quote\Model\Quote">
         <plugin sortOrder="1" name="extendIntegrationCart" type="Extend\Integration\Plugin\Model\QuotePlugin"/>
     </type>
+    <type name="Extend\Integration\Logger\ExtendOrders">
+        <arguments>
+            <argument name="name" xsi:type="string">ExtendOrders</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Extend\Integration\Logger\Handler\ExtendOrders</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Extend\Integration\Service\Api\OrderObserverHandler">
+        <arguments>
+            <argument name="extendOrdersLogger" xsi:type="object">Extend\Integration\Logger\ExtendOrders</argument>
+        </arguments>
+    </type>
 </config>
