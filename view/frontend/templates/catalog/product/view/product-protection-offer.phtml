@@ -28,6 +28,107 @@ $isCurrencySupported = $viewModel->isCurrencySupported();
 $shouldRender = $viewModel->isExtendProductProtectionEnabled() && $viewModel->isProductProtectionProductDisplayPageOfferEnabled() && $isCurrencySupported;
 ?>
 
+<script>
+window.testExtendEndpoints = async function (params) {
+    params = Object.assign({
+        storeCode: '',
+        storeId: '',
+        storeUuid: '',
+        extendStoreUuid: '<?= $escaper->escapeJs($viewModel->getExtendStoreUuid()) ?>',
+        consumerKey: '',
+        orderId: '',
+        creditmemoId: '',
+        shipmentId: '',
+        sku: '<?= $escaper->escapeJs($productSku) ?>',
+        categoryId: '',
+        cartId: '',
+        magentoStoreUuid: ''
+    }, params || {});
+
+    var base = (window.BASE_URL || window.location.origin + '/').replace(/\/$/, '');
+    var results = {};
+
+    function test(label, method, path) {
+        var url = base + path;
+        var controller = new AbortController();
+        var timeout = setTimeout(function () { controller.abort(); }, 5000);
+
+        return fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal })
+            .then(function (res) {
+                clearTimeout(timeout);
+                return res.text().then(function (body) {
+                    var json = null;
+                    try { json = JSON.parse(body); } catch (e) {}
+                    var success = json !== null;
+                    results[label] = { success: success, status: res.status, url: url };
+                });
+            })
+            .catch(function (e) {
+                clearTimeout(timeout);
+                var failed = e.name === 'AbortError' ? 'timeout' : e.message;
+                results[label] = { success: false, failed: failed, url: url };
+            });
+    }
+
+    var p = params;
+
+    await Promise.all([
+        // Store Integration
+        test('GET store/:code',                              'GET',    '/rest/V1/extend/integration/store/' + p.storeCode),
+        test('GET store/id/:store_id',                       'GET',    '/rest/V1/extend/integration/store/id/' + p.storeId),
+        test('GET store/uuid/:store_uuid',                   'GET',    '/rest/V1/extend/integration/store/uuid/' + p.storeUuid),
+        test('GET store/extend_uuid/:extend_store_uuid',     'GET',    '/rest/V1/extend/integration/store/extend_uuid/' + p.extendStoreUuid),
+        test('POST store/:store_uuid/extend_uuid',           'POST',   '/rest/V1/extend/integration/store/' + (p.storeUuid || p.magentoStoreUuid) + '/extend_uuid'),
+        test('GET stores/consumer_key/:consumer_key',        'GET',    '/rest/V1/extend/integration/stores/consumer_key/' + p.consumerKey),
+
+        // OAuth Client Management
+        test('POST /V1/extend/integration/client',           'POST',   '/rest/V1/extend/integration/client'),
+
+        // Shipping Protection
+        test('POST sp-totals',                               'POST',   '/rest/V1/extend/integration/sp-totals'),
+        test('PUT sp-totals',                                'PUT',    '/rest/V1/extend/integration/sp-totals'),
+        test('DELETE sp-totals',                             'DELETE', '/rest/V1/extend/integration/sp-totals'),
+        test('POST api/sp-totals',                           'POST',   '/rest/V1/extend/integration/api/sp-totals'),
+
+        // Product Protection
+        test('POST pp/upsert',                               'POST',   '/rest/V1/extend/integration/pp/upsert'),
+        test('POST pp/upsert/:cart_id',                      'POST',   '/rest/V1/extend/integration/pp/upsert/' + p.cartId),
+
+        // Monitoring and Health
+        test('GET healthcheck',                              'GET',    '/rest/V1/extend/integration/healthcheck'),
+
+        // Core Magento
+        test('GET /rest/V1/orders/{id}',                     'GET',    '/rest/V1/orders/' + p.orderId),
+        test('GET /rest/V1/creditmemo/{id}',                 'GET',    '/rest/V1/creditmemo/' + p.creditmemoId),
+        test('GET /rest/V1/shipment/{id}',                   'GET',    '/rest/V1/shipment/' + p.shipmentId),
+        test('GET /rest/V1/store/storeConfigs',              'GET',    '/rest/V1/store/storeConfigs'),
+        test('GET /rest/V1/store/storeViews',                'GET',    '/rest/V1/store/storeViews'),
+        test('GET /rest/V1/products/{sku}',                  'GET',    '/rest/V1/products/' + p.sku),
+        test('GET /rest/V1/products',                        'GET',    '/rest/V1/products'),
+        test('GET /rest/V1/categories/{categoryId}',         'GET',    '/rest/V1/categories/' + p.categoryId),
+        test('GET /rest/V1/categories/list',                 'GET',    '/rest/V1/categories/list'),
+
+        // OAuth
+        test('POST /oauth/token/request',                    'POST',   '/oauth/token/request'),
+        test('POST /oauth/token/access',                     'POST',   '/oauth/token/access'),
+
+        // Admin
+        test('GET minicart/categories',                      'GET',    '/extend_integration/minicart/categories'),
+        test('POST admin/integration/create',                'POST',   '/admin/extend_integration/integration/create'),
+        test('POST admin/integration/createdemo',            'POST',   '/admin/extend_integration/integration/createdemo'),
+        test('POST admin/integration/createprod',            'POST',   '/admin/extend_integration/integration/createprod'),
+        test('GET admin/extend/about',                       'GET',    '/admin/extend_integration/extend/about'),
+        test('GET admin/extend/requestsupport',              'GET',    '/admin/extend_integration/extend/requestsupport'),
+        test('POST admin/productprotection/create',          'POST',   '/admin/extend_integration/productprotection/create'),
+    ]);
+
+    console.group('Extend Endpoint Test Results');
+    console.table(results);
+    console.groupEnd();
+    return results;
+};
+</script>
+
 <?php if ($shouldRender) : ?>
   <div class="product-protection-offer" id="product_protection_offer_<?= $escaper->escapeHtml($sanitizedProductSku) ?>"></div>
   <script type="text/x-magento-init">
