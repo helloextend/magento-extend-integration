@@ -7,6 +7,7 @@
 namespace Extend\Integration\Controller\Adminhtml\Integration;
 
 use Extend\Integration\Controller\Adminhtml\Integration\Create;
+use Extend\Integration\Logger\ExtendIntegration as IntegrationLogger;
 use Magento\Integration\Model\IntegrationService;
 use Magento\Integration\Model\ConfigBasedIntegrationManager;
 use Magento\Integration\Model\AuthorizationService;
@@ -22,15 +23,17 @@ class CreateProd extends Create
      * @param ConfigBasedIntegrationManager $configBasedIntegrationManager
      * @param AuthorizationService $authorizationService;
      * @param ManagerInterface $messageManager
+     * @param IntegrationLogger $integrationLogger
      */
     public function __construct(
         Context $context,
         IntegrationService $integrationService,
         ConfigBasedIntegrationManager $configBasedIntegrationManager,
         AuthorizationService $authorizationService,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        IntegrationLogger $integrationLogger
     ) {
-        parent::__construct($context, $integrationService, $configBasedIntegrationManager, $authorizationService, $messageManager);
+        parent::__construct($context, $integrationService, $configBasedIntegrationManager, $authorizationService, $messageManager, $integrationLogger);
     }
 
     protected function getIntegrationName()
