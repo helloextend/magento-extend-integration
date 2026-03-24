@@ -120,6 +120,7 @@ abstract class Create extends \Magento\Backend\App\Action
                 $this->integrationLogger->info('Integration created and made mutable', [
                     'name' => $this->integrationName,
                     'integration_id' => $updatedIntegration->getId(),
+                    'changed' => ['setup_type' => 0],
                 ]);
 
                 $this->integrationLogger->info('Granting permissions to integration', [
@@ -131,6 +132,7 @@ abstract class Create extends \Magento\Backend\App\Action
                 $this->integrationLogger->info('Permissions granted to integration', [
                     'name' => $this->integrationName,
                     'integration_id' => $updatedIntegration->getId(),
+                    'created' => ['resources' => $this->DEFAULT_INTEGRATION_RESOURCES],
                 ]);
 
                 $this->messageManager->addSuccessMessage(

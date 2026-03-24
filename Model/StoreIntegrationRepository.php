@@ -209,6 +209,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
                 'store_id' => $storeId,
                 'integration_id' => $integrationId,
                 'extend_store_integration_id' => $storeIntegration->getId(),
+                'changed' => ['disabled' => 0],
             ]);
             $storeIntegration->setDisabled(0);
             $this->storeIntegrationResource->save($storeIntegration);
@@ -224,6 +225,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
                     'store_id' => $storeId,
                     'environment' => $environment,
                     'legacy_extend_store_id' => $legacyExtendProductionStoreId,
+                    'created' => ['extend_store_uuid' => $legacyExtendProductionStoreId],
                 ]);
                 $storeIntegration->setExtendStoreUuid($legacyExtendProductionStoreId);
             }
@@ -232,6 +234,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
                     'store_id' => $storeId,
                     'environment' => $environment,
                     'legacy_extend_store_id' => $legacyExtendSandboxStoreId,
+                    'created' => ['extend_store_uuid' => $legacyExtendSandboxStoreId],
                 ]);
                 $storeIntegration->setExtendStoreUuid($legacyExtendSandboxStoreId);
             }
@@ -242,6 +245,11 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
                 'store_id' => $storeId,
                 'integration_id' => $integrationId,
                 'extend_store_integration_id' => $storeIntegration->getId(),
+                'created' => [
+                    'store_id' => $storeId,
+                    'integration_id' => $integrationId,
+                    'extend_store_uuid' => $storeIntegration->getExtendStoreUuid(),
+                ],
             ]);
             $this->generateUuidForStore($storeIntegration);
         }
@@ -263,6 +271,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
                 'store_id' => $storeIntegration->getStoreId(),
                 'store_uuid' => $uuid,
                 'extend_store_integration_id' => $storeIntegration->getId(),
+                'created' => ['store_uuid' => $uuid],
             ]);
         }
 
@@ -286,6 +295,11 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
         }
         $storeIntegration->setExtendStoreUuid($extendUuid);
         $this->storeIntegrationResource->save($storeIntegration);
+        $this->integrationLogger->info('Extend UUID added to store', [
+            'store_uuid' => $storeUuid,
+            'extend_store_integration_id' => $storeIntegration->getId(),
+            'changed' => ['extend_store_uuid' => $extendUuid],
+        ]);
     }
 
     /**
@@ -331,5 +345,11 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
         $integration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
         $integration->setIntegrationError($integrationError);
         $this->storeIntegrationResource->save($integration);
+        $this->integrationLogger->info('Integration error updated for store', [
+            'store_id' => $storeId,
+            'integration_id' => $integrationId,
+            'extend_store_integration_id' => $integration->getId(),
+            'changed' => ['integration_error' => $integrationError],
+        ]);
     }
 }

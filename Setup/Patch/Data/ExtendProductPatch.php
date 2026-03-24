@@ -113,6 +113,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 ]);
                 $this->integrationLogger->info('Extend Integration - Production created', [
                     'integration_id' => $this->integrationService->findByName('Extend Integration - Production')->getIntegrationId(),
+                    'created' => ['name' => 'Extend Integration - Production'],
                 ]);
             } else {
                 $this->integrationLogger->info('Extend Integration - Production already exists, skipping');
@@ -128,6 +129,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 ]);
                 $this->integrationLogger->info('Extend Integration - Demo created', [
                     'integration_id' => $this->integrationService->findByName('Extend Integration - Demo')->getIntegrationId(),
+                    'created' => ['name' => 'Extend Integration - Demo'],
                 ]);
             } else {
                 $this->integrationLogger->info('Extend Integration - Demo already exists, skipping');
@@ -141,6 +143,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 $this->integrationLogger->info('Setting default active environment to Demo', [
                     'integration_id' => $defaultEnvironmentId,
                     'config_path' => $this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG,
+                    'changed' => [$this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG => $defaultEnvironmentId],
                 ]);
                 $this->configWriter->save(
                     $this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG,

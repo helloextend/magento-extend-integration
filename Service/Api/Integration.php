@@ -6,6 +6,7 @@
 
 namespace Extend\Integration\Service\Api;
 
+use Extend\Integration\Logger\ExtendIntegration as IntegrationLogger;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -46,6 +47,7 @@ class Integration
     private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
     private AccessTokenBuilder $accessTokenBuilder;
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
+    private IntegrationLogger $integrationLogger;
 
     public function __construct(
         Curl $curl,
@@ -54,7 +56,8 @@ class Integration
         StoreManagerInterface $storeManager,
         ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
         AccessTokenBuilder $accessTokenBuilder,
-        StoreIntegrationRepositoryInterface $storeIntegrationRepository
+        StoreIntegrationRepositoryInterface $storeIntegrationRepository,
+        IntegrationLogger $integrationLogger
     ) {
         $this->curl = $curl;
         $this->serializer = $serializer;
@@ -63,6 +66,7 @@ class Integration
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
         $this->accessTokenBuilder = $accessTokenBuilder;
         $this->storeIntegrationRepository = $storeIntegrationRepository;
+        $this->integrationLogger = $integrationLogger;
     }
 
     /**
@@ -84,6 +88,12 @@ class Integration
             $fullUrl = $this->activeEnvironmentURLBuilder->getIntegrationURL() . $endpoint['path'];
             $payload = json_encode($data);
 
+            $this->integrationLogger->info('Sending request to Extend API', [
+                'endpoint' => $endpoint['path'],
+                'created' => $data['created'] ?? null,
+                'changed' => $data['changed'] ?? null,
+            ]);
+
             $this->curl->post($fullUrl, $payload);
 
             $status = $this->curl->getStatus();
@@ -95,12 +105,24 @@ class Integration
                 'Curl request to ' . $fullUrl . ' provided the following response: ' . $response
             );
 
+            $this->integrationLogger->info('Received response from Extend API', [
+                'endpoint' => $endpoint['path'],
+                'status' => $status,
+                'response_body' => $responseBody,
+            ]);
+
             if ($status >= 400) {
                 $errorMessage =
                     'Curl request to ' .
                     $fullUrl .
                     ' provided the following unsuccessful response: ' .
                     $response;
+
+                $this->integrationLogger->error('Extend API request failed', [
+                    'endpoint' => $endpoint['path'],
+                    'status' => $status,
+                    'response_body' => $responseBody,
+                ]);
 
                 $this->logErrorToLoggingService(
                     $errorMessage,
@@ -118,6 +140,10 @@ class Integration
             }
         } catch (\Exception $exception) {
             $this->logger->critical($exception->getMessage());
+            $this->integrationLogger->critical('Exception during Extend API request', [
+                'endpoint' => $endpoint['path'] ?? 'unknown',
+                'error' => $exception->getMessage(),
+            ]);
             $this->logErrorToLoggingService(
                 $exception->getMessage(),
                 $this->storeManager->getStore()->getId(),
@@ -169,6 +195,16 @@ class Integration
                 self::EXTEND_INTEGRATION_ENDPOINTS['log_error'];
 
             $this->curl->post($endpoint, $body);
+
+            $loggingStatus = $this->curl->getStatus();
+            $loggingResponseBody = $this->curl->getBody();
+
+            if ($loggingStatus >= 400) {
+                $this->logger->error('Extend logging service returned an error', [
+                    'status' => $loggingStatus,
+                    'response_body' => $loggingResponseBody,
+                ]);
+            }
         } catch (\Exception $exception) {
             $this->logger->error('Cannot log to logging service: ' . $exception->getMessage());
         }

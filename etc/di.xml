@@ -91,6 +91,11 @@
             <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
         </arguments>
     </type>
+    <type name="Extend\Integration\Service\Api\Integration">
+        <arguments>
+            <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
+        </arguments>
+    </type>
     <type name="Extend\Integration\Logger\ExtendOrders">
         <arguments>
             <argument name="name" xsi:type="string">ExtendOrders</argument>

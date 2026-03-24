@@ -104,6 +104,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
             $this->integrationLogger->info('Store linked to integration', [
                 'store_id' => $currentStore,
                 'integration_id' => $integrationId,
+                'created' => ['store_id' => $currentStore, 'integration_id' => $integrationId],
             ]);
         } else {
             $this->integrationLogger->info('Store already linked to integration', [
