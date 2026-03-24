@@ -60,6 +60,8 @@ class Extend
     public const ORDER_LOGGING_ENABLE = 'extend/order_logging/enable';
     public const ORDER_LOGGING_LEVEL = 'extend/order_logging/log_level';
 
+    public const INTEGRATION_LOGGING_ENABLE = 'extend/integration_logging/enable';
+
     /**
      * Lead token url param
      */
@@ -116,6 +118,14 @@ class Extend
     public function getOrderLogLevel(): string
     {
         return (string)$this->scopeConfig->getValue(self::ORDER_LOGGING_LEVEL);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIntegrationLoggingEnabled(): bool
+    {
+        return (bool)$this->scopeConfig->getValue(self::INTEGRATION_LOGGING_ENABLE);
     }
 
     /**

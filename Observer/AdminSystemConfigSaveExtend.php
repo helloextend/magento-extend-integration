@@ -7,6 +7,7 @@
 namespace Extend\Integration\Observer;
 
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
+use Extend\Integration\Logger\ExtendIntegration as IntegrationLogger;
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\MetadataBuilder;
 use Extend\Integration\Service\Extend as ExtendService;
@@ -26,6 +27,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
     private StoreIntegrationRepositoryInterface $storeIntegrationRepository;
     private OauthServiceInterface $oauthService;
     private MetadataBuilder $metadataBuilder;
+    private IntegrationLogger $integrationLogger;
 
     /**
      * @param LoggerInterface $logger
@@ -42,7 +44,8 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         ScopeConfigInterface $scopeConfig,
         StoreIntegrationRepositoryInterface $storeIntegrationRepository,
         OauthServiceInterface $oauthService,
-        MetadataBuilder $metadataBuilder
+        MetadataBuilder $metadataBuilder,
+        IntegrationLogger $integrationLogger
     ) {
         parent::__construct($logger, $extendService, $extendIntegrationService, $storeManager);
         $this->integrationService = $integrationService;
@@ -50,6 +53,7 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         $this->storeIntegrationRepository = $storeIntegrationRepository;
         $this->oauthService = $oauthService;
         $this->metadataBuilder = $metadataBuilder;
+        $this->integrationLogger = $integrationLogger;
     }
 
     /**
@@ -82,11 +86,30 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         $integration = $this->integrationService->get($activeIntegration);
         $integrationId = $integration->getId();
 
+        $this->integrationLogger->info('Admin config save: activating store', [
+            'store_id' => $currentStore,
+            'integration_id' => $integrationId,
+            'integration_name' => $integration->getName(),
+        ]);
+
         $storeListForActiveIntegration = $this->storeIntegrationRepository->getListByIntegration($integrationId);
         $hasIntegration = in_array($currentStore, $storeListForActiveIntegration);
 
         if (!$hasIntegration) {
+            $this->integrationLogger->info('Linking store to integration', [
+                'store_id' => $currentStore,
+                'integration_id' => $integrationId,
+            ]);
             $this->storeIntegrationRepository->saveStoreToIntegration($integrationId, $currentStore);
+            $this->integrationLogger->info('Store linked to integration', [
+                'store_id' => $currentStore,
+                'integration_id' => $integrationId,
+            ]);
+        } else {
+            $this->integrationLogger->info('Store already linked to integration', [
+                'store_id' => $currentStore,
+                'integration_id' => $integrationId,
+            ]);
         }
 
         $storeIntegration = $this->storeIntegrationRepository->getByStoreIdAndIntegrationId($currentStore, $integrationId);
@@ -95,6 +118,10 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         // if there is an error we need to re-try the integration, this will allow us to recover from an error state
         // if there is no error we return early
         if ($hasIntegration && $storeIntegration->getIntegrationError() === null) {
+            $this->integrationLogger->info('Store integration healthy, no action needed', [
+                'store_id' => $currentStore,
+                'store_uuid' => $storeIntegration->getStoreUuid(),
+            ]);
             return;
         }
 
@@ -109,6 +136,14 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
         $oauthKey = $oauth->getKey();
 
         if ($oauthKey && $oauth->getSecret()) {
+            $this->integrationLogger->info('Sending store creation webhook to Extend', [
+                'store_id' => $currentStore,
+                'store_uuid' => $storeIntegration->getStoreUuid(),
+                'extend_store_id' => $extendStoreId ?: $storeIntegration->getExtendStoreUuid(),
+                'endpoint' => $endpoint['path'],
+                'retrying_error' => $storeIntegration->getIntegrationError() !== null,
+            ]);
+
             [$headers, $body] = $this->metadataBuilder->execute([], $endpoint, [
                 'magentoStoreUuid' => $storeIntegration->getStoreUuid(),
                 'magentoStoreId' => $currentStore,
@@ -141,6 +176,24 @@ class AdminSystemConfigSaveExtend extends BaseExtendObserver
                 $integrationId,
                 $response ?? null
             );
+
+            if ($response === null) {
+                $this->integrationLogger->info('Store creation webhook sent successfully', [
+                    'store_id' => $currentStore,
+                    'store_uuid' => $storeIntegration->getStoreUuid(),
+                ]);
+            } else {
+                $this->integrationLogger->error('Store creation webhook failed', [
+                    'store_id' => $currentStore,
+                    'store_uuid' => $storeIntegration->getStoreUuid(),
+                    'error' => $response,
+                ]);
+            }
+        } else {
+            $this->integrationLogger->warning('OAuth credentials missing, skipping store creation webhook', [
+                'store_id' => $currentStore,
+                'integration_id' => $integrationId,
+            ]);
         }
     }
 }

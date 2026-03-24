@@ -48,7 +48,7 @@
                 <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Enable Order Logging</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Logs order webhook activity to var/log/extend-orders.log</comment>
+                    <comment>Logs order webhook activity to var/log/extend/orders.log</comment>
                 </field>
                 <field id="log_level" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Log Level</label>
@@ -57,6 +57,14 @@
                     <depends>
                         <field id="extend/order_logging/enable">1</field>
                     </depends>
+                </field>
+            </group>
+            <group id="integration_logging" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Integration Logging</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Integration Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Logs integration setup events (store creation, table creation, admin config) to var/log/extend/integration.log</comment>
                 </field>
             </group>
         </section>

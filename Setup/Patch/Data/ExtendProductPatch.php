@@ -8,6 +8,7 @@ namespace Extend\Integration\Setup\Patch\Data;
 
 use Exception;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
+use Extend\Integration\Logger\ExtendIntegration as IntegrationLogger;
 use Extend\Integration\Model\Config\Source\Environment;
 use Extend\Integration\Service\Api\Integration;
 use Extend\Integration\Service\Api\MetadataBuilder;
@@ -43,6 +44,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     private OauthServiceInterface $oauthService;
     private SchemaSetupInterface $schemaSetup;
     private WriterInterface $configWriter;
+    private IntegrationLogger $integrationLogger;
 
     public function __construct(
         AttributeSetInstaller $attributeSetInstaller,
@@ -57,7 +59,8 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
         Environment $environment,
         OauthServiceInterface $oauthService,
         SchemaSetupInterface $schemaSetup,
-        WriterInterface $configWriter
+        WriterInterface $configWriter,
+        IntegrationLogger $integrationLogger
     ) {
         $this->attributeSetInstaller = $attributeSetInstaller;
         $this->configBasedIntegrationManager = $configBasedIntegrationManager;
@@ -72,6 +75,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
         $this->oauthService = $oauthService;
         $this->schemaSetup = $schemaSetup;
         $this->configWriter = $configWriter;
+        $this->integrationLogger = $integrationLogger;
     }
 
     /**
@@ -97,22 +101,36 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
     public function apply()
     {
         try {
+            $this->integrationLogger->info('Applying ExtendProductPatch');
+
             if (!$this->integrationService
                     ->findByName('Extend Integration - Production')
                     ->getIntegrationId()
             ) {
+                $this->integrationLogger->info('Creating Extend Integration - Production');
                 $this->configBasedIntegrationManager->processIntegrationConfig([
                     'Extend Integration - Production',
                 ]);
+                $this->integrationLogger->info('Extend Integration - Production created', [
+                    'integration_id' => $this->integrationService->findByName('Extend Integration - Production')->getIntegrationId(),
+                ]);
+            } else {
+                $this->integrationLogger->info('Extend Integration - Production already exists, skipping');
             }
 
             if (!$this->integrationService
                     ->findByName('Extend Integration - Demo')
                     ->getIntegrationId()
             ) {
+                $this->integrationLogger->info('Creating Extend Integration - Demo');
                 $this->configBasedIntegrationManager->processIntegrationConfig([
                     'Extend Integration - Demo',
                 ]);
+                $this->integrationLogger->info('Extend Integration - Demo created', [
+                    'integration_id' => $this->integrationService->findByName('Extend Integration - Demo')->getIntegrationId(),
+                ]);
+            } else {
+                $this->integrationLogger->info('Extend Integration - Demo already exists, skipping');
             }
 
             //Set default active environment to demo
@@ -120,14 +138,22 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 $defaultEnvironmentId = $this->integrationService
                     ->findByName('Extend Integration - Demo')
                     ->getIntegrationId();
+                $this->integrationLogger->info('Setting default active environment to Demo', [
+                    'integration_id' => $defaultEnvironmentId,
+                    'config_path' => $this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG,
+                ]);
                 $this->configWriter->save(
                     $this->extendIntegration::INTEGRATION_ENVIRONMENT_CONFIG,
                     $defaultEnvironmentId,
                     ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
                     0
                 );
+                $this->integrationLogger->info('Default active environment saved to config');
             });
+
+            $this->integrationLogger->info('ExtendProductPatch applied successfully');
         } catch (Exception $exception) {
+            $this->integrationLogger->error('ExtendProductPatch failed', ['error' => $exception->getMessage()]);
             throw new SetupException(
                 new Phrase(
                     'There was a problem applying the Extend Integration Product Patch: %1',

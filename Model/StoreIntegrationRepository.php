@@ -7,6 +7,7 @@
 namespace Extend\Integration\Model;
 
 use Extend\Integration\Api\Data\StoreIntegrationInterface;
+use Extend\Integration\Logger\ExtendIntegration as IntegrationLogger;
 use Extend\Integration\Model\ResourceModel\StoreIntegration as StoreIntegrationResource;
 use Extend\Integration\Model\ResourceModel\StoreIntegration\Collection;
 use Extend\Integration\Model\ResourceModel\StoreIntegration\CollectionFactory;
@@ -37,6 +38,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
     private ScopeConfigInterface $scopeConfig;
     private EncryptorInterface $encryptor;
     private ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder;
+    private IntegrationLogger $integrationLogger;
 
     public function __construct(
         StoreManager                $storeManager,
@@ -48,7 +50,8 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
         CollectionFactory           $storeIntegrationCollectionFactory,
         ScopeConfigInterface        $scopeConfig,
         EncryptorInterface          $encryptor,
-        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder
+        ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
+        IntegrationLogger           $integrationLogger
     ) {
         $this->storeManager = $storeManager;
         $this->identityService = $identityService;
@@ -60,6 +63,7 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
         $this->scopeConfig = $scopeConfig;
         $this->encryptor = $encryptor;
         $this->activeEnvironmentURLBuilder = $activeEnvironmentURLBuilder;
+        $this->integrationLogger = $integrationLogger;
     }
 
     /**
@@ -194,8 +198,18 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      */
     public function saveStoreToIntegration(int $integrationId, int $storeId): void
     {
+        $this->integrationLogger->info('Saving store to integration', [
+            'store_id' => $storeId,
+            'integration_id' => $integrationId,
+        ]);
+
         $storeIntegration = $this->getByStoreIdAndIntegrationId($storeId, $integrationId);
         if ($storeIntegration->getData('disabled') == 1) {
+            $this->integrationLogger->info('Re-enabling previously disabled store integration', [
+                'store_id' => $storeId,
+                'integration_id' => $integrationId,
+                'extend_store_integration_id' => $storeIntegration->getId(),
+            ]);
             $storeIntegration->setDisabled(0);
             $this->storeIntegrationResource->save($storeIntegration);
         } else {
@@ -206,14 +220,29 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
             $environment = $this->activeEnvironmentURLBuilder->getEnvironmentFromURL($integration->getEndpoint());
             $storeIntegration = $this->storeIntegrationFactory->create();
             if ($legacyExtendProductionStoreId && $environment == 'prod') {
+                $this->integrationLogger->info('Migrating legacy production Extend store ID', [
+                    'store_id' => $storeId,
+                    'environment' => $environment,
+                    'legacy_extend_store_id' => $legacyExtendProductionStoreId,
+                ]);
                 $storeIntegration->setExtendStoreUuid($legacyExtendProductionStoreId);
             }
             if ($legacyExtendSandboxStoreId && $environment == 'demo') {
+                $this->integrationLogger->info('Migrating legacy sandbox Extend store ID', [
+                    'store_id' => $storeId,
+                    'environment' => $environment,
+                    'legacy_extend_store_id' => $legacyExtendSandboxStoreId,
+                ]);
                 $storeIntegration->setExtendStoreUuid($legacyExtendSandboxStoreId);
             }
             $storeIntegration->setStoreId($storeId);
             $storeIntegration->setIntegrationId($integrationId);
             $this->storeIntegrationResource->save($storeIntegration);
+            $this->integrationLogger->info('Store integration record created', [
+                'store_id' => $storeId,
+                'integration_id' => $integrationId,
+                'extend_store_integration_id' => $storeIntegration->getId(),
+            ]);
             $this->generateUuidForStore($storeIntegration);
         }
     }
@@ -227,10 +256,14 @@ class StoreIntegrationRepository implements \Extend\Integration\Api\StoreIntegra
      */
     public function generateUuidForStore(StoreIntegrationInterface $storeIntegration): void
     {
-
         if (!$storeIntegration->getStoreUuid()) {
             $uuid = $this->identityService->generateId();
             $storeIntegration->setStoreUuid($uuid);
+            $this->integrationLogger->info('Generated Magento store UUID', [
+                'store_id' => $storeIntegration->getStoreId(),
+                'store_uuid' => $uuid,
+                'extend_store_integration_id' => $storeIntegration->getId(),
+            ]);
         }
 
         $this->storeIntegrationResource->save($storeIntegration);

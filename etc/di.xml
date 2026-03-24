@@ -63,6 +63,34 @@
     <type name="Magento\Quote\Model\Quote">
         <plugin sortOrder="1" name="extendIntegrationCart" type="Extend\Integration\Plugin\Model\QuotePlugin"/>
     </type>
+    <type name="Extend\Integration\Logger\ExtendIntegration">
+        <arguments>
+            <argument name="name" xsi:type="string">ExtendIntegration</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">Extend\Integration\Logger\Handler\ExtendIntegration</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Extend\Integration\Controller\Adminhtml\Integration\Create">
+        <arguments>
+            <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
+        </arguments>
+    </type>
+    <type name="Extend\Integration\Observer\AdminSystemConfigSaveExtend">
+        <arguments>
+            <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
+        </arguments>
+    </type>
+    <type name="Extend\Integration\Model\StoreIntegrationRepository">
+        <arguments>
+            <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
+        </arguments>
+    </type>
+    <type name="Extend\Integration\Setup\Patch\Data\ExtendProductPatch">
+        <arguments>
+            <argument name="integrationLogger" xsi:type="object">Extend\Integration\Logger\ExtendIntegration</argument>
+        </arguments>
+    </type>
     <type name="Extend\Integration\Logger\ExtendOrders">
         <arguments>
             <argument name="name" xsi:type="string">ExtendOrders</argument>

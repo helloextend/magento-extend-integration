@@ -13,6 +13,9 @@
                 <enable>0</enable>
                 <log_level>errors_only</log_level>
             </order_logging>
+            <integration_logging>
+                <enable>0</enable>
+            </integration_logging>
         </extend>
         <extend_plans>
             <shipping_protection>
