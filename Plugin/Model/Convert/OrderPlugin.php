@@ -237,9 +237,12 @@ class OrderPlugin
     /**
      * Get shipping protection total data for an order
      *
-     * Attempts to retrieve shipping protection data first by ORDER entity type (if order is persisted),
-     * then falls back to QUOTE entity type to handle "Authorize and Capture" payment flows where
-     * invoice/creditmemo creation happens before order shipping protection data is saved.
+     * Persisted orders: look up by ORDER entity type only.
+     * If the ORDER lookup throws (e.g., serializer error on corrupt session cache), we log and
+     * return null rather than falling back to QUOTE. Risking a stale QUOTE record from the
+     * Guidance module (the MINT-5973 bug) is worse than one invoice/creditmemo missing SP data.
+     * Unpersisted orders (Authorize & Capture flow, entity ID is null): fall back to QUOTE entity type
+     * because invoice/creditmemo conversion happens before the order is persisted.
      *
      * @param \Magento\Sales\Model\Order $order
      * @return \Extend\Integration\Model\ShippingProtectionTotal|null
@@ -248,7 +251,7 @@ class OrderPlugin
     {
         $shippingProtectionTotalData = null;
 
-        // try to retrieve an SP total data using the ORDER entity type first (available if order is persisted)
+        // Persisted order: look up by ORDER entity type only — no QUOTE fallback
         if ($order->getEntityId() !== null) {
           try {
             $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
@@ -256,22 +259,21 @@ class OrderPlugin
                 ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID
             );
           } catch (\Exception $e) {
-            // Log the error and continue with fallback lookup below
             $this->logger->error('Error retrieving shipping protection total data for order with entity id ' . $order->getEntityId() . ': ' . $e->getMessage());
           }
+
+          return $shippingProtectionTotalData;
         }
 
-        // fall back to lookup based on the QUOTE entity type, if order is not found or not persisted yet.
-        // this handles "Authorize and Capture" payment action flows where conversion to invoice happens before the
-        // order is persisted and shipping protection data is saved to it.
-        if ((!$shippingProtectionTotalData || !$shippingProtectionTotalData->getData()) && $order->getQuoteId()) {
+        // Unpersisted order (Authorize and Capture flow): fall back to QUOTE entity type
+        // because invoice/creditmemo conversion happens before the order is persisted
+        if ($order->getQuoteId()) {
           try {
             $shippingProtectionTotalData = $this->shippingProtectionTotalRepository->get(
                 $order->getQuoteId(),
                 ShippingProtectionTotalInterface::QUOTE_ENTITY_TYPE_ID
             );
           } catch (\Exception $e) {
-            // Log the error and continue returning null so as to not break the flow
             $this->logger->error('Error retrieving shipping protection total data for order with quote id ' . $order->getQuoteId() . ': ' . $e->getMessage());
           }
         }
