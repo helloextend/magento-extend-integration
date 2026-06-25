@@ -46,6 +46,7 @@ class TotalsConverterPlugin
             return $result;
 
         if (isset($result['shipping_protection'])) {
+            $spQuoteId = null;
             $quoteId = $this->checkoutSession->getQuote()->getId();
             if ($quoteId) {
                 $spQuoteId = $this->shippingProtectionTotalRepository
