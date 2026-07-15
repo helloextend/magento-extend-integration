@@ -103,12 +103,12 @@ class ExtendOAuthClientRepositoryTest extends TestCase
     protected function setUp(): void
     {
         // Mock dependencies
-        $this->extendOAuthClientResourceMock = $this->createStub(ExtendOAuthClientResource::class);
+        $this->extendOAuthClientResourceMock = $this->createMock(ExtendOAuthClientResource::class);
         $this->extendOAuthClientCollectionFactoryMock = $this->createStub(ExtendOAuthClientCollectionFactory::class);
         $this->extendOAuthClientFactoryMock = $this->createStub(ExtendOAuthClientFactory::class);
         $this->integrationServiceMock = $this->createStub(IntegrationServiceInterface::class);
         $this->oauthServiceMock = $this->createStub(OauthServiceInterface::class);
-        $this->encryptorMock = $this->createStub(EncryptorInterface::class);
+        $this->encryptorMock = $this->createMock(EncryptorInterface::class);
 
         // Create stubs for the consumers and integrations
         $this->consumerMock = $this->createStub(Consumer::class);
@@ -126,12 +126,12 @@ class ExtendOAuthClientRepositoryTest extends TestCase
         $this->consumerForIntegrationNotFoundMock->method('getId')->willReturn($this->consumerIdForIntegrationNotFoundMock);
 
         $this->oauthServiceMock->method('loadConsumerByKey')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [$this->consumerKeyMock, $this->consumerMock],
                 [$this->consumerKeyNotMatchingIntegrationIdMock, $this->consumerNotMatchingIntegrationIdMock],
                 [$this->consumerKeyNotFoundMock, $this->consumerNotFoundMock],
                 [$this->consumerKeyForIntegrationNotFoundMock, $this->consumerForIntegrationNotFoundMock]
-            ]));
+            ]);
 
         // Map the mocked integrations to their ids/keys
         $this->integrationMock->method('getId')->willReturn($this->integrationIdMock);
@@ -139,11 +139,11 @@ class ExtendOAuthClientRepositoryTest extends TestCase
         $this->integrationNotFoundMock->method('getId')->willReturn(null);
 
         $this->integrationServiceMock->method('findByConsumerId')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [$this->consumerIdMock, $this->integrationMock],
                 [$this->consmerIdNotMatchingIntegrationIdMock, $this->integrationNotMatchingConsumerIdMock],
                 [$this->consumerIdForIntegrationNotFoundMock, $this->integrationNotFoundMock]
-            ]));
+            ]);
 
         // Mock the encryptor to return the encrypted client secret
         $this->encryptorMock->method('encrypt')->willReturn($this->encryptedClientSecret);
@@ -238,7 +238,7 @@ class ExtendOAuthClientRepositoryTest extends TestCase
     public function testSaveClientWithNoExistingIntegration()
     {
         // Mock the client instance
-        $extendOAuthClient = $this->createStub(ExtendOAuthClient::class);
+        $extendOAuthClient = $this->createMock(ExtendOAuthClient::class);
         $this->extendOAuthClientFactoryMock->method('create')->willReturn($extendOAuthClient);
 
         // Expect load() to be called with the integrationId
@@ -281,7 +281,7 @@ class ExtendOAuthClientRepositoryTest extends TestCase
     public function testSaveClientWithExistingIntegration()
     {
         // Mock the client instance
-        $extendOAuthClient = $this->createStub(ExtendOAuthClient::class);
+        $extendOAuthClient = $this->createMock(ExtendOAuthClient::class);
         $this->extendOAuthClientFactoryMock->method('create')->willReturn($extendOAuthClient);
 
         // Expect load() to be called with the integrationId
@@ -324,7 +324,7 @@ class ExtendOAuthClientRepositoryTest extends TestCase
     public function testSaveClientWhenConsumerKeyAndInterationIdAreNotTheSame()
     {
         // Mock the client instance
-        $extendOAuthClient = $this->createStub(ExtendOAuthClient::class);
+        $extendOAuthClient = $this->createMock(ExtendOAuthClient::class);
         $this->extendOAuthClientFactoryMock->method('create')->willReturn($extendOAuthClient);
 
         // Expect load() to be called with the integrationId

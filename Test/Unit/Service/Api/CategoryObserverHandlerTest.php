@@ -18,6 +18,7 @@ use Magento\Store\Model\Store;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
+use Extend\Integration\Test\Unit\Mock\CategoryWithStoreIdsInterface;
 
 class CategoryObserverHandlerTest extends TestCase
 {
@@ -98,11 +99,7 @@ class CategoryObserverHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->category = $this->getMockBuilder(CategoryInterface::class)
-            ->addMethods(['getStoreIds'])
-            ->onlyMethods(['getId', 'getName'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->category = $this->createMock(CategoryWithStoreIdsInterface::class);
         $this->category
             ->method('getStoreIds')
             ->willReturn([$this->storeId]);

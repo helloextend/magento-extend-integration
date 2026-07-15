@@ -99,14 +99,11 @@ class InfoPluginTest extends TestCase
 
     public function setUp(): void
     {
-        $this->mockOrderItem = $this->getMockBuilder(OrderItemInterface::class)
-        ->setMethods(['getSku'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $this->mockOrderItem = $this->createMock(OrderItemInterface::class);
         $this->order = $this->getMockBuilder(Order::class)
-        ->setMethods(['getStoreId', 'getIncrementId', 'getItems'])
+        ->onlyMethods(['getStoreId', 'getIncrementId', 'getItems'])
         ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        ->getMock();
         $this->order
         ->expects($this->any())
         ->method('getStoreId')
@@ -120,25 +117,19 @@ class InfoPluginTest extends TestCase
         ->method('getItems')
         ->willReturn([$this->mockOrderItem]);
         $this->subject = $this->getMockBuilder(Info::class)
-        ->setMethods(['getOrder'])
+        ->onlyMethods(['getOrder'])
         ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        ->getMock();
         $this->subject
         ->expects($this->any())
         ->method('getOrder')
         ->willReturn($this->order);
-        $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
-        ->onlyMethods(['getIntegrationId'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $this->storeIntegration = $this->createMock(StoreIntegrationInterface::class);
         $this->storeIntegration
         ->expects($this->any())
         ->method('getIntegrationId')
         ->willReturn($this->mockIntegrationId);
-        $this->integrationStoresRepository = $this->getMockBuilder(StoreIntegrationRepositoryInterface::class)
-        ->onlyMethods(['getByStoreIdAndActiveEnvironment'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $this->integrationStoresRepository = $this->createMock(StoreIntegrationRepositoryInterface::class);
         $this->integrationStoresRepository
         ->expects($this->any())
         ->method('getByStoreIdAndActiveEnvironment')
@@ -154,10 +145,7 @@ class InfoPluginTest extends TestCase
         ->method('getData')
         ->with(Integration::IDENTITY_LINK_URL)
         ->willReturn($this->mockIdentityLinkUrl);
-        $this->integrationService = $this->getMockBuilder(IntegrationServiceInterface::class)
-        ->onlyMethods(['get'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $this->integrationService = $this->createMock(IntegrationServiceInterface::class);
         $this->integrationService
         ->expects($this->any())
         ->method('get')

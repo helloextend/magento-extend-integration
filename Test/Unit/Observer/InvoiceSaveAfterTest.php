@@ -112,11 +112,8 @@ class InvoiceSaveAfterTest extends TestCase
     {
         $this->orderMock = $this->createMock(Order::class);
         $this->invoice = $this->getMockBuilder(Invoice::class)
-            ->addMethods(
-                ['getOmitSp']
-            )
             ->onlyMethods(
-                ['getOrder', 'getId', 'getExtensionAttributes']
+                ['getOrder', 'getId', 'getExtensionAttributes', '__call']
             )
             ->disableOriginalConstructor()
             ->getMock();
@@ -124,12 +121,9 @@ class InvoiceSaveAfterTest extends TestCase
         $this->invoice->method('getId')->willReturn($this->invoiceId);
 
         $this->observer = $this->getMockBuilder(Observer::class)
-            ->addMethods(['getInvoice'])
+            ->onlyMethods(['__call'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->observer
-            ->method('getInvoice')
-            ->willReturn($this->invoice);
         $this->shippingProtection = $this->createMock(ShippingProtectionInterface::class);
         $this->invoiceExtension = $this->createMock(MagicMockInterface::class);
         $this->store = $this->createMock(Store::class);
@@ -163,7 +157,9 @@ class InvoiceSaveAfterTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getInvoice');
+            ->method('__call')
+            ->with('getInvoice')
+            ->willReturn($this->invoice);
         $this->invoice
             ->expects($this->once())
             ->method('getExtensionAttributes')
@@ -200,7 +196,9 @@ class InvoiceSaveAfterTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getInvoice');
+            ->method('__call')
+            ->with('getInvoice')
+            ->willReturn($this->invoice);
         $this->invoice
             ->expects($this->once())
             ->method('getExtensionAttributes')
@@ -241,7 +239,9 @@ class InvoiceSaveAfterTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getInvoice');
+            ->method('__call')
+            ->with('getInvoice')
+            ->willReturn($this->invoice);
         $this->invoice
             ->expects($this->once())
             ->method('getExtensionAttributes')
@@ -272,7 +272,7 @@ class InvoiceSaveAfterTest extends TestCase
 
     public function testSkipsExtensionAttributeSaveWhenOmitSp()
     {
-        $this->invoice->method('getOmitSp')->willReturn(true);
+        $this->invoice->method('__call')->with('getOmitSp')->willReturn(true);
 
         $this->extendService
             ->expects($this->once())
@@ -280,7 +280,9 @@ class InvoiceSaveAfterTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getInvoice');
+            ->method('__call')
+            ->with('getInvoice')
+            ->willReturn($this->invoice);
         $this->invoice
             ->expects($this->once())
             ->method('getExtensionAttributes')
@@ -333,7 +335,9 @@ class InvoiceSaveAfterTest extends TestCase
             ->willReturn(true);
         $this->observer
             ->expects($this->once())
-            ->method('getInvoice');
+            ->method('__call')
+            ->with('getInvoice')
+            ->willReturn($this->invoice);
         $this->invoice
             ->expects($this->once())
             ->method('getExtensionAttributes')

@@ -90,13 +90,14 @@ class SalesOrderSaveAfterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->orderMock = $this->createStub(Order::class);
+        $this->orderMock = $this->createMock(Order::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getOrder'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->event
-            ->method('getOrder')
+            ->method('getData')
+            ->with('order')
             ->willReturn($this->orderMock);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
@@ -148,7 +149,7 @@ class SalesOrderSaveAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getOrder');
+            ->method('getData');
         $this->orderMock
             ->expects($this->once())
             ->method('getCreatedAt')
@@ -174,7 +175,7 @@ class SalesOrderSaveAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getOrder');
+            ->method('getData');
         $this->orderMock
             ->expects($this->once())
             ->method('getCreatedAt')
@@ -220,7 +221,7 @@ class SalesOrderSaveAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getOrder');
+            ->method('getData');
         $this->orderMock
             ->expects($this->once())
             ->method('getCreatedAt')

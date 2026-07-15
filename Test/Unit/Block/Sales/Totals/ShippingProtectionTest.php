@@ -68,10 +68,7 @@ class ShippingProtectionTest extends TestCase
         $this->context = $this->createStub(Context::class);
         $this->layout = $this->createStub(\Magento\Framework\View\LayoutInterface::class);
         $this->block =  $this->getMockBuilder(\Magento\Sales\Block\Order\Totals::class)
-        ->addMethods(
-            ['getType']
-        )
-        ->onlyMethods(['getSource', 'getOrder', 'addTotal'])
+        ->onlyMethods(['getSource', 'getOrder', 'addTotal', 'getData'])
         ->disableOriginalConstructor()
         ->getMock();
         $this->extensionAttributes = $this->createStub(\Magento\Sales\Api\Data\OrderExtension::class);
@@ -93,7 +90,7 @@ class ShippingProtectionTest extends TestCase
         $this->layout->method('getBlock')->willReturn($this->block);
         $this->block->method('getSource')->willReturn($this->order);
         $this->block->method('getOrder')->willReturn($this->order);
-        $this->block->method('getType')->willReturn(\Magento\Sales\Block\Order\Totals::class);
+        $this->block->method('getData')->with('type')->willReturn(\Magento\Sales\Block\Order\Totals::class);
         $this->order->method('getExtensionAttributes')->willReturn($this->extensionAttributes);
         $this->shippingProtection->method('getPrice')->willReturn($price);
 

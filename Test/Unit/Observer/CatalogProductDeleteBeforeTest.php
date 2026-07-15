@@ -76,12 +76,9 @@ class CatalogProductDeleteBeforeTest extends TestCase
     {
         $this->productMock = $this->createMock(Product::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getProduct'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->event
-            ->method('getProduct')
-            ->willReturn($this->productMock);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);
@@ -113,7 +110,9 @@ class CatalogProductDeleteBeforeTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getProduct');
+            ->method('getData')
+            ->with('product')
+            ->willReturn($this->productMock);
         $this->productObserverHandler
             ->expects($this->once())
             ->method('execute')
@@ -151,7 +150,9 @@ class CatalogProductDeleteBeforeTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getProduct');
+            ->method('getData')
+            ->with('product')
+            ->willReturn($this->productMock);
         $this->storeManager
             ->expects($this->once())
             ->method('getStore');

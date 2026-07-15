@@ -18,49 +18,54 @@ class EnableProductProtectionTest extends TestCase
 {
 
   /**
-   * @var EnableCartBalancing
+   * @var EnableProductProtection
    */
-  private $model;
+    private $model;
 
   /**
    * @var AbstractElement|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $elementMock;
+    private $elementMock;
 
   /**
    * @var Context|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $contextMock;
+    private $contextMock;
 
   /**
    * @var ScopeConfigInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $scopeConfigMock;
+    private $scopeConfigMock;
 
   /**
    * @var Manager|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $managerMock;
+    private $managerMock;
 
   /**
    * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $storeManagerMock;
+    private $storeManagerMock;
 
   /**
    * @var \Magento\Store\Api\Data\StoreInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $mockStore;
+    private $mockStore;
 
   /**
    * @var SecureHtmlRenderer|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $secureRendererMock;
+    private $secureRendererMock;
 
   /**
    * @var int
    */
-  private $mockStoreId;
+    private $mockStoreId;
+
+  /**
+   * @var array
+   */
+    private $setDataCalls;
 
 
   /**
@@ -68,185 +73,181 @@ class EnableProductProtectionTest extends TestCase
    *
    * @return void
    */
-  protected function setUp(): void
-  {
+    protected function setUp(): void
+    {
 
-    // setting up mocks - these are arguments for the EnableProductProtection constructor
-    $this->contextMock = $this->getMockBuilder(Context::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+      // setting up mocks - these are arguments for the EnableProductProtection constructor
+        $this->contextMock = $this->getMockBuilder(Context::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['getValue', 'isSetFlag'])
-      ->getMock();
+        $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['getValue', 'isSetFlag'])
+        ->getMock();
 
-    $this->managerMock = $this->getMockBuilder(Manager::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['isEnabled'])
-      ->getMock();
+        $this->managerMock = $this->getMockBuilder(Manager::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['isEnabled'])
+        ->getMock();
 
-    $this->storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods(['getStores'])
-      ->getMockForAbstractClass();
+        $this->storeManagerMock = $this->createMock(StoreManagerInterface::class);
 
-    $this->mockStoreId = 123;
-    $this->mockStore = $this->createMock(\Magento\Store\Api\Data\StoreInterface::class);
-    $this->mockStore
-      ->method('getId')
-      ->willReturn($this->mockStoreId);
+        $this->mockStoreId = 123;
+        $this->mockStore = $this->createMock(\Magento\Store\Api\Data\StoreInterface::class);
+        $this->mockStore
+        ->method('getId')
+        ->willReturn($this->mockStoreId);
 
-    $this->storeManagerMock->method('getStores')
-      ->willReturn([$this->mockStore]);
+        $this->storeManagerMock->method('getStores')
+        ->willReturn([$this->mockStore]);
 
-    $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
-    $this->secureRendererMock->method('renderEventListenerAsTag')
-      ->willReturnCallback(
-        function (string $event, string $js, string $selector): string {
-          return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
-        }
-      );
-    $this->secureRendererMock->method('renderStyleAsTag')
-      ->willReturnCallback(
-        function (string $style, string $selector): string {
-          return "<style>$selector { $style }</style>";
-        }
-      );
+        $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
+        $this->secureRendererMock->method('renderEventListenerAsTag')
+        ->willReturnCallback(
+            function (string $event, string $js, string $selector): string {
+                return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
+            }
+        );
+        $this->secureRendererMock->method('renderStyleAsTag')
+        ->willReturnCallback(
+            function (string $style, string $selector): string {
+                return "<style>$selector { $style }</style>";
+            }
+        );
 
-    // the key to this unit test is to ensure that every constructor argument is mocked!
-    // otherwise we'll run into errors where methods are called on null objects.
-    $this->model = new EnableProductProtection(
-      $this->contextMock,
-      $this->scopeConfigMock,
-      $this->managerMock,
-      $this->storeManagerMock,
-      [],
-      $this->secureRendererMock
-    );
+      // the key to this unit test is to ensure that every constructor argument is mocked!
+      // otherwise we'll run into errors where methods are called on null objects.
+        $this->model = new EnableProductProtection(
+            $this->contextMock,
+            $this->scopeConfigMock,
+            $this->managerMock,
+            $this->storeManagerMock,
+            [],
+            $this->secureRendererMock
+        );
 
-    // we also need to mock any arguments passed to any tested functions
-    $this->elementMock = $this->getMockBuilder(AbstractElement::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods([
+      // we also need to mock any arguments passed to any tested functions
+        $this->elementMock = $this->getMockBuilder(AbstractElement::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods([
         'getElementHtml',
         'getHtmlId',
-        'getName'
-      ])
-      ->addMethods([
-        'setDisabled',
-        'setValue',
-        'setIsDisableInheritance',
-        'setComment'
-      ])
-      ->getMock();
-    $this->elementMock
-      ->method('getName')
-      ->willReturn('test_name');
-  }
+        'getName',
+        'setData'
+        ])
+        ->getMock();
+        $this->elementMock
+        ->method('getName')
+        ->willReturn('test_name');
 
-  public function testGetElementHtmlWithV1EnabledAndExtendWarrantyEnabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => true,
-        'isExtendWarrantyEnabled' => true,
-        'isV2Enabled' => false
-      ]
-    );
-    $this->elementMock->expects($this->once())
-      ->method('setDisabled')
-      ->with(true);
-    $this->elementMock->expects($this->once())
-      ->method('setValue')
-      ->with(0);
-    $this->elementMock->expects($this->once())
-      ->method('setComment')
-      ->with(
-        __(
-          'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is completely disabled on all stores.'
-        )
-      );
-    PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
-  }
+        $this->setDataCalls = [];
+        $this->elementMock
+        ->method('setData')
+        ->willReturnCallback(function ($key, $value = null) {
+            $this->setDataCalls[] = [$key, $value];
+            return $this->elementMock;
+        });
+    }
 
-  public function testGetElementHtmlWithV1EnabledAndExtendWarrantyNotEnabledAndV2NotEnabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => true,
-        'isExtendWarrantyEnabled' => false,
-        'isV2Enabled' => false
-      ]
-    );
-    $this->elementMock->expects($this->once())
-      ->method('setDisabled')
-      ->with(true);
-    $this->elementMock->expects($this->once())
-      ->method('setValue')
-      ->with(0);
-    PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
-  }
+  /**
+   * @param array $expected list of [key, value] setData invocations, in order
+   */
+    private function assertSetDataCalls(array $expected): void
+    {
+        $this->assertEquals($expected, $this->setDataCalls);
+    }
 
-  public function testGetElementHtmlWithV1DisabledAndV2Enabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => false,
-        'isExtendWarrantyEnabled' => false,
-        'isV2Enabled' => true
-      ]
-    );
-    $this->elementMock->expects($this->never())
-      ->method('setDisabled');
-    $this->elementMock->expects($this->never())
-      ->method('setValue');
-    PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
-  }
+    public function testGetElementHtmlWithV1EnabledAndExtendWarrantyEnabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => true,
+            'isExtendWarrantyEnabled' => true,
+            'isV2Enabled' => false
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
+        $this->assertSetDataCalls([
+        ['disabled', true],
+        ['value', 0],
+        ['comment', __(
+            'Magento Product Protection V2 can only be enabled if Magento Product Protection V1 is completely disabled on all stores.'
+        )],
+        ]);
+    }
 
-  public function testRenderInheritCheckboxWithV1EnabledAndExtendWarrantyEnabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => true,
-        'isExtendWarrantyEnabled' => true,
-        'isV2Enabled' => false
-      ]
-    );
-    $this->elementMock->expects($this->once())
-      ->method('setIsDisableInheritance')
-      ->with(true);
-    PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
-  }
+    public function testGetElementHtmlWithV1EnabledAndExtendWarrantyNotEnabledAndV2NotEnabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => true,
+            'isExtendWarrantyEnabled' => false,
+            'isV2Enabled' => false
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
+        $this->assertSetDataCalls([
+        ['disabled', true],
+        ['value', 0],
+        ]);
+    }
 
-  public function testRenderInheritCheckboxWithV1EnabledAndExtendWarrantyNotEnabledAndV2NotEnabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => true,
-        'isExtendWarrantyEnabled' => false,
-        'isV2Enabled' => false
-      ]
-    );
-    $this->elementMock->expects($this->once())
-      ->method('setIsDisableInheritance')
-      ->with(true);
-    PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
-  }
+    public function testGetElementHtmlWithV1DisabledAndV2Enabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => false,
+            'isExtendWarrantyEnabled' => false,
+            'isV2Enabled' => true
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
+        $this->assertSetDataCalls([]);
+    }
 
-  public function testRenderInheritCheckboxWithV1DisabledAndV2Enabled()
-  {
-    $this->setTestConditions(
-      [
-        'isV1Enabled' => false,
-        'isExtendWarrantyEnabled' => false,
-        'isV2Enabled' => true
-      ]
-    );
-    $this->elementMock->expects($this->never())
-      ->method('setIsDisableInheritance');
-    PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
-  }
+    public function testRenderInheritCheckboxWithV1EnabledAndExtendWarrantyEnabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => true,
+            'isExtendWarrantyEnabled' => true,
+            'isV2Enabled' => false
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
+        $this->assertSetDataCalls([
+        ['is_disable_inheritance', true],
+        ]);
+    }
+
+    public function testRenderInheritCheckboxWithV1EnabledAndExtendWarrantyNotEnabledAndV2NotEnabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => true,
+            'isExtendWarrantyEnabled' => false,
+            'isV2Enabled' => false
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
+        $this->assertSetDataCalls([
+        ['is_disable_inheritance', true],
+        ]);
+    }
+
+    public function testRenderInheritCheckboxWithV1DisabledAndV2Enabled()
+    {
+        $this->setTestConditions(
+            [
+            'isV1Enabled' => false,
+            'isExtendWarrantyEnabled' => false,
+            'isV2Enabled' => true
+            ]
+        );
+        PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
+        $this->assertSetDataCalls([]);
+    }
 
   /**
    * helper function to set up the test conditions for the above tests.
@@ -257,33 +258,34 @@ class EnableProductProtectionTest extends TestCase
    * 3. isV2Enabled
    * @return void
    */
-  private function setTestConditions(
-    array $conditions
-  ) {
-    [
-      'isV1Enabled' => $isV1Enabled,
-      'isExtendWarrantyEnabled' => $isExtendWarrantyEnabled,
-      'isV2Enabled' => $isV2Enabled
-    ] = $conditions;
+    private function setTestConditions(
+        array $conditions
+    ) {
+        [
+        'isV1Enabled' => $isV1Enabled,
+        'isExtendWarrantyEnabled' => $isExtendWarrantyEnabled,
+        'isV2Enabled' => $isV2Enabled
+        ] = $conditions;
 
-    // create a map of arguments with return values.
-    // first three are expected args, fourth is corresponding return value.
-    $scopeConfigMockValueMap = [
-      // v1
-      ['warranty/enableExtend/enable', 'stores', $this->mockStoreId, $isV1Enabled ? 1 : 0],
-      // v2
-      [Extend::ENABLE_EXTEND, 'default', null, $isV2Enabled ? 1 : 0],
-    ];
+      // The module calls getValue with a variable arg count (v1: path,'stores',storeId; v2: path
+      // only). willReturnMap matches on exact passed args and resolves a mixed-arity map
+      // differently across PHPUnit 9.6 vs 12.5, so dispatch on the path argument instead.
+        $this->scopeConfigMock->expects($this->any())
+        ->method('getValue')
+        ->willReturnCallback(function ($path) use ($isV1Enabled, $isV2Enabled) {
+            if ($path === 'warranty/enableExtend/enable') {
+                return $isV1Enabled ? 1 : 0;
+            }
+            if ($path === Extend::ENABLE_EXTEND) {
+                return $isV2Enabled ? 1 : 0;
+            }
+            return null;
+        });
 
-    // setup: use the map to set up scopeConfig's getValue mock behavior.
-    $this->scopeConfigMock->expects($this->any())
-      ->method('getValue')
-      ->willReturn($this->returnValueMap($scopeConfigMockValueMap));
-
-    // setup: Extend_Warranty disabled
-    $this->managerMock->expects($this->any())
-      ->method('isEnabled')
-      ->with('Extend_Warranty')
-      ->willReturn($isExtendWarrantyEnabled);
-  }
+      // setup: Extend_Warranty disabled
+        $this->managerMock->expects($this->any())
+        ->method('isEnabled')
+        ->with('Extend_Warranty')
+        ->willReturn($isExtendWarrantyEnabled);
+    }
 }

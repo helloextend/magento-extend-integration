@@ -89,15 +89,12 @@ class BatchProductObserverHandlerTest extends TestCase
         $this->store = $this->getMockBuilder(Store::class)
             ->onlyMethods(['getId'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->onlyMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
             ->onlyMethods(['execute'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->metadataMock = [
             [
                 'X-Extend-Access-Token' => 'token',
@@ -113,10 +110,7 @@ class BatchProductObserverHandlerTest extends TestCase
             ],
         ];
 
-        $this->productRepository = $this->getMockBuilder(ProductRepositoryInterface::class)
-            ->onlyMethods(['getById'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
 
         $this->objectManager = new ObjectManager($this);
         $this->batchProductObserverHandler = $this->objectManager->getObject(
@@ -158,7 +152,7 @@ class BatchProductObserverHandlerTest extends TestCase
         $this->productRepository
             ->expects($this->exactly($numberOfProducts))
             ->method('getById')
-            ->willReturnCallback(function($productId) use ($productMocks) {
+            ->willReturnCallback(function ($productId) use ($productMocks) {
                 return $productMocks[$productId] ?? null;
             });
 

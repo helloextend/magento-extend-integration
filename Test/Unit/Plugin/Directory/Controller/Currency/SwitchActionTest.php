@@ -11,6 +11,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Api\Data\CartItemInterface;
+use Magento\Quote\Model\Quote\Item;
 use Extend\Integration\Service\Extend;
 use Extend\Integration\Model\ShippingProtectionTotalRepository;
 use Extend\Integration\Plugin\Directory\Controller\Currency\SwitchAction;
@@ -45,17 +46,13 @@ class SwitchActionTest extends TestCase
     protected function setUp(): void
     {
         $this->checkoutSession = $this->createStub(Session::class);
-        $this->cartRepository = $this->createStub(CartRepositoryInterface::class);
-        $this->shippingProtectionTotalRepository = $this->createStub(ShippingProtectionTotalRepository::class);
+        $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
+        $this->shippingProtectionTotalRepository = $this->createMock(ShippingProtectionTotalRepository::class);
 
-        // Create a mock Extend Product
-        $this->extendProduct = $this->createStub(CartItemInterface::class);
-
-        // Since we leverage Magento "magic" methods, we need to add them explicitly for the test
-        $this->extendProduct = $this->getMockBuilder(CartItemInterface::class)
-            ->setMethods(['getSku', 'getId'])
+        $this->extendProduct = $this->getMockBuilder(Item::class)
+            ->onlyMethods(['getSku', 'getId'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->extendProduct->expects($this->any())
             ->method('getSku')
             ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
@@ -66,7 +63,7 @@ class SwitchActionTest extends TestCase
         $this->merchantItem = $this->createStub(CartItemInterface::class);
         $this->merchantItem->method('getSku')->willReturn('merchant-item');
 
-        $this->quote = $this->createStub(Quote::class);
+        $this->quote = $this->createMock(Quote::class);
         $this->quote->method('collectTotals')->willReturn($this->quote);
         $this->checkoutSession->method('getQuote')->willReturn($this->quote);
 

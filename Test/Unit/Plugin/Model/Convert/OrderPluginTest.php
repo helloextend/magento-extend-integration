@@ -100,7 +100,6 @@ class OrderPluginTest extends TestCase
         $this->creditmemo = $this->getMockBuilder(Creditmemo::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getExtensionAttributes', 'setExtensionAttributes', 'setData'])
-            ->addMethods(['setSpgSpRemovedFromCreditMemo'])
             ->getMock();
 
         $this->plugin = new OrderPlugin(
@@ -359,25 +358,25 @@ class OrderPluginTest extends TestCase
         $newSp->expects($this->once())->method('setOfferType')->with('EXTEND');
         $this->shippingProtectionFactory->method('create')->willReturn($newSp);
 
-        // setShippingProtection is a magic __call setter, not declared on the interface,
-        // so it is added via addMethods rather than stubbed as an existing method.
-        $creditmemoExtAttrs = $this->getMockBuilder(\Magento\Sales\Api\Data\CreditmemoExtensionInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['setShippingProtection'])
-            ->getMockForAbstractClass();
+        $creditmemoExtAttrs = $this->createMock(\Magento\Sales\Api\Data\CreditmemoExtensionInterface::class);
         $creditmemoExtAttrs->expects($this->once())->method('setShippingProtection')->with($newSp);
         $this->creditmemo->method('getExtensionAttributes')->willReturn($creditmemoExtAttrs);
 
-        $this->creditmemo->expects($this->once())
-            ->method('setData')
-            ->with('original_shipping_protection', 2.46);
-        $this->creditmemo->expects($this->never())->method('setSpgSpRemovedFromCreditMemo');
+        $setDataCalls = [];
+        $this->creditmemo->method('setData')
+            ->willReturnCallback(function ($key, $value = null) use (&$setDataCalls) {
+                $setDataCalls[$key] = $value;
+                return $this->creditmemo;
+            });
 
         // POST branch returns early, so copyFieldsetToTarget must not be called
         $this->objectCopyService->expects($this->never())->method('copyFieldsetToTarget');
 
         $result = $this->plugin->afterToCreditmemo($this->subject, $this->creditmemo, $this->order);
         $this->assertSame($this->creditmemo, $result);
+        $this->assertArrayHasKey('original_shipping_protection', $setDataCalls);
+        $this->assertSame(2.46, $setDataCalls['original_shipping_protection']);
+        $this->assertArrayNotHasKey('spg_sp_removed_from_credit_memo', $setDataCalls);
     }
 
     /**
@@ -405,22 +404,22 @@ class OrderPluginTest extends TestCase
         $newSp->expects($this->once())->method('setPrice')->with(0);
         $this->shippingProtectionFactory->method('create')->willReturn($newSp);
 
-        // setShippingProtection is a magic __call setter, not declared on the interface,
-        // so it is added via addMethods rather than stubbed as an existing method.
-        $creditmemoExtAttrs = $this->getMockBuilder(\Magento\Sales\Api\Data\CreditmemoExtensionInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['setShippingProtection'])
-            ->getMockForAbstractClass();
+        $creditmemoExtAttrs = $this->createMock(\Magento\Sales\Api\Data\CreditmemoExtensionInterface::class);
         $this->creditmemo->method('getExtensionAttributes')->willReturn($creditmemoExtAttrs);
 
-        $this->creditmemo->expects($this->once())
-            ->method('setSpgSpRemovedFromCreditMemo')
-            ->with(true);
+        $setDataCalls = [];
+        $this->creditmemo->method('setData')
+            ->willReturnCallback(function ($key, $value = null) use (&$setDataCalls) {
+                $setDataCalls[$key] = $value;
+                return $this->creditmemo;
+            });
 
         $this->objectCopyService->expects($this->never())->method('copyFieldsetToTarget');
 
         $result = $this->plugin->afterToCreditmemo($this->subject, $this->creditmemo, $this->order);
         $this->assertSame($this->creditmemo, $result);
+        $this->assertArrayHasKey('spg_sp_removed_from_credit_memo', $setDataCalls);
+        $this->assertTrue($setDataCalls['spg_sp_removed_from_credit_memo']);
     }
 
     /* ======================================== helpers ======================================== */

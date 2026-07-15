@@ -101,6 +101,16 @@ class ShippingProtectionTest extends TestCase
    */
     private $invoiceItemsCollectionMock;
 
+  /**
+   * @var array
+   */
+    private $invoiceData = [];
+
+  /**
+   * @var array
+   */
+    private $setDataCalls = [];
+
     protected function setUp(): void
     {
       // set primitive test values
@@ -114,7 +124,7 @@ class ShippingProtectionTest extends TestCase
         $this->shippingProtectionTotalMock = $this->createStub(ShippingProtectionTotal::class);
         $this->shippingProtectionTotalMock->method('getId')->willReturn(123);
         $this->shippingProtectionTotalMock->method('getShippingProtectionBasePrice')->willReturn($this->shippingProtectionBasePrice);
-        $this->shippingProtectionFactoryMock = $this->createStub(ShippingProtectionFactory::class);
+        $this->shippingProtectionFactoryMock = $this->createMock(ShippingProtectionFactory::class);
         $this->baseShippingProtectionModelMock = $this->createStub(BaseShippingProtectionModel::class);
         $this->baseShippingProtectionModelMock->method('getBase')->willReturn($this->shippingProtectionBasePrice);
         $this->baseShippingProtectionModelMock->method('getPrice')->willReturn($this->shippingProtectionPrice);
@@ -140,16 +150,20 @@ class ShippingProtectionTest extends TestCase
         'setGrandTotal',
         'setBaseGrandTotal',
         'getGrandTotal',
-        'getBaseGrandTotal'
-        ])
-        ->addMethods([
-        'setShippingProtection',
-        'setBaseShippingProtection',
-        'getShippingProtection',
-        'getBaseShippingProtection',
-        'setOmitSp'
+        'getBaseGrandTotal',
+        'getData',
+        'setData'
         ])
         ->getMock();
+        $this->invoiceMock->method('getData')
+        ->willReturnCallback(function ($key = null) {
+            return $this->invoiceData[$key] ?? null;
+        });
+        $this->invoiceMock->method('setData')
+        ->willReturnCallback(function ($key, $value = null) {
+            $this->setDataCalls[] = [$key, $value];
+            return $this->invoiceMock;
+        });
         $this->extensionAttributesMock = $this->createMock(MagicMockInterface::class);
         $this->invoiceMock->method('getExtensionAttributes')
         ->willReturn($this->extensionAttributesMock);
@@ -178,9 +192,10 @@ class ShippingProtectionTest extends TestCase
         'invoiceHasSingleVirtualItem' => true,
         ]);
       // set expectations
-        $this->expectNothingToHappen();
+        $this->expectNoRealTotalMethodsCalled();
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+        $this->assertShippingProtectionNotSet();
     }
 
   // test collect when invoice extension attributes has shipping protection and invoice has no order and invoice has a single, non-virtual item
@@ -192,13 +207,14 @@ class ShippingProtectionTest extends TestCase
         'invoiceHasOrder' => false,
         'invoiceHasSingleNonVirtualItem' => true,
         ]);
-        $this->invoiceMock->method('getShippingProtection')->willReturn($this->shippingProtectionPrice);
-        $this->invoiceMock->method('getBaseShippingProtection')->willReturn($this->shippingProtectionBasePrice);
+        $this->invoiceData['shipping_protection'] = $this->shippingProtectionPrice;
+        $this->invoiceData['base_shipping_protection'] = $this->shippingProtectionBasePrice;
 
       // set expectations
-        $this->expectInvoiceValuesToBeUpdatedWithNonZeroValues();
+        $this->expectGrandTotalsUpdatedWithNonZeroValues();
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+        $this->assertShippingProtectionSetWithNonZeroValues();
     }
 
   // test collect when invoice extension attributes has shipping protection and invoice is in shipping protection total repository already
@@ -210,10 +226,10 @@ class ShippingProtectionTest extends TestCase
         'invoiceHasOrder' => true,
         'invoiceIsInShippingProtectionTotalRepositoryAlready' => true,
         ]);
-      // set expectations
-        $this->invoiceMock->expects($this->exactly(2))->method('setOmitSp')->withConsecutive([false], [true]);
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+      // set expectations
+        $this->assertOmitSpCalledWith([false, true]);
     }
 
   // test collect when invoice extension attributes has shipping protection and invoice is in shipping protection total repository already for $0 SPG
@@ -227,10 +243,10 @@ class ShippingProtectionTest extends TestCase
         ]);
         $this->shippingProtectionTotalMock->method('getShippingProtectionBasePrice')->willReturn(0.0);
         $this->shippingProtectionTotalMock->method('getOfferType')->willReturn(ShippingProtectionTotalRepositoryInterface::OFFER_TYPE_SAFE_PACKAGE);
-      // set expectations
-        $this->invoiceMock->expects($this->exactly(2))->method('setOmitSp')->withConsecutive([false], [true]);
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+      // set expectations
+        $this->assertOmitSpCalledWith([false, true]);
     }
 
   // test collect when invoice extension attributes has shipping protection and invoice has an order and order has a single, virtual item
@@ -243,10 +259,10 @@ class ShippingProtectionTest extends TestCase
         'invoiceIsInShippingProtectionTotalRepositoryAlready' => true,
         'invoiceHasSingleVirtualItem' => true,
         ]);
-      // set expectations
-        $this->invoiceMock->expects($this->exactly(2))->method('setOmitSp')->withConsecutive([false], [true]);
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+      // set expectations
+        $this->assertOmitSpCalledWith([false, true]);
     }
 
   // test collect when invoice extension attributes has shipping protection and invoice has an order and order has a single, non-virtual item
@@ -258,16 +274,17 @@ class ShippingProtectionTest extends TestCase
         'invoiceHasOrder' => true,
         'invoiceHasSingleNonVirtualItem' => true,
         ]);
-        $this->invoiceMock->method('getShippingProtection')->willReturn($this->shippingProtectionPrice);
-        $this->invoiceMock->method('getBaseShippingProtection')->willReturn($this->shippingProtectionBasePrice);
+        $this->invoiceData['shipping_protection'] = $this->shippingProtectionPrice;
+        $this->invoiceData['base_shipping_protection'] = $this->shippingProtectionBasePrice;
         $this->orderMock->method('getInvoiceCollection')->willReturn($this->invoiceCollectionMock);
         $this->invoiceCollectionMock->method('getAllIds')->willReturn([123]);
         $this->invoiceItemMock->method('getQty')->willReturn(3);
         $this->orderItemMock->method('getIsVirtual')->willReturn('0');
       // set expectations
-        $this->expectInvoiceValuesToBeUpdatedWithNonZeroValues();
+        $this->expectGrandTotalsUpdatedWithNonZeroValues();
       // run the test function
         $this->testSubject->collect($this->invoiceMock);
+        $this->assertShippingProtectionSetWithNonZeroValues();
     }
 
   /* =================================================================================================== */
@@ -351,20 +368,44 @@ class ShippingProtectionTest extends TestCase
   /* ============================== helper methods for validating results ============================== */
   /* =================================================================================================== */
 
-    private function expectNothingToHappen()
+    private function expectNoRealTotalMethodsCalled()
     {
-        $this->invoiceMock->expects($this->never())->method('setShippingProtection');
-        $this->invoiceMock->expects($this->never())->method('setBaseShippingProtection');
         $this->invoiceMock->expects($this->never())->method('setGrandTotal');
         $this->invoiceMock->expects($this->never())->method('setBaseGrandTotal');
         $this->shippingProtectionFactoryMock->expects($this->never())->method('create');
     }
 
-    private function expectInvoiceValuesToBeUpdatedWithNonZeroValues()
+    private function expectGrandTotalsUpdatedWithNonZeroValues()
     {
-        $this->invoiceMock->expects($this->once())->method('setShippingProtection')->with($this->shippingProtectionPrice);
-        $this->invoiceMock->expects($this->once())->method('setBaseShippingProtection')->with($this->shippingProtectionBasePrice);
         $this->invoiceMock->expects($this->once())->method('setGrandTotal')->with($this->invoiceGrandTotal + $this->shippingProtectionPrice);
         $this->invoiceMock->expects($this->once())->method('setBaseGrandTotal')->with($this->invoiceBaseGrandTotal + $this->shippingProtectionBasePrice);
+    }
+
+    private function assertShippingProtectionNotSet()
+    {
+        $this->assertSame([], $this->setDataCallsForKey('shipping_protection'));
+        $this->assertSame([], $this->setDataCallsForKey('base_shipping_protection'));
+    }
+
+    private function assertShippingProtectionSetWithNonZeroValues()
+    {
+        $this->assertSame([$this->shippingProtectionPrice], $this->setDataCallsForKey('shipping_protection'));
+        $this->assertSame([$this->shippingProtectionBasePrice], $this->setDataCallsForKey('base_shipping_protection'));
+    }
+
+    private function assertOmitSpCalledWith(array $expected)
+    {
+        $this->assertSame($expected, $this->setDataCallsForKey('omit_sp'));
+    }
+
+    private function setDataCallsForKey(string $key): array
+    {
+        $values = [];
+        foreach ($this->setDataCalls as [$calledKey, $value]) {
+            if ($calledKey === $key) {
+                $values[] = $value;
+            }
+        }
+        return $values;
     }
 }

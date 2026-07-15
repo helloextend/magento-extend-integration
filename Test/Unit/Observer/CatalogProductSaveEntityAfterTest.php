@@ -75,12 +75,9 @@ class CatalogProductSaveEntityAfterTest extends TestCase
     {
         $this->productMock = $this->createMock(Product::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getProduct'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->event
-            ->method('getProduct')
-            ->willReturn($this->productMock);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);
@@ -112,7 +109,9 @@ class CatalogProductSaveEntityAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getProduct');
+            ->method('getData')
+            ->with('product')
+            ->willReturn($this->productMock);
         $this->productMock
             ->expects($this->once())
             ->method('isObjectNew')
@@ -142,7 +141,9 @@ class CatalogProductSaveEntityAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getProduct');
+            ->method('getData')
+            ->with('product')
+            ->willReturn($this->productMock);
         $this->productMock
             ->expects($this->once())
             ->method('isObjectNew')
@@ -184,7 +185,9 @@ class CatalogProductSaveEntityAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getProduct');
+            ->method('getData')
+            ->with('product')
+            ->willReturn($this->productMock);
         $this->productObserverHandler
             ->expects($this->once())
             ->method('execute')

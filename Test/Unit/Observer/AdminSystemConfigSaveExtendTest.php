@@ -96,12 +96,12 @@ class AdminSystemConfigSaveExtendTest extends TestCase
     {
         $this->request = $this->createMock(RequestInterface::class);
         $this->event = $this->getMockBuilder(Event::class)
-        ->addMethods(['getRequest'])
+        ->onlyMethods(['getData'])
         ->disableOriginalConstructor()
         ->getMock();
         $this->observer = $this->createMock(Observer::class);
 
-        $this->event->method('getRequest')->willReturn($this->request);
+        $this->event->method('getData')->with('request')->willReturn($this->request);
         $this->observer->method('getEvent')->willReturn($this->event);
 
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -163,10 +163,7 @@ class AdminSystemConfigSaveExtendTest extends TestCase
         $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
         'getId' => 1,
         ]);
-        $mockStoreIntegrationInterface = $this->getMockBuilder(StoreIntegrationInterface::class)
-        ->onlyMethods(['getStoreUuid', 'getExtendStoreUuid'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $mockStoreIntegrationInterface = $this->createMock(StoreIntegrationInterface::class);
 
         $mockConsumer = $this->getMockBuilder(Consumer::class)
         ->disableOriginalConstructor()
@@ -215,10 +212,7 @@ class AdminSystemConfigSaveExtendTest extends TestCase
         $integrationModel = $this->createConfiguredMock(\Magento\Integration\Model\Integration::class, [
         'getId' => 1,
         ]);
-        $mockStoreIntegrationInterface = $this->getMockBuilder(StoreIntegrationInterface::class)
-        ->onlyMethods(['getStoreUuid', 'getExtendStoreUuid'])
-        ->disableOriginalConstructor()
-        ->getMockForAbstractClass();
+        $mockStoreIntegrationInterface = $this->createMock(StoreIntegrationInterface::class);
 
         $mockConsumer = $this->getMockBuilder(Consumer::class)
         ->disableOriginalConstructor()

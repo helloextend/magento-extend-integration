@@ -114,28 +114,26 @@ class HowToActivateTest extends TestCase
         ];
 
         $this->integrationModel1 = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
-        ->addMethods(
-            ['getIdentityLinkUrl', 'getConsumerKey']
-        )
-         ->onlyMethods(['getId', 'getStatus'])
+         ->onlyMethods(['getId', 'getStatus', 'getData'])
          ->disableOriginalConstructor()
          ->getMock();
         $this->integrationModel1->method('getId')->willReturn(1);
         $this->integrationModel1->method('getStatus')->willReturn(1);
-        $this->integrationModel1->method('getIdentityLinkUrl')->willReturn('https://merchants.extend.com/magento');
-        $this->integrationModel1->method('getConsumerKey')->willReturn('prodConsumerKey');
+        $this->integrationModel1->method('getData')->willReturnMap([
+            ['identity_link_url', null, 'https://merchants.extend.com/magento'],
+            ['consumer_key', null, 'prodConsumerKey'],
+        ]);
 
         $this->integrationModel2 = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
-         ->addMethods(
-             ['getIdentityLinkUrl', 'getConsumerKey']
-         )
-         ->onlyMethods(['getId', 'getStatus'])
+         ->onlyMethods(['getId', 'getStatus', 'getData'])
          ->disableOriginalConstructor()
          ->getMock();
         $this->integrationModel2->method('getId')->willReturn(2);
         $this->integrationModel2->method('getStatus')->willReturn(0);
-        $this->integrationModel2->method('getIdentityLinkUrl')->willReturn('https://merchants.demo.extend.com/magento');
-        $this->integrationModel2->method('getConsumerKey')->willReturn('demoConsumerKey');
+        $this->integrationModel2->method('getData')->willReturnMap([
+            ['identity_link_url', null, 'https://merchants.demo.extend.com/magento'],
+            ['consumer_key', null, 'demoConsumerKey'],
+        ]);
 
         $this->activationStatusData = [
             [

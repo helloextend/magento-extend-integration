@@ -76,7 +76,7 @@ class CatalogCategoryDeleteBeforeTest extends TestCase
     {
         $this->category = $this->createStub(CategoryInterface::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getCategory'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->observer = $this->createConfiguredMock(Observer::class, [
@@ -109,7 +109,8 @@ class CatalogCategoryDeleteBeforeTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->categoryObserverHandler
             ->expects($this->once())
@@ -147,7 +148,8 @@ class CatalogCategoryDeleteBeforeTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
          $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn(null);
         $this->categoryObserverHandler
             ->expects($this->never())
@@ -165,7 +167,8 @@ class CatalogCategoryDeleteBeforeTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
          $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->categoryObserverHandler
             ->expects($this->once())

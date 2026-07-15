@@ -8,14 +8,17 @@ namespace Extend\Integration\Test\Unit\Plugin\Model;
 
 use Extend\Integration\Plugin\Model\OrderItemRepositoryPlugin;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
-use Magento\Sales\Api\Data\OrderExtensionInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Sales\Api\Data\OrderItemExtensionInterface;
 use Magento\Sales\Api\Data\OrderItemExtensionFactory;
 use Magento\Sales\Api\Data\OrderItemSearchResultInterface;
-use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Quote\Model\Quote\Item as QuoteItem;
 use Magento\Quote\Model\ResourceModel\Quote\Item\Collection as QuoteItemCollection;
 use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as QuoteItemCollectionFactory;
 use Extend\Integration\Service\Extend;
+use Extend\Integration\Model\ProductProtection;
 use Extend\Integration\Model\ProductProtectionFactory;
+use Extend\Integration\Api\ProductProtectionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -32,12 +35,12 @@ class OrderItemRepositoryPluginTest extends TestCase
     private $orderItemSearchResult;
 
     /**
-     * @var ExtensibleDataInterface|MockObject
+     * @var OrderItemInterface|MockObject
      */
     private $orderItem;
 
     /**
-     * @var ExtensibleDataInterface|MockObject
+     * @var QuoteItem|MockObject
      */
     private $quoteItem;
 
@@ -47,8 +50,8 @@ class OrderItemRepositoryPluginTest extends TestCase
     private $orderItemExtensionFactory;
 
      /**
-     * @var OrderExtensionInterface|MockObject
-     */
+      * @var OrderItemExtensionInterface|MockObject
+      */
     private $orderItemExtensions;
 
     /**
@@ -67,6 +70,11 @@ class OrderItemRepositoryPluginTest extends TestCase
     private $productProtectionFactory;
 
     /**
+     * @var ProductProtection|MockObject
+     */
+    private $productProtection;
+
+    /**
      * @var Extend|MockObject
      */
     private $extend;
@@ -79,13 +87,10 @@ class OrderItemRepositoryPluginTest extends TestCase
     protected function setUp(): void
     {
         $this->subject = $this->createMock(OrderItemRepositoryInterface::class);
-        $this->orderItem = $this->getMockBuilder(ExtensibleDataInterface::class)
+        $this->orderItem = $this->createMock(OrderItemInterface::class);
+        $this->quoteItem = $this->getMockBuilder(QuoteItem::class)
             ->disableOriginalConstructor()
-            ->addMethods(['getSku', 'getQuoteItemId', 'setExtensionAttributes'])
-            ->getMock();
-        $this->quoteItem = $this->getMockBuilder(ExtensibleDataInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getProduct', 'getOptions', 'getOptionByCode'])
+            ->onlyMethods(['getProduct', 'getOptions', 'getOptionByCode'])
             ->getMock();
         $this->quoteItem
             ->method('getProduct')
@@ -94,10 +99,7 @@ class OrderItemRepositoryPluginTest extends TestCase
           'getItems' => [$this->orderItem]
         ]);
         $this->orderItemExtensionFactory = $this->createMock(OrderItemExtensionFactory::class);
-        $this->orderItemExtensions = $this->getMockBuilder(OrderExtensionInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['setProductProtection'])
-            ->getMockForAbstractClass();
+        $this->orderItemExtensions = $this->createMock(OrderItemExtensionInterface::class);
         $this->quoteItemCollectionFactory = $this->createMock(QuoteItemCollectionFactory::class);
         $this->quoteItemCollection = $this->getMockBuilder(QuoteItemCollection::class)
             ->disableOriginalConstructor()
@@ -110,6 +112,7 @@ class OrderItemRepositoryPluginTest extends TestCase
             ->method('addFieldToFilter')
             ->willReturn($this->quoteItemCollection);
         $this->productProtectionFactory = $this->createMock(ProductProtectionFactory::class);
+        $this->productProtection = $this->createMock(ProductProtection::class);
         $this->extend = $this->createMock(Extend::class);
         $this->orderItemRepositoryPlugin = new OrderItemRepositoryPlugin(
             $this->orderItemExtensionFactory,
@@ -167,6 +170,9 @@ class OrderItemRepositoryPluginTest extends TestCase
         $this->orderItemExtensionFactory
             ->method('create')
             ->willReturn($this->orderItemExtensions);
+        $this->productProtectionFactory
+            ->method('create')
+            ->willReturn($this->productProtection);
         $this->quoteItemCollection
             ->method('getFirstItem')
             ->willReturn($this->quoteItem);
@@ -193,6 +199,9 @@ class OrderItemRepositoryPluginTest extends TestCase
         $this->orderItemExtensionFactory
             ->method('create')
             ->willReturn($this->orderItemExtensions);
+        $this->productProtectionFactory
+            ->method('create')
+            ->willReturn($this->productProtection);
         $this->quoteItemCollection
             ->method('getFirstItem')
             ->willReturn($this->quoteItem);

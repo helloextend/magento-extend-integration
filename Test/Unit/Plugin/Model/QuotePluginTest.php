@@ -13,6 +13,8 @@ use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
 use Extend\Integration\Plugin\Model\QuotePlugin;
 use Extend\Integration\Service\Extend;
+use Extend\Integration\Test\Unit\Mock\QuotePluginTestItemDouble;
+use Extend\Integration\Test\Unit\Mock\QuotePluginTestQuoteDouble;
 use Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid;
 
 class QuotePluginTest extends TestCase
@@ -46,12 +48,12 @@ class QuotePluginTest extends TestCase
         // create the class to test
         $this->testSubject = new QuotePlugin($this->extendMock, $this->envViewModelMock);
         // create arguments for tested method(s)
-        $this->quoteMock = $this->getMockBuilder(Quote::class)
+        $this->quoteMock = $this->getMockBuilder(QuotePluginTestQuoteDouble::class)
             ->disableOriginalConstructor()
-            ->addMethods(['setTotalsCollectedFlag'])
-            ->onlyMethods(['getAllVisibleItems', 'getItemById', 'removeItem'])
+            ->onlyMethods(['getAllVisibleItems', 'getItemById', 'removeItem', 'setTotalsCollectedFlag', 'getTotalsCollectedFlag'])
             ->getMock();
         $this->quoteMock->method('setTotalsCollectedFlag')->willReturn($this->quoteMock);
+        $this->quoteMock->method('getTotalsCollectedFlag')->willReturn(false);
         $this->quoteMock->method('removeItem')->willReturn($this->quoteMock);
     }
 
@@ -682,14 +684,14 @@ class QuotePluginTest extends TestCase
     {
         if (isset($quoteItems) && count($quoteItems) > 0) {
             $this->quoteMock->method('getAllVisibleItems')->willReturn($quoteItems);
-            $this->quoteMock->method('getItemById')->will($this->returnValueMap(
+            $this->quoteMock->method('getItemById')->willReturnMap(
                 array_map(
                     function ($quoteItem) {
                         return [$quoteItem->getId(), $quoteItem];
                     },
                     $quoteItems
                 )
-            ));
+            );
         } else {
             $this->quoteMock->method('getAllVisibleItems')->willReturn([]);
             $this->quoteMock->method('getItemById')->willReturn(null);
@@ -718,10 +720,9 @@ class QuotePluginTest extends TestCase
         ?string $leadToken = null,
         ?int $leadQty = null
     ) {
-        $quoteItemMock = $this->getMockBuilder(Item::class)
+        $quoteItemMock = $this->getMockBuilder(QuotePluginTestItemDouble::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getSku', 'getQty', 'getId', 'getOptionByCode', 'setQty'])
-            ->addMethods(['getCustomPrice'])
+            ->onlyMethods(['getSku', 'getQty', 'getId', 'getOptionByCode', 'setQty', 'getCustomPrice'])
             ->getMock();
         $quoteItemMock->method('getSku')->willReturn($productSku);
         $quoteItemMock->method('getQty')->willReturn($qty);
@@ -741,7 +742,7 @@ class QuotePluginTest extends TestCase
         if (isset($leadQty)) {
             $quoteItemOptionsMap[] = ['lead_quantity', $this->createQuoteItemOptionMock($leadQty)];
         }
-        $quoteItemMock->method('getOptionByCode')->will($this->returnValueMap($quoteItemOptionsMap));
+        $quoteItemMock->method('getOptionByCode')->willReturnMap($quoteItemOptionsMap);
         return $quoteItemMock;
     }
 
@@ -770,12 +771,10 @@ class QuotePluginTest extends TestCase
      */
     private function expectRemoveItemToBeCalledTimes(int $times, array &$actualArgs = [])
     {
-        $this->quoteMock->expects($this->exactly($times))->method('removeItem')->will(
-            $this->returnCallback(
-                function ($itemId) use (&$actualArgs) {
-                    $actualArgs[] = $itemId;
-                }
-            )
+        $this->quoteMock->expects($this->exactly($times))->method('removeItem')->willReturnCallback(
+            function ($itemId) use (&$actualArgs) {
+                $actualArgs[] = $itemId;
+            }
         );
     }
 

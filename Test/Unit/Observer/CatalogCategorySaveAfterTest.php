@@ -84,9 +84,9 @@ class CatalogCategorySaveAfterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->category = $this->createStub(CategoryInterface::class);
+        $this->category = $this->createMock(CategoryInterface::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getCategory'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->observer = $this->createConfiguredMock(Observer::class, [
@@ -119,7 +119,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->category
             ->expects($this->once())
@@ -153,7 +154,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->category
             ->expects($this->once())
@@ -187,7 +189,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->category
             ->expects($this->once())
@@ -221,7 +224,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->category
             ->expects($this->once())
@@ -267,7 +271,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
          $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn(null);
         $this->categoryObserverHandler
             ->expects($this->never())
@@ -285,7 +290,8 @@ class CatalogCategorySaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->method('getCategory')
+            ->method('getData')
+            ->with('category')
             ->willReturn($this->category);
         $this->category
             ->expects($this->once())

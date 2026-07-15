@@ -12,7 +12,8 @@ use Extend\Integration\Service\Extend;
 use Extend\Integration\Plugin\Model\OrderPlugin;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item as OrderItem;
-use Magento\Framework\Api\ExtensibleDataInterface;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\Collection as InvoiceCollection;
 use Magento\Sales\Model\ResourceModel\Order\Creditmemo\Collection as CreditmemoCollection;
 use Magento\Sales\Model\ResourceModel\Order\Item\Collection as OrderItemCollection;
@@ -32,7 +33,7 @@ class OrderPluginTest extends TestCase
     private $invoiceCollectionResult;
 
     /**
-     * @var ExtensibleDataInterface|MockObject
+     * @var Invoice|MockObject
      */
     private $invoiceCollectionItem;
 
@@ -52,7 +53,7 @@ class OrderPluginTest extends TestCase
     private $creditmemoId = 1;
 
     /**
-     * @var ExtensibleDataInterface|MockObject
+     * @var Creditmemo|MockObject
      */
     private $creditmemoCollectionItem;
 
@@ -67,7 +68,7 @@ class OrderPluginTest extends TestCase
     private $orderIncrementId = '1';
 
     /**
-     * @var ExtensibleDataInterface|MockObject
+     * @var Order|MockObject
      */
     private $orderResult;
 
@@ -104,30 +105,21 @@ class OrderPluginTest extends TestCase
     protected function setUp(): void
     {
         $this->subject = $this->createMock(Order::class);
-        $this->invoiceCollectionItem = $this->getMockBuilder(ExtensibleDataInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getId'])
-            ->getMock();
+        $this->invoiceCollectionItem = $this->createMock(Invoice::class);
         $this->invoiceCollectionResult = $this->createConfiguredMock(InvoiceCollection::class, [
             'getItems' => [$this->invoiceCollectionItem]
         ]);
         $this->invoiceCollectionItem
             ->method('getId')
             ->willReturn($this->invoiceId);
-        $this->creditmemoCollectionItem = $this->getMockBuilder(ExtensibleDataInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getId'])
-            ->getMock();
+        $this->creditmemoCollectionItem = $this->createMock(Creditmemo::class);
         $this->creditmemoCollectionResult = $this->createConfiguredMock(CreditmemoCollection::class, [
             'getItems' => [$this->creditmemoCollectionItem]
         ]);
         $this->creditmemoCollectionItem
             ->method('getId')
             ->willReturn($this->creditmemoId);
-        $this->orderResult = $this->getMockBuilder(ExtensibleDataInterface::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['getId'])
-            ->getMock();
+        $this->orderResult = $this->createMock(Order::class);
         $this->orderResult
             ->method('getId')
             ->willReturn($this->orderId);
@@ -176,10 +168,10 @@ class OrderPluginTest extends TestCase
             ->expects($this->once())
             ->method('getAndSaturateExtensionAttributes')
             ->with(
-              $this->invoiceId,
-              ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
-              $this->invoiceCollectionItem
-          );
+                $this->invoiceId,
+                ShippingProtectionTotalInterface::INVOICE_ENTITY_TYPE_ID,
+                $this->invoiceCollectionItem
+            );
         $this->orderPlugin->afterGetInvoiceCollection($this->subject, $this->invoiceCollectionResult);
     }
 
@@ -222,10 +214,10 @@ class OrderPluginTest extends TestCase
             ->expects($this->once())
             ->method('getAndSaturateExtensionAttributes')
             ->with(
-              $this->creditmemoId,
-              ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
-              $this->creditmemoCollectionItem
-          );
+                $this->creditmemoId,
+                ShippingProtectionTotalInterface::CREDITMEMO_ENTITY_TYPE_ID,
+                $this->creditmemoCollectionItem
+            );
           $this->orderPlugin->afterGetCreditmemosCollection($this->subject, $this->creditmemoCollectionResult);
     }
 
@@ -253,10 +245,10 @@ class OrderPluginTest extends TestCase
             ->expects($this->once())
             ->method('getAndSaturateExtensionAttributes')
             ->with(
-              $this->orderId,
-              ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
-              $this->orderResult
-          );
+                $this->orderId,
+                ShippingProtectionTotalInterface::ORDER_ENTITY_TYPE_ID,
+                $this->orderResult
+            );
         $this->orderPlugin->afterLoadByIncrementId($this->subject, $this->orderResult, $this->orderIncrementId);
     }
 

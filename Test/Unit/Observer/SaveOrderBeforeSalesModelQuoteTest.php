@@ -112,10 +112,10 @@ class SaveOrderBeforeSalesModelQuoteTest extends TestCase
         $this->event = $this->createMock(Event::class);
         $this->event
             ->method('getData')
-            ->willReturn($this->returnValueMap([
+            ->willReturnMap([
                 ['order', null, $this->order],
                 ['quote', null, $this->quote],
-            ]));
+            ]);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);

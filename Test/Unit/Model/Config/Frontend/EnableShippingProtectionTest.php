@@ -19,168 +19,165 @@ class EnableShippingProtectionTest extends TestCase
   /**
    * @var EnableShippingProtection
    */
-  private $model;
+    private $model;
 
   /**
    * @var AbstractElement|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $elementMock;
+    private $elementMock;
 
   /**
    * @var Context|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $contextMock;
+    private $contextMock;
 
   /**
    * @var ScopeConfigInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $scopeConfigMock;
+    private $scopeConfigMock;
 
   /**
    * @var Manager|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $managerMock;
+    private $managerMock;
 
   /**
    * @var StoreManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $storeManagerMock;
+    private $storeManagerMock;
 
   /**
    * @var SecureHtmlRenderer|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $secureRendererMock;
+    private $secureRendererMock;
 
 
   /**
    * set up the test
    * @return void
    */
-  protected function setUp(): void
-  {
+    protected function setUp(): void
+    {
 
-    $this->contextMock = $this->getMockBuilder(Context::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+        $this->contextMock = $this->getMockBuilder(Context::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
-      ->disableOriginalConstructor()
-      ->setMethods(['getValue', 'isSetFlag'])
-      ->getMock();
+        $this->scopeConfigMock = $this->getMockBuilder(ScopeConfigInterface::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['getValue', 'isSetFlag'])
+        ->getMock();
 
-    $this->managerMock = $this->getMockBuilder(Manager::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+        $this->managerMock = $this->getMockBuilder(Manager::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+        $this->storeManagerMock = $this->getMockBuilder(StoreManagerInterface::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-    $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
-    $this->secureRendererMock->method('renderEventListenerAsTag')
-      ->willReturnCallback(
-        function (string $event, string $js, string $selector): string {
-          return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
-        }
-      );
-    $this->secureRendererMock->method('renderStyleAsTag')
-      ->willReturnCallback(
-        function (string $style, string $selector): string {
-          return "<style>$selector { $style }</style>";
-        }
-      );
+        $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
+        $this->secureRendererMock->method('renderEventListenerAsTag')
+        ->willReturnCallback(
+            function (string $event, string $js, string $selector): string {
+                return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
+            }
+        );
+        $this->secureRendererMock->method('renderStyleAsTag')
+        ->willReturnCallback(
+            function (string $style, string $selector): string {
+                return "<style>$selector { $style }</style>";
+            }
+        );
 
-    $this->model = new EnableShippingProtection(
-      $this->contextMock,
-      $this->scopeConfigMock,
-      $this->managerMock,
-      $this->storeManagerMock,
-      [],
-      $this->secureRendererMock
-    );
+        $this->model = new EnableShippingProtection(
+            $this->contextMock,
+            $this->scopeConfigMock,
+            $this->managerMock,
+            $this->storeManagerMock,
+            [],
+            $this->secureRendererMock
+        );
 
-    $this->elementMock = $this->getMockBuilder(AbstractElement::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods([
+        $this->elementMock = $this->getMockBuilder(AbstractElement::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods([
         'getElementHtml',
         'getHtmlId',
-        'getName'
-      ])
-      ->addMethods([
-        'setDisabled',
-        'setValue',
-        'setIsDisableInheritance'
-      ])
-      ->getMock();
-    $this->elementMock
-      ->method('getName')
-      ->willReturn('test_name');
-  }
+        'getName',
+        'setData'
+        ])
+        ->getMock();
+        $this->elementMock
+        ->method('getName')
+        ->willReturn('test_name');
+    }
 
-  public function testGetElementHtmlWithV2Enabled()
-  {
-    $this->scopeConfigMock->expects($this->once())
-      ->method('getValue')
-      ->with(Extend::ENABLE_EXTEND)
-      ->willReturn(true);
+    public function testGetElementHtmlWithV2Enabled()
+    {
+        $this->scopeConfigMock->expects($this->once())
+        ->method('getValue')
+        ->with(Extend::ENABLE_EXTEND)
+        ->willReturn(true);
 
-    $this->elementMock->expects($this->never())
-      ->method('setDisabled');
+        $this->elementMock->expects($this->never())
+        ->method('setData');
 
-    $this->elementMock->expects($this->never())
-      ->method('setValue');
+        $this->elementMock->expects($this->once())
+        ->method('getElementHtml');
 
-    $this->elementMock->expects($this->once())
-      ->method('getElementHtml');
+        PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
+    }
 
-    PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
-  }
+    public function testGetElementHtmlWithV2Disabled()
+    {
+        $this->scopeConfigMock->expects($this->once())
+        ->method('getValue')
+        ->with(Extend::ENABLE_EXTEND)
+        ->willReturn(false);
 
-  public function testGetElementHtmlWithV2Disabled()
-  {
-    $this->scopeConfigMock->expects($this->once())
-      ->method('getValue')
-      ->with(Extend::ENABLE_EXTEND)
-      ->willReturn(false);
+        $setDataCalls = [];
+        $this->elementMock->expects($this->exactly(2))
+        ->method('setData')
+        ->willReturnCallback(
+            function ($key, $value) use (&$setDataCalls) {
+                $setDataCalls[$key] = $value;
+                return $this->elementMock;
+            }
+        );
 
-    $this->elementMock->expects($this->once())
-      ->method('setDisabled')
-      ->with(true);
+        $this->elementMock->expects($this->once())
+        ->method('getElementHtml');
 
-    $this->elementMock->expects($this->once())
-      ->method('setValue')
-      ->with(0);
+        PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
 
-    $this->elementMock->expects($this->once())
-      ->method('getElementHtml');
+        $this->assertSame(['disabled' => true, 'value' => 0], $setDataCalls);
+    }
 
-    PHPUnitUtils::callMethod($this->model, '_getElementHtml', [$this->elementMock]);
-  }
+    public function testRenderInheritCheckboxWithV2Enabled()
+    {
+        $this->scopeConfigMock->expects($this->once())
+        ->method('getValue')
+        ->with(Extend::ENABLE_EXTEND)
+        ->willReturn(true);
 
-  public function testRenderInheritCheckboxWithV2Enabled()
-  {
-    $this->scopeConfigMock->expects($this->once())
-      ->method('getValue')
-      ->with(Extend::ENABLE_EXTEND)
-      ->willReturn(true);
+        $this->elementMock->expects($this->never())
+        ->method('setData');
 
-    $this->elementMock->expects($this->never())
-      ->method('setIsDisableInheritance');
+        PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
+    }
 
-    PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
-  }
+    public function testRenderInheritCheckboxWithV2Disabled()
+    {
+        $this->scopeConfigMock->expects($this->once())
+        ->method('getValue')
+        ->with(Extend::ENABLE_EXTEND)
+        ->willReturn(false);
 
-  public function testRenderInheritCheckboxWithV2Disabled()
-  {
-    $this->scopeConfigMock->expects($this->once())
-      ->method('getValue')
-      ->with(Extend::ENABLE_EXTEND)
-      ->willReturn(false);
+        $this->elementMock->expects($this->once())
+        ->method('setData')
+        ->with('is_disable_inheritance', true);
 
-    $this->elementMock->expects($this->once())
-      ->method('setIsDisableInheritance')
-      ->with(true);
-
-    PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
-  }
+        PHPUnitUtils::callMethod($this->model, '_renderInheritCheckbox', [$this->elementMock]);
+    }
 }

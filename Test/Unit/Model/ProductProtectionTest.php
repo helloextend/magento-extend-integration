@@ -110,7 +110,7 @@ class ProductProtectionTest extends TestCase
 
     /**
      * Test PHP 8.4 nullable parameter compatibility
-     * 
+     *
      * This test verifies that the upsert method can handle nullable parameters
      * without triggering PHP 8.4 deprecation warnings
      */
@@ -147,7 +147,8 @@ class ProductProtectionTest extends TestCase
         // Verify all parameters are nullable
         $parameters = $upsertMethod->getParameters();
         foreach ($parameters as $parameter) {
-            $this->assertTrue($parameter->allowsNull(), 
+            $this->assertTrue(
+                $parameter->allowsNull(),
                 "Parameter {$parameter->getName()} should allow null for PHP 8.4 compatibility"
             );
         }
@@ -171,7 +172,8 @@ class ProductProtectionTest extends TestCase
         
         // Check that all parameters are nullable
         foreach ($parameters as $parameter) {
-            $this->assertTrue($parameter->allowsNull(), 
+            $this->assertTrue(
+                $parameter->allowsNull(),
                 "Parameter {$parameter->getName()} should allow null values for PHP 8.4 compatibility"
             );
         }
@@ -184,7 +186,7 @@ class ProductProtectionTest extends TestCase
 
     /**
      * Test backward compatibility with PHP 7.4-8.3
-     * 
+     *
      * This test ensures that the nullable parameter changes don't break
      * compatibility with older PHP versions
      */
@@ -197,7 +199,8 @@ class ProductProtectionTest extends TestCase
         // Verify that all parameters still allow null (backward compatible)
         $parameters = $upsertMethod->getParameters();
         foreach ($parameters as $parameter) {
-            $this->assertTrue($parameter->allowsNull(), 
+            $this->assertTrue(
+                $parameter->allowsNull(),
                 "Parameter {$parameter->getName()} should allow null for backward compatibility"
             );
         }
@@ -205,7 +208,7 @@ class ProductProtectionTest extends TestCase
 
     /**
      * Test actual invocation with all null parameters
-     * 
+     *
      * This test verifies that PHP 8.4 can actually invoke the upsert method
      * with all null parameters without throwing type errors
      */
@@ -224,7 +227,6 @@ class ProductProtectionTest extends TestCase
         
         $reflection = new \ReflectionClass($this->productProtection);
         $upsertMethod = $reflection->getMethod('upsert');
-        $upsertMethod->setAccessible(true);
         
         // Expect LocalizedException for missing required parameters
         $this->expectException(LocalizedException::class);
@@ -233,13 +235,23 @@ class ProductProtectionTest extends TestCase
         // This should throw a LocalizedException, not a TypeError
         $upsertMethod->invoke(
             $this->productProtection,
-            null, null, null, null, null, null, null, null, null, null, null
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
         );
     }
 
     /**
      * Test actual invocation with mixed null and valid values
-     * 
+     *
      * This test verifies that PHP 8.4 can invoke the upsert method
      * with a mix of null and valid values
      */
@@ -258,7 +270,6 @@ class ProductProtectionTest extends TestCase
         
         $reflection = new \ReflectionClass($this->productProtection);
         $upsertMethod = $reflection->getMethod('upsert');
-        $upsertMethod->setAccessible(true);
         
         // Expect LocalizedException for price = 0
         $this->expectException(LocalizedException::class);

@@ -67,8 +67,8 @@ class CreateProdTest extends TestCase
         $this->authorizationService = $this->createStub(\Magento\Integration\Model\AuthorizationService::class);
         $this->messageManager = $this->createMock(\Magento\Framework\Message\ManagerInterface::class);
         $this->integrationModel = $this->getMockBuilder(\Magento\Integration\Model\Integration::class)
-        ->addMethods(
-            ['getIntegrationId']
+        ->onlyMethods(
+            ['getData']
         )
         ->disableOriginalConstructor()
         ->getMock();
@@ -83,7 +83,9 @@ class CreateProdTest extends TestCase
         $this->context->method('getResponse')->willReturn($this->response);
         $this->context->method('getHelper')->willReturn($this->helper);
         $this->integrationService->method('findByName')->willReturn($this->integrationModel);
-        $this->integrationModel->method('getIntegrationId')->willReturn($integrationId);
+        $this->integrationModel->method('getData')->willReturnCallback(
+            fn ($key = null, $index = null) => $key === 'integration_id' ? $integrationId : []
+        );
 
       // Create the test subject
         $this->testSubject = new CreateProd(

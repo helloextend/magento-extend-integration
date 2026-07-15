@@ -36,9 +36,7 @@ class IntegrationTest extends TestCase
         
         $curl->expects($this->once())->method('setHeaders');
 
-        $storeIntegration = $this->getMockBuilder('Extend\\Integration\\Api\\Data\\StoreIntegrationInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $storeIntegration = $this->createMock(\Extend\Integration\Api\Data\StoreIntegrationInterface::class);
         $storeIntegration->method('getExtendStoreUuid')->willReturn($extendUuid);
         $storeIntegration->method('getStoreUuid')->willReturn($magentoStoreUuid);
         $storeIntegrationRepo->method('getByStoreIdAndActiveEnvironment')->with($storeId)->willReturn($storeIntegration);
@@ -91,9 +89,7 @@ class IntegrationTest extends TestCase
         
         $curl->expects($this->once())->method('setHeaders');
 
-        $storeIntegration = $this->getMockBuilder('Extend\\Integration\\Api\\Data\\StoreIntegrationInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $storeIntegration = $this->createMock(\Extend\Integration\Api\Data\StoreIntegrationInterface::class);
         $storeIntegration->method('getExtendStoreUuid')->willReturn('');
         $storeIntegration->method('getStoreUuid')->willReturn('');
         $storeIntegrationRepo->method('getByStoreIdAndActiveEnvironment')->with($storeId)->willReturn($storeIntegration);
@@ -147,9 +143,7 @@ class IntegrationTest extends TestCase
         
         $curl->expects($this->once())->method('setHeaders');
 
-        $storeIntegration = $this->getMockBuilder('Extend\\Integration\\Api\\Data\\StoreIntegrationInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $storeIntegration = $this->createMock(\Extend\Integration\Api\Data\StoreIntegrationInterface::class);
         $storeIntegration->method('getExtendStoreUuid')->willReturn($extendUuid);
         $storeIntegration->method('getStoreUuid')->willReturn($magentoStoreUuid);
         $storeIntegrationRepo->method('getByStoreIdAndActiveEnvironment')->with($storeId)->willReturn($storeIntegration);
@@ -206,9 +200,7 @@ class IntegrationTest extends TestCase
         
         $curl->expects($this->once())->method('setHeaders');
 
-        $storeIntegration = $this->getMockBuilder('Extend\\Integration\\Api\\Data\\StoreIntegrationInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $storeIntegration = $this->createMock(\Extend\Integration\Api\Data\StoreIntegrationInterface::class);
         $storeIntegration->method('getExtendStoreUuid')->willReturn($extendUuid);
         $storeIntegration->method('getStoreUuid')->willReturn($magentoStoreUuid);
         $storeIntegrationRepo->method('getByStoreIdAndActiveEnvironment')->with($storeId)->willReturn($storeIntegration);

@@ -93,20 +93,20 @@ class CatalogProductImportBunchDeleteAfterTest extends TestCase
         $this->adapterMock = $this->createMock(Product::class);
         $this->adapterMock
             ->method('getNewSku')
-            ->willReturn($this->returnValueMap([
+            ->willReturnMap([
                 [$this->bunchDataArrayMock[1]['sku'], $this->productDataArrayMocks[0]],
                 [$this->bunchDataArrayMock[2]['sku'], $this->productDataArrayMocks[1]],
-            ]));
+            ]);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getBunch', 'getAdapter'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->event
-            ->method('getBunch')
-            ->willReturn($this->bunchDataArrayMock);
-        $this->event
-            ->method('getAdapter')
-            ->willReturn($this->adapterMock);
+            ->method('getData')
+            ->willReturnMap([
+                ['bunch', null, $this->bunchDataArrayMock],
+                ['adapter', null, $this->adapterMock],
+            ]);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);
@@ -137,11 +137,8 @@ class CatalogProductImportBunchDeleteAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->expects($this->once())
-            ->method('getBunch');
-        $this->event
-            ->expects($this->once())
-            ->method('getAdapter');
+            ->expects($this->exactly(2))
+            ->method('getData');
         $this->adapterMock
             ->expects($this->exactly(2))
             ->method('getNewSku');
@@ -181,12 +178,8 @@ class CatalogProductImportBunchDeleteAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->expects($this->once())
-            ->method('getBunch');
-        $this->event
-            ->expects($this->once())
-            ->method('getAdapter')
-            ->willReturn($this->adapterMock);
+            ->expects($this->exactly(2))
+            ->method('getData');
         $this->adapterMock
             ->expects($this->exactly(2))
             ->method('getNewSku');

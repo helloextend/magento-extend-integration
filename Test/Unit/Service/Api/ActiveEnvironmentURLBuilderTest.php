@@ -35,29 +35,20 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
         $this->lowerEnvIntegrationEndpoint =
             $this->lowerEnvironmentIntegrationBaseURL . '/auth/start';
         $this->prodIntegrationEndpoint = $this->prodIntegrationBaseURL . '/auth/start';
-        $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
-            ->onlyMethods(['getValue'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->scopeConfig
             ->expects($this->any())
             ->method('getValue')
             ->with(ActiveEnvironmentURLBuilder::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
 
-        $this->logger = $this->getMockBuilder(LoggerInterface::class)
-            ->onlyMethods(['critical'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->integration = $this->getMockBuilder(Integration::class)
-            ->addMethods(['getEndpoint'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->integrationService = $this->getMockBuilder(IntegrationServiceInterface::class)
-            ->onlyMethods(['get'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->integrationService = $this->createMock(IntegrationServiceInterface::class);
         $this->integrationService
             ->expects($this->any())
             ->method('get')
@@ -79,7 +70,8 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
     {
         $this->integration
             ->expects($this->once())
-            ->method('getEndpoint')
+            ->method('getData')
+            ->with('endpoint')
             ->willReturn($this->lowerEnvIntegrationEndpoint);
 
         $this->assertEquals(
@@ -92,7 +84,8 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
     {
         $this->integration
             ->expects($this->once())
-            ->method('getEndpoint')
+            ->method('getData')
+            ->with('endpoint')
             ->willReturn($this->prodIntegrationEndpoint);
 
         $this->assertEquals(
@@ -105,7 +98,8 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
     {
         $this->integration
             ->expects($this->once())
-            ->method('getEndpoint')
+            ->method('getData')
+            ->with('endpoint')
             ->willReturn($this->lowerEnvIntegrationEndpoint);
 
         $this->assertEquals(
@@ -118,7 +112,8 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
     {
         $this->integration
             ->expects($this->once())
-            ->method('getEndpoint')
+            ->method('getData')
+            ->with('endpoint')
             ->willReturn($this->prodIntegrationEndpoint);
 
         $this->assertEquals(

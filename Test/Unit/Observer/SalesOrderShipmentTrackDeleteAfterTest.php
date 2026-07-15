@@ -24,8 +24,8 @@ use Exception;
 class SalesOrderShipmentTrackDeleteAfterTest extends TestCase
 {
      /**
-     * @var Observer|MockObject
-     */
+      * @var Observer|MockObject
+      */
     private $observer;
 
     /**
@@ -85,12 +85,9 @@ class SalesOrderShipmentTrackDeleteAfterTest extends TestCase
             'getShipment' => $this->shipmentMock
         ]);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getTrack'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->event
-            ->method('getTrack')
-            ->willReturn($this->trackMock);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);
@@ -122,7 +119,9 @@ class SalesOrderShipmentTrackDeleteAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getTrack');
+            ->method('getData')
+            ->with('track')
+            ->willReturn($this->trackMock);
         $this->trackMock
             ->expects($this->once())
             ->method('getShipment');
@@ -164,7 +163,9 @@ class SalesOrderShipmentTrackDeleteAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getTrack');
+            ->method('getData')
+            ->with('track')
+            ->willReturn($this->trackMock);
         $this->trackMock
             ->expects($this->once())
             ->method('getShipment');

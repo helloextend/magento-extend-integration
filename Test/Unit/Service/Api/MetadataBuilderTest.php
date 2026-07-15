@@ -48,27 +48,21 @@ class MetadataBuilderTest extends TestCase
         $this->identityService = $this->getMockBuilder(IdentityService::class)
             ->onlyMethods(['generateId'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->identityService
             ->expects($this->any())
             ->method('generateId')
             ->willReturn($this->generatedUUIDMock);
 
-        $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
-            ->onlyMethods(['getStoreUuid'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->storeIntegration = $this->createMock(StoreIntegrationInterface::class);
         $this->storeIntegration
             ->expects($this->any())
             ->method('getStoreUuid')
             ->willReturn($this->storeUUID);
 
-        $this->storeIntegrationRepository = $this->getMockBuilder(
+        $this->storeIntegrationRepository = $this->createMock(
             StoreIntegrationRepositoryInterface::class
-        )
-            ->onlyMethods(['getByStoreIdAndActiveEnvironment', 'getListByIntegration'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        );
         $this->storeIntegrationRepository
             ->expects($this->any())
             ->method('getByStoreIdAndActiveEnvironment')
@@ -80,7 +74,7 @@ class MetadataBuilderTest extends TestCase
         $this->accessTokenBuilder = $this->getMockBuilder(AccessTokenBuilder::class)
             ->onlyMethods(['getAccessToken'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->accessTokenBuilder
             ->expects($this->any())
             ->method('getAccessToken')
@@ -89,7 +83,7 @@ class MetadataBuilderTest extends TestCase
         $this->composerInformation = $this->getMockBuilder(ComposerInformation::class)
             ->onlyMethods(['getInstalledMagentoPackages'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
 
         $this->composerInformation
             ->expects($this->any())
@@ -124,10 +118,7 @@ class MetadataBuilderTest extends TestCase
             ->method('loadConsumer')
             ->willReturn(['helloextend/integration' => $this->magentoVersion]);
 
-        $this->productMetadata = $this->getMockBuilder(ProductMetadataInterface::class)
-            ->onlyMethods(['getVersion'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->productMetadata = $this->createMock(ProductMetadataInterface::class);
         $this->productMetadata
             ->expects($this->any())
             ->method('getVersion')

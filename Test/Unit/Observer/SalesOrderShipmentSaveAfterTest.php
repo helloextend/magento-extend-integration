@@ -86,11 +86,12 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
     {
         $this->shipment = $this->createMock(Shipment::class);
         $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getShipment'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->event
-            ->method('getShipment')
+            ->method('getData')
+            ->with('shipment')
             ->willReturn($this->shipment);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
@@ -123,7 +124,8 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getShipment');
+            ->method('getData')
+            ->with('shipment');
         $this->shipment
             ->expects($this->once())
             ->method('getCreatedAt')
@@ -159,7 +161,8 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
             ->willReturn($this->event);
         $this->event
             ->expects($this->once())
-            ->method('getShipment')
+            ->method('getData')
+            ->with('shipment')
             ->willReturn($this->shipment);
         $this->shipment
             ->expects($this->once())
@@ -207,7 +210,8 @@ class SalesOrderShipmentSaveAfterTest extends TestCase
             ->method('getEvent');
         $this->event
             ->expects($this->once())
-            ->method('getShipment');
+            ->method('getData')
+            ->with('shipment');
         $this->shipment
             ->expects($this->once())
             ->method('getCreatedAt')

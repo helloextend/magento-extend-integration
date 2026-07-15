@@ -126,10 +126,10 @@ class HealthCheckTest extends TestCase
         // and which will provide the consumer id
         $integrationModel = $this
             ->getMockBuilder(\Magento\Integration\Model\Integration::class)
-            ->addMethods(['getConsumerId'])
+            ->onlyMethods(['getData'])
             ->disableOriginalConstructor()
             ->getMock();
-        $integrationModel->method('getConsumerId')->willReturn($this->mockConsumerId);
+        $integrationModel->method('getData')->with('consumer_id')->willReturn($this->mockConsumerId);
         $this->integrationService->method('get')->with($activeIntegration)->willReturn($integrationModel);
 
         // mock the consumer model, which will be returned by the oauth service and

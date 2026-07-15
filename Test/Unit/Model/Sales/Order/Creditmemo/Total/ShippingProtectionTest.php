@@ -159,7 +159,6 @@ class ShippingProtectionTest extends TestCase
         $this->creditmemoMock = $this->getMockBuilder(Creditmemo::class)
         ->disableOriginalConstructor()
         ->onlyMethods(['getOrder', 'getExtensionAttributes', 'setGrandTotal', 'setBaseGrandTotal', 'getGrandTotal', 'getBaseGrandTotal', 'getTaxAmount', 'getBaseTaxAmount','setTaxAmount', 'setBaseTaxAmount', 'setExtensionAttributes', 'setData', 'isLast'])
-        ->addMethods(['setShippingProtection', 'setBaseShippingProtection', 'getShippingProtection', 'getBaseShippingProtection', 'setShippingProtectionTax', 'getShippingProtectionTax', 'setOmitSp'])
         ->getMock();
         $this->extensionAttributesMock = $this->createMock(MagicMockInterface::class);
         $this->creditmemoMock->method('getExtensionAttributes')
@@ -372,9 +371,21 @@ class ShippingProtectionTest extends TestCase
     private function expectShippingProtectionPriceGettersAndSettersToBeCalledOnceEachWithCorrespondingPriceValues()
     {
         $this->baseShippingProtectionModelMock->expects($this->once())->method('getShippingProtectionTax')->willReturn($this->shippingProtectionTax);
-        $this->creditmemoMock->expects($this->once())->method('setShippingProtection')->with($this->shippingProtectionPrice);
-        $this->creditmemoMock->expects($this->once())->method('setBaseShippingProtection')->with($this->shippingProtectionBasePrice);
-        $this->creditmemoMock->expects($this->once())->method('setShippingProtectionTax')->with($this->shippingProtectionTax);
+        $expectedSetDataValues = [
+            'omit_sp' => false,
+            'shipping_protection' => $this->shippingProtectionPrice,
+            'base_shipping_protection' => $this->shippingProtectionBasePrice,
+            'shipping_protection_tax' => $this->shippingProtectionTax,
+        ];
+        $seenSetDataKeys = [];
+        $this->creditmemoMock->expects($this->exactly(count($expectedSetDataValues)))->method('setData')
+        ->willReturnCallback(function ($key, $value) use ($expectedSetDataValues, &$seenSetDataKeys) {
+            $this->assertArrayHasKey($key, $expectedSetDataValues);
+            $this->assertArrayNotHasKey($key, $seenSetDataKeys);
+            $this->assertSame($expectedSetDataValues[$key], $value);
+            $seenSetDataKeys[$key] = true;
+            return $this->creditmemoMock;
+        });
         $this->creditmemoMock->expects($this->once())->method('getGrandTotal')->willReturn($this->creditmemoStartingGrandTotal);
         $this->creditmemoMock->expects($this->once())->method('setGrandTotal')->with($this->creditmemoStartingGrandTotal + $this->shippingProtectionPrice + $this->shippingProtectionTax);
         $this->creditmemoMock->expects($this->once())->method('getBaseGrandTotal')->willReturn($this->creditmemoStartingBaseGrandTotal);
@@ -388,6 +399,12 @@ class ShippingProtectionTest extends TestCase
 
     private function expectOmitSpSetToTrue()
     {
-        $this->creditmemoMock->expects($this->exactly(2))->method('setOmitSp')->withConsecutive([false], [true]);
+        $expectedOmitSpArgs = [false, true];
+        $this->creditmemoMock->expects($this->exactly(2))->method('setData')
+        ->willReturnCallback(function ($key, $omitSp) use (&$expectedOmitSpArgs) {
+            $this->assertSame('omit_sp', $key);
+            $this->assertSame(array_shift($expectedOmitSpArgs), $omitSp);
+            return $this->creditmemoMock;
+        });
     }
 }

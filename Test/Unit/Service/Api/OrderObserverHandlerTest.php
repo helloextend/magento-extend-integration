@@ -99,11 +99,8 @@ class OrderObserverHandlerTest extends TestCase
         $this->store = $this->getMockBuilder(Store::class)
             ->onlyMethods(['getId'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->onlyMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
             ->expects($this->any())
             ->method('getStore')
@@ -111,7 +108,7 @@ class OrderObserverHandlerTest extends TestCase
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
             ->onlyMethods(['execute'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->metadataMock = [
             'webhook_id' => '937ea8a4-69c9-4133-88a0-c1477a9123d6',
             'webhook_created_at' => time(),
@@ -125,9 +122,9 @@ class OrderObserverHandlerTest extends TestCase
         $this->orderIdMock = 'testId';
         $this->orderStatusMock = 'testStatus';
         $this->order = $this->getMockBuilder(Order::class)
-            ->setMethods(['getId', 'getStatus'])
+            ->onlyMethods(['getId', 'getStatus'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->order
             ->expects($this->any())
             ->method('getId')

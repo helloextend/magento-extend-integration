@@ -140,7 +140,7 @@ class ShippingProtectionTest extends TestCase
         $this->cartExtensionMock = $this->createMock(MagicMockInterface::class);
         $this->storeMock = $this->createStub(Store::class);
         $this->storeManagerMock->method('getStore')->willReturn($this->storeMock);
-        $this->calculationMock = $this->createStub(Calculation::class);
+        $this->calculationMock = $this->createMock(Calculation::class);
         $this->rateRequestMock = $this->createStub(RateRequest::class);
         $this->calculationMock->method('getRateRequest')->willReturn($this->rateRequestMock);
         $this->cartExtensionFactoryMock = $this->createConfiguredMock(
@@ -180,7 +180,7 @@ class ShippingProtectionTest extends TestCase
                 ])
             ]);
         $this->total = new Total();
-        $this->shippingProtectionMock = $this->createStub(BaseShippingProtectionModel::class);
+        $this->shippingProtectionMock = $this->createMock(BaseShippingProtectionModel::class);
         $this->quoteMock = $this->createStub(Quote::class);
         $this->testSubject->setCode('shipping_protection');
 

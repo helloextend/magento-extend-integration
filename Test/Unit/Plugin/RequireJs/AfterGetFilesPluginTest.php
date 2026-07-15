@@ -47,7 +47,7 @@ class AfterGetFilesPluginTest extends TestCase
     protected function setUp(): void
     {
         // create mock constructor arg for the tested class
-        $this->extendServiceMock = $this->createStub(ExtendService::class);
+        $this->extendServiceMock = $this->createMock(ExtendService::class);
 
         // create an instance of the class to test
         $this->testSubject = new AfterGetFilesPlugin($this->extendServiceMock);

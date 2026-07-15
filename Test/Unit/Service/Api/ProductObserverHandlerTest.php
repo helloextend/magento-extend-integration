@@ -96,15 +96,12 @@ class ProductObserverHandlerTest extends TestCase
         $this->store = $this->getMockBuilder(Store::class)
             ->onlyMethods(['getId'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->store
             ->expects($this->any())
             ->method('getId')
             ->willReturn($this->magentoStoreIdMock);
-        $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
-            ->onlyMethods(['getStore'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
             ->expects($this->any())
             ->method('getStore')
@@ -112,7 +109,7 @@ class ProductObserverHandlerTest extends TestCase
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
             ->onlyMethods(['execute'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->metadataMock = [
             'webhook_id' => '937ea8a4-69c9-4133-88a0-c1477a9123d6',
             'webhook_created_at' => time(),
@@ -128,7 +125,7 @@ class ProductObserverHandlerTest extends TestCase
         $this->product = $this->getMockBuilder(Product::class)
             ->onlyMethods(['getId', 'getStoreIds', 'getSku'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
         $this->product
             ->expects($this->any())
             ->method('getId')

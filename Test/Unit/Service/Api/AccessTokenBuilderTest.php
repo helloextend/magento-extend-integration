@@ -92,12 +92,9 @@ class AccessTokenBuilderTest extends TestCase
         $this->extendOAuthClient = $this->getMockBuilder(ExtendOAuthClient::class)
             ->onlyMethods(['setExtendAccessToken', 'getExtendClientId', 'getExtendClientSecret', 'getExtendAccessToken'])
             ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+            ->getMock();
 
-        $this->storeIntegration = $this->getMockBuilder(StoreIntegrationInterface::class)
-            ->onlyMethods(['getExtendClientId', 'getExtendClientSecret'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->storeIntegration = $this->createMock(StoreIntegrationInterface::class);
 
         $this->payload = [
             'grant_type' => $this->tokenGrantType,
@@ -106,33 +103,18 @@ class AccessTokenBuilderTest extends TestCase
             'scope' => $this->scope,
         ];
 
-        $this->scopeConfig = $this->getMockBuilder(ScopeConfigInterface::class)
-            ->onlyMethods(['getValue'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->scopeConfig
             ->expects($this->any())
             ->method('getValue')
             ->with(\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
 
-        $this->extendOAuthClientRepository = $this->getMockBuilder(ExtendOAuthClientRepositoryInterface::class)
-            ->onlyMethods(['getByIntegrationId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->extendOAuthClientRepository = $this->createMock(ExtendOAuthClientRepositoryInterface::class);
 
+        $this->storeIntegrationRepository = $this->createMock(StoreIntegrationRepositoryInterface::class);
 
-        $this->storeIntegrationRepository = $this->getMockBuilder(
-            StoreIntegrationRepositoryInterface::class
-        )
-            ->onlyMethods(['getListByIntegration', 'getByStoreIdAndIntegrationId'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->encryptor = $this->getMockBuilder(EncryptorInterface::class)
-            ->onlyMethods(['decrypt', 'encrypt'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->encryptor = $this->createMock(EncryptorInterface::class);
 
         $this->activeEnvironmentURLBuilder = $this->getMockBuilder(
             ActiveEnvironmentURLBuilder::class
@@ -150,7 +132,7 @@ class AccessTokenBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extendOAuthClientResource = $this->createStub(
+        $this->extendOAuthClientResource = $this->createMock(
             \Extend\Integration\Model\ResourceModel\ExtendOAuthClient::class
         );
 
@@ -527,79 +509,79 @@ class AccessTokenBuilderTest extends TestCase
         $this->assertEquals($this->accessToken, $this->accessTokenBuilder->getAccessToken());
     }
 
-	public function testGetExtendOAuthClientDataWithNoIntegrationIdProvided()
-	{
-		$this->scopeConfig
-			->expects($this->once())
-			->method('getValue');
-		$this->extendOAuthClientRepository
-			->expects($this->once())
-			->method('getByIntegrationId')
-			->with((int) $this->integrationId)
-			->willReturn($this->extendOAuthClient);
-		$this->extendOAuthClient
-			->expects($this->once())
-			->method('getExtendClientId')
-			->willReturn($this->clientId);
-		$this->extendOAuthClient
-			->expects($this->once())
-			->method('getExtendClientSecret')
-			->willReturn($this->encryptedClientSecret);
+    public function testGetExtendOAuthClientDataWithNoIntegrationIdProvided()
+    {
+        $this->scopeConfig
+            ->expects($this->once())
+            ->method('getValue');
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
 
-		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData(), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
-	}
+        $this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData(), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
+    }
 
-	public function testGetExtendOAuthClientDataWithIntegrationIdProvided()
-	{
-		$this->scopeConfig
-			->expects($this->never())
-			->method('getValue');
-		$this->extendOAuthClientRepository
-			->expects($this->once())
-			->method('getByIntegrationId')
-			->with((int) $this->integrationId)
-			->willReturn($this->extendOAuthClient);
-		$this->extendOAuthClient
-			->expects($this->once())
-			->method('getExtendClientId')
-			->willReturn($this->clientId);
-		$this->extendOAuthClient
-			->expects($this->once())
-			->method('getExtendClientSecret')
-			->willReturn($this->encryptedClientSecret);
+    public function testGetExtendOAuthClientDataWithIntegrationIdProvided()
+    {
+        $this->scopeConfig
+            ->expects($this->never())
+            ->method('getValue');
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willReturn($this->extendOAuthClient);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->extendOAuthClient
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
 
-		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
-	}
+        $this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret, 'accessToken' => null]);
+    }
 
-	public function testGetExtendOAuthClientDataWithIntegrationIdProvidedAndNoExtendOauth()
-	{
-		$this->scopeConfig
-			->expects($this->never())
-			->method('getValue');
-		$this->extendOAuthClientRepository
-			->expects($this->once())
-			->method('getByIntegrationId')
-			->with((int) $this->integrationId)
-			->willThrowException(new NoSuchEntityException());
-		$this->storeIntegrationRepository
-			->expects($this->once())
-			->method('getListByIntegration')
-			->with((int) $this->integrationId)
-			->willReturn([$this->storeId]);
-		$this->storeIntegrationRepository
-			->expects($this->once())
-			->method('getByStoreIdAndIntegrationId')
-			->with((int) $this->integrationId, $this->storeId)
-			->willReturn($this->storeIntegration);
-		$this->storeIntegration
-			->expects($this->once())
-			->method('getExtendClientId')
-			->willReturn($this->clientId);
-		$this->storeIntegration
-			->expects($this->once())
-			->method('getExtendClientSecret')
-			->willReturn($this->encryptedClientSecret);
+    public function testGetExtendOAuthClientDataWithIntegrationIdProvidedAndNoExtendOauth()
+    {
+        $this->scopeConfig
+            ->expects($this->never())
+            ->method('getValue');
+        $this->extendOAuthClientRepository
+            ->expects($this->once())
+            ->method('getByIntegrationId')
+            ->with((int) $this->integrationId)
+            ->willThrowException(new NoSuchEntityException());
+        $this->storeIntegrationRepository
+            ->expects($this->once())
+            ->method('getListByIntegration')
+            ->with((int) $this->integrationId)
+            ->willReturn([$this->storeId]);
+        $this->storeIntegrationRepository
+            ->expects($this->once())
+            ->method('getByStoreIdAndIntegrationId')
+            ->with((int) $this->integrationId, $this->storeId)
+            ->willReturn($this->storeIntegration);
+        $this->storeIntegration
+            ->expects($this->once())
+            ->method('getExtendClientId')
+            ->willReturn($this->clientId);
+        $this->storeIntegration
+            ->expects($this->once())
+            ->method('getExtendClientSecret')
+            ->willReturn($this->encryptedClientSecret);
 
-		$this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret]);
-	}
+        $this->assertEquals($this->accessTokenBuilder->getExtendOAuthClientData($this->integrationId), ['clientId' => $this->clientId, 'clientSecret' => $this->encryptedClientSecret]);
+    }
 }

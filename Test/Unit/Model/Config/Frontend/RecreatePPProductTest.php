@@ -15,46 +15,46 @@ class RecreatePPProductTest extends TestCase
   /**
    * @var RecreatePPProduct|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $model;
+    private $model;
 
   /**
    * @var AbstractElement|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $elementMock;
+    private $elementMock;
 
   /**
    * @var \Magento\Framework\Url|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $urlMock;
+    private $urlMock;
 
   /**
    * @var \Magento\Framework\Filesystem|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $filesystemMock;
+    private $filesystemMock;
 
   /**
    * @var Context|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $contextMock;
+    private $contextMock;
 
   /**
    * @var SecureHtmlRenderer|\PHPUnit\Framework\MockObject\MockObject
    */
-  private $secureRendererMock;
+    private $secureRendererMock;
 
-  protected function setUp(): void
-  {
-    $this->urlMock = $this->createMock(\Magento\Framework\Url::class);
-    $this->urlMock->method('getUrl')
-      ->willReturn($this->returnArgument(0));
+    protected function setUp(): void
+    {
+        $this->urlMock = $this->createMock(\Magento\Framework\Url::class);
+        $this->urlMock->method('getUrl')
+        ->willReturnArgument(0);
 
-    $this->filesystemMock = $this->createMock(\Magento\Framework\Filesystem::class);
-    $this->filesystemMock->method('getDirectoryRead')
-      ->willReturn($this->createMock(\Magento\Framework\Filesystem\Directory\ReadInterface::class));
+        $this->filesystemMock = $this->createMock(\Magento\Framework\Filesystem::class);
+        $this->filesystemMock->method('getDirectoryRead')
+        ->willReturn($this->createMock(\Magento\Framework\Filesystem\Directory\ReadInterface::class));
 
-    $this->contextMock = $this->getMockBuilder(Context::class)
-      ->disableOriginalConstructor()
-      ->onlyMethods([
+        $this->contextMock = $this->getMockBuilder(Context::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods([
         'getUrlBuilder',
         'getEventManager',
         'getAppState',
@@ -62,130 +62,133 @@ class RecreatePPProductTest extends TestCase
         'getFilesystem',
         'getValidator',
         'getLogger'
-      ])
-      ->getMock();
+        ])
+        ->getMock();
 
-    $this->contextMock
-      ->method('getUrlBuilder')
-      ->willReturn($this->urlMock);
+        $this->contextMock
+        ->method('getUrlBuilder')
+        ->willReturn($this->urlMock);
 
-    $this->contextMock
-      ->method('getEventManager')
-      ->willReturn($this->createMock(\Magento\Framework\Event\Manager::class));
+        $this->contextMock
+        ->method('getEventManager')
+        ->willReturn($this->createMock(\Magento\Framework\Event\Manager::class));
 
-    $this->contextMock
-      ->method('getAppState')
-      ->willReturn($this->createMock(\Magento\Framework\App\State::class));
+        $this->contextMock
+        ->method('getAppState')
+        ->willReturn($this->createMock(\Magento\Framework\App\State::class));
 
-    $this->contextMock
-      ->method('getResolver')
-      ->willReturn($this->createMock(\Magento\Framework\View\Element\Template\File\Resolver::class));
+        $this->contextMock
+        ->method('getResolver')
+        ->willReturn($this->createMock(\Magento\Framework\View\Element\Template\File\Resolver::class));
 
-    $this->contextMock
-      ->method('getFilesystem')
-      ->willReturn($this->filesystemMock);
+        $this->contextMock
+        ->method('getFilesystem')
+        ->willReturn($this->filesystemMock);
 
-    $this->contextMock
-      ->method('getValidator')
-      ->willReturn($this->createMock(\Magento\Framework\View\Element\Template\File\Validator::class));
+        $this->contextMock
+        ->method('getValidator')
+        ->willReturn($this->createMock(\Magento\Framework\View\Element\Template\File\Validator::class));
 
-    $this->contextMock
-      ->method('getLogger')
-      ->willReturn($this->createMock(\Psr\Log\LoggerInterface::class));
+        $this->contextMock
+        ->method('getLogger')
+        ->willReturn($this->createMock(\Psr\Log\LoggerInterface::class));
 
-    $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
-    $this->secureRendererMock->method('renderEventListenerAsTag')
-      ->willReturnCallback(
-        function (string $event, string $js, string $selector): string {
-          return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
-        }
-      );
-    $this->secureRendererMock->method('renderStyleAsTag')
-      ->willReturnCallback(
-        function (string $style, string $selector): string {
-          return "<style>$selector { $style }</style>";
-        }
-      );
+        $this->secureRendererMock = $this->createMock(SecureHtmlRenderer::class);
+        $this->secureRendererMock->method('renderEventListenerAsTag')
+        ->willReturnCallback(
+            function (string $event, string $js, string $selector): string {
+                return "<script>document.querySelector('$selector').$event = function () { $js };</script>";
+            }
+        );
+        $this->secureRendererMock->method('renderStyleAsTag')
+        ->willReturnCallback(
+            function (string $style, string $selector): string {
+                return "<style>$selector { $style }</style>";
+            }
+        );
 
-    // this creates a partial mock of the model. the functions we're testing are unmocked,
-    // but we can still mock the functions that they call and assert that they're called.
-    $this->model = $this->getMockBuilder(RecreatePPProduct::class)
-      ->setConstructorArgs([
+      // this creates a partial mock of the model. the functions we're testing are unmocked,
+      // but we can still mock the functions that they call and assert that they're called.
+        $this->model = $this->getMockBuilder(RecreatePPProduct::class)
+        ->setConstructorArgs([
         $this->contextMock,
         [],
         $this->secureRendererMock,
-      ])
-      ->onlyMethods([
+        ])
+        ->onlyMethods([
         'addData',
         'getTemplate',
         'setTemplate'
-      ])
-      ->getMock();
+        ])
+        ->getMock();
 
-    $this->elementMock = $this->getMockBuilder(AbstractElement::class)
-      ->disableOriginalConstructor()
-      ->addMethods(['getOriginalData'])
-      ->getMock();
-  }
+        $this->elementMock = $this->getMockBuilder(AbstractElement::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['getData'])
+        ->getMock();
+    }
 
-  public function testPrepareLayoutWhenTemplateIsSet()
-  {
-    $this->model->expects($this->once())
-      ->method('getTemplate')
-      ->willReturn('some_template');
-    $this->model->expects($this->never())
-      ->method('setTemplate');
-    PHPUnitUtils::callMethod($this->model, '_prepareLayout');
-  }
+    public function testPrepareLayoutWhenTemplateIsSet()
+    {
+        $this->model->expects($this->once())
+        ->method('getTemplate')
+        ->willReturn('some_template');
+        $this->model->expects($this->never())
+        ->method('setTemplate');
+        PHPUnitUtils::callMethod($this->model, '_prepareLayout');
+    }
 
-  public function testPrepareLayoutWhenTemplateIsNotSet()
-  {
-    $this->model->expects($this->once())
-      ->method('getTemplate')
-      ->willReturn(null);
-    $this->model->expects($this->once())
-      ->method('setTemplate')
-      ->with('Extend_Integration::system/config/recreate_pp_product.phtml');
-    PHPUnitUtils::callMethod($this->model, '_prepareLayout');
-  }
+    public function testPrepareLayoutWhenTemplateIsNotSet()
+    {
+        $this->model->expects($this->once())
+        ->method('getTemplate')
+        ->willReturn(null);
+        $this->model->expects($this->once())
+        ->method('setTemplate')
+        ->with('Extend_Integration::system/config/recreate_pp_product.phtml');
+        PHPUnitUtils::callMethod($this->model, '_prepareLayout');
+    }
 
-  public function testGetElementHtmlWhenButtonLabelIsNotSet()
-  {
-    $this->elementMock->expects($this->once())
-      ->method('getOriginalData')
-      ->willReturn([
+    public function testGetElementHtmlWhenButtonLabelIsNotSet()
+    {
+        $this->elementMock->expects($this->once())
+        ->method('getData')
+        ->with('original_data')
+        ->willReturn([
         'button_url' => 'test_url',
-      ]);
-    $this->model->expects($this->never())
-      ->method('addData');
-    $this->model->_getElementHtml($this->elementMock);
-  }
-  public function testGetElementHtmlWhenButtonUrlIsNotSet()
-  {
-    $this->elementMock->expects($this->once())
-      ->method('getOriginalData')
-      ->willReturn([
+        ]);
+        $this->model->expects($this->never())
+        ->method('addData');
+        $this->model->_getElementHtml($this->elementMock);
+    }
+    public function testGetElementHtmlWhenButtonUrlIsNotSet()
+    {
+        $this->elementMock->expects($this->once())
+        ->method('getData')
+        ->with('original_data')
+        ->willReturn([
         'button_label' => 'test_label'
-      ]);
-    $this->model->expects($this->never())
-      ->method('addData');
-    $this->model->_getElementHtml($this->elementMock);
-  }
-  public function testGetElementHtmlWhenButtonLabelAndButtonUrlAreSet()
-  {
-    $this->elementMock->expects($this->once())
-      ->method('getOriginalData')
-      ->willReturn([
+        ]);
+        $this->model->expects($this->never())
+        ->method('addData');
+        $this->model->_getElementHtml($this->elementMock);
+    }
+    public function testGetElementHtmlWhenButtonLabelAndButtonUrlAreSet()
+    {
+        $this->elementMock->expects($this->once())
+        ->method('getData')
+        ->with('original_data')
+        ->willReturn([
         'button_label' => 'test_label',
         'button_url' => 'test_url'
-      ]);
-    $this->model->expects($this->once())
-      ->method('addData')
-      ->with([
+        ]);
+        $this->model->expects($this->once())
+        ->method('addData')
+        ->with([
         'button_label' => 'test_label',
         'html_id' => 'recreate_pp_product',
         'button_url' => 'test_url'
-      ]);
-    $this->model->_getElementHtml($this->elementMock);
-  }
+        ]);
+        $this->model->_getElementHtml($this->elementMock);
+    }
 }

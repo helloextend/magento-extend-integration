@@ -215,11 +215,11 @@ class StoreIntegrationRepositoryTest extends TestCase
         $this->identityServiceMock = $this->createStub(IdentityService::class);
         $this->storeIntegrationFactoryMock = $this->createStub(StoreIntegrationFactory::class);
         $this->storeIntegrationResourceMock = $this->createStub(StoreIntegrationResource::class);
-        $this->oauthServiceInterfaceMock = $this->createStub(OauthServiceInterface::class);
-        $this->integrationServiceInterfaceMock = $this->createStub(IntegrationServiceInterface::class);
+        $this->oauthServiceInterfaceMock = $this->createMock(OauthServiceInterface::class);
+        $this->integrationServiceInterfaceMock = $this->createMock(IntegrationServiceInterface::class);
         $this->storeIntegrationCollectionFactoryMock = $this->createStub(CollectionFactory::class);
         $this->scopeConfigInterfaceMock = $this->createStub(ScopeConfigInterface::class);
-        $this->encryptorInterfaceMock = $this->createStub(EncryptorInterface::class);
+        $this->encryptorInterfaceMock = $this->createMock(EncryptorInterface::class);
         $this->activeEnvironmentURLBuilderMock = $this->createStub(ActiveEnvironmentURLBuilder::class);
 
         // create the class to test
@@ -257,16 +257,10 @@ class StoreIntegrationRepositoryTest extends TestCase
         $this->consumerMock4 = $this->createConfiguredMock(Consumer::class, [
           'getId' => $this->consumerIdMock4
         ]);
-        $this->integrationMock1 = $this->getMockBuilder(Integration::class)->disableOriginalConstructor()->onlyMethods(['getId'])->addMethods(['setClientId', 'setClientSecret'])->getMock();
+        $this->integrationMock1 = $this->getMockBuilder(Integration::class)->disableOriginalConstructor()->onlyMethods(['getId', '__call'])->getMock();
         $this->integrationMock1
             ->method('getId')
             ->willReturn($this->integrationIdMock1);
-        $this->integrationMock1
-            ->method('setClientId')
-            ->willReturn(null);
-        $this->integrationMock1
-            ->method('setClientSecret')
-            ->willReturn(null);
         $this->integrationMock2 = $this->createConfiguredMock(Integration::class, [
           'getId' => $this->integrationIdMock2
         ]);
@@ -278,20 +272,20 @@ class StoreIntegrationRepositoryTest extends TestCase
           ->willReturn($this->encryptedClientSecret);
         $this->oauthServiceInterfaceMock
             ->method('loadConsumerByKey')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
               [ $this->consumerKeyMock1, $this->consumerMock1 ],
               [ $this->consumerKeyMock2, $this->consumerMock2 ],
               [ $this->consumerKeyNoIntegrationMock, $this->consumerMock3],
               [ $this->consumerKeyNoStoresMock, $this->consumerMock4],
               [ $this->consumerKeyInvalidMock, null ]
-            ]));
+            ]);
         $this->integrationServiceInterfaceMock
             ->method('findByConsumerId')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
               [ $this->consumerIdMock1, $this->integrationMock1],
               [ $this->consumerIdMock2, $this->integrationMock2],
               [ $this->consumerIdMock4, $this->integrationMock4]
-            ]));
+            ]);
         $this->storeIntegrationCollectionMock = $this->getMockBuilder(Collection::class)
             ->disableOriginalConstructor()
             ->onlyMethods([
@@ -473,22 +467,24 @@ class StoreIntegrationRepositoryTest extends TestCase
             ->method('getIterator')
             ->willReturn(new \ArrayIterator([$this->integrationMock1]));
 
-        $this->integrationMock1
-            ->expects($this->once())
-            ->method('setClientId')
-            ->with($clientId);
-
         $this->encryptorInterfaceMock
             ->expects($this->once())
             ->method('encrypt')
             ->with($clientSecret)
             ->willReturn($this->encryptedClientSecret);
 
+        $magicCalls = [];
         $this->integrationMock1
-            ->expects($this->once())
-            ->method('setClientSecret')
-            ->with($this->encryptedClientSecret);
+            ->expects($this->exactly(2))
+            ->method('__call')
+            ->willReturnCallback(function ($name, $arguments) use (&$magicCalls) {
+                $magicCalls[$name] = $arguments;
+                return $this->integrationMock1;
+            });
 
         $this->testSubject->attachClientIdAndSecretToIntegration($this->consumerKeyMock1, $clientId, $clientSecret);
+
+        $this->assertSame([$clientId], $magicCalls['setClientId']);
+        $this->assertSame([$this->encryptedClientSecret], $magicCalls['setClientSecret']);
     }
 }

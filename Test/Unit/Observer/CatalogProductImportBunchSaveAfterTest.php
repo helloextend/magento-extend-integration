@@ -18,6 +18,7 @@ use Magento\CatalogImportExport\Model\Import\Product;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Exception;
+use Extend\Integration\Test\Unit\Mock\MagicMockInterface;
 
 class CatalogProductImportBunchSaveAfterTest extends TestCase
 {
@@ -27,7 +28,7 @@ class CatalogProductImportBunchSaveAfterTest extends TestCase
     private $observer;
 
     /**
-     * @var Event|MockObject
+     * @var MagicMockInterface|MockObject
      */
     private $event;
 
@@ -93,20 +94,11 @@ class CatalogProductImportBunchSaveAfterTest extends TestCase
         $this->adapterMock = $this->createMock(Product::class);
         $this->adapterMock
             ->method('getNewSku')
-            ->willReturn($this->returnValueMap([
+            ->willReturnMap([
                 [$this->bunchDataArrayMock[1]['sku'], $this->productDataArrayMocks[0]],
                 [$this->bunchDataArrayMock[2]['sku'], $this->productDataArrayMocks[1]],
-            ]));
-        $this->event = $this->getMockBuilder(Event::class)
-            ->addMethods(['getBunch', 'getAdapter'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->event
-            ->method('getBunch')
-            ->willReturn($this->bunchDataArrayMock);
-        $this->event
-            ->method('getAdapter')
-            ->willReturn($this->adapterMock);
+            ]);
+        $this->event = $this->createMock(MagicMockInterface::class);
         $this->observer = $this->createConfiguredMock(Observer::class, [
             'getEvent' => $this->event,
         ]);
@@ -137,11 +129,13 @@ class CatalogProductImportBunchSaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->expects($this->once())
-            ->method('getBunch');
-        $this->event
-            ->expects($this->once())
-            ->method('getAdapter');
+            ->expects($this->exactly(2))
+            ->method('__call')
+            ->willReturnCallback(fn (string $name, array $arguments) => match ($name) {
+                'getBunch' => $this->bunchDataArrayMock,
+                'getAdapter' => $this->adapterMock,
+                default => throw new Exception('Unexpected magic method: ' . $name),
+            });
         $this->adapterMock
             ->expects($this->exactly(2))
             ->method('getNewSku');
@@ -181,11 +175,13 @@ class CatalogProductImportBunchSaveAfterTest extends TestCase
             ->expects($this->once())
             ->method('getEvent');
         $this->event
-            ->expects($this->once())
-            ->method('getBunch');
-        $this->event
-            ->expects($this->once())
-            ->method('getAdapter');
+            ->expects($this->exactly(2))
+            ->method('__call')
+            ->willReturnCallback(fn (string $name, array $arguments) => match ($name) {
+                'getBunch' => $this->bunchDataArrayMock,
+                'getAdapter' => $this->adapterMock,
+                default => throw new Exception('Unexpected magic method: ' . $name),
+            });
         $this->adapterMock
             ->expects($this->exactly(2))
             ->method('getNewSku');
