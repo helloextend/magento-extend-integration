@@ -28,8 +28,25 @@
                 <value id="extend-offers-demo" type="host">extendcoreoffersdemo-offersthemelogobucketeb21afa-19jnurg0a0o17.s3.amazonaws.com</value>
                 <value id="extend-offers-dev" type="host">extendcoreoffersdev-offersthemelogobucketeb21afaa-2ttuvks0mzbd.s3.amazonaws.com</value>
                 <value id="extend-offers-stage" type="host">extendcoreoffersstage-offersthemelogobucketeb21af-1f81w2c7u5t7p.s3.amazonaws.com</value>
-                <value id="fallback-image" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/learnMoreModal-default-1654273334107-learnMoreModal.backgroundImageUrl_Generic_WomanwithBox2.jpg</value>
-                <value id="sp-offer-extend-logo" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/offers/shippingProtectionCartOffer-default-1720746621507-extend_svg_cart.svg</value>
+                <!-- Each content bucket is whitelisted in all three S3 addressing forms and scoped to the bucket, no tighter. CSP matches the host exactly, and a source ending in "/" matches as a path prefix. -->
+                <value id="extend-content-prod" type="host">ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-prod-global" type="host">ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm.s3.amazonaws.com</value>
+                <value id="extend-content-prod-legacy" type="host">https://s3.amazonaws.com/ccspersistenceprod-contentstaticassets04b201d4-1apqb8dyegznm/</value>
+                <value id="extend-content-demo" type="host">ccspersistencedemo-contentstaticassets04b201d4-16x955emz0wxo.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-demo-global" type="host">ccspersistencedemo-contentstaticassets04b201d4-16x955emz0wxo.s3.amazonaws.com</value>
+                <value id="extend-content-demo-legacy" type="host">https://s3.amazonaws.com/ccspersistencedemo-contentstaticassets04b201d4-16x955emz0wxo/</value>
+                <value id="extend-content-dev" type="host">ccspersistencedev-contentstaticassets04b201d4-yga8a4yvjef2.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-dev-global" type="host">ccspersistencedev-contentstaticassets04b201d4-yga8a4yvjef2.s3.amazonaws.com</value>
+                <value id="extend-content-dev-legacy" type="host">https://s3.amazonaws.com/ccspersistencedev-contentstaticassets04b201d4-yga8a4yvjef2/</value>
+                <value id="extend-content-stage" type="host">ccspersistencestage-contentstaticassets04b201d4-d2hq2h502u66.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-stage-global" type="host">ccspersistencestage-contentstaticassets04b201d4-d2hq2h502u66.s3.amazonaws.com</value>
+                <value id="extend-content-stage-legacy" type="host">https://s3.amazonaws.com/ccspersistencestage-contentstaticassets04b201d4-d2hq2h502u66/</value>
+                <value id="extend-content-platformsandbox" type="host">ccspersistenceplatformsan-contentstaticassets04b20-hummk0wnkucu.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-platformsandbox-global" type="host">ccspersistenceplatformsan-contentstaticassets04b20-hummk0wnkucu.s3.amazonaws.com</value>
+                <value id="extend-content-platformsandbox-legacy" type="host">https://s3.amazonaws.com/ccspersistenceplatformsan-contentstaticassets04b20-hummk0wnkucu/</value>
+                <value id="extend-content-offerssandbox" type="host">ccspersistenceofferssand-contentstaticassets04b20-1hoyak4welg5e.s3.us-east-1.amazonaws.com</value>
+                <value id="extend-content-offerssandbox-global" type="host">ccspersistenceofferssand-contentstaticassets04b20-1hoyak4welg5e.s3.amazonaws.com</value>
+                <value id="extend-content-offerssandbox-legacy" type="host">https://s3.amazonaws.com/ccspersistenceofferssand-contentstaticassets04b20-1hoyak4welg5e/</value>
             </values>
         </policy>
     </policies>
