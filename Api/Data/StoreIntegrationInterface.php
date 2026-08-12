@@ -78,11 +78,10 @@ interface StoreIntegrationInterface
      */
     public function setDisabled(int $disabled): void;
 
-
     /**
-     * 
-     * Set the extend integration error
-     * @param string $integrationError
+     * Set the Extend integration error
+     *
+     * @param string|null $integrationError
      * @return void
      */
     public function setIntegrationError(?string $integrationError): void;
@@ -130,5 +129,10 @@ interface StoreIntegrationInterface
      */
     public function getDisabled(): ?int;
 
+    /**
+     * Get the Extend integration error
+     *
+     * @return string|null
+     */
     public function getIntegrationError(): ?string;
 }
