@@ -46,6 +46,9 @@ class EnvironmentAndExtendStoreUuid implements
     /** @var Extend */
     private $extendService;
 
+    /** @var Integration */
+    private $integration;
+
     /**
      * EnvironmentAndExtendStoreUuid constructor
      *
@@ -56,6 +59,7 @@ class EnvironmentAndExtendStoreUuid implements
      * @param LoggerInterface $logger
      * @param Http $request
      * @param Extend $extendService
+     * @param Integration $integration
      */
     public function __construct(
         StoreIntegrationRepositoryInterface $storeIntegrationRepository,
@@ -64,7 +68,8 @@ class EnvironmentAndExtendStoreUuid implements
         ActiveEnvironmentURLBuilder $activeEnvironmentURLBuilder,
         LoggerInterface $logger,
         Http $request,
-        Extend $extendService
+        Extend $extendService,
+        Integration $integration
     ) {
         $this->storeIntegrationRepository = $storeIntegrationRepository;
         $this->storeManager = $storeManager;
@@ -73,6 +78,7 @@ class EnvironmentAndExtendStoreUuid implements
         $this->logger = $logger;
         $this->request = $request;
         $this->extendService = $extendService;
+        $this->integration = $integration;
     }
 
     /**

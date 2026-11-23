@@ -7,6 +7,7 @@
 namespace Extend\Integration\Test\Unit\ViewModel;
 
 use PHPUnit\Framework\TestCase;
+use Exception;
 use Extend\Integration\ViewModel\EnvironmentAndExtendStoreUuid;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -17,6 +18,7 @@ use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\Store;
 use Magento\Directory\Model\Currency;
 use Extend\Integration\Service\Extend;
+use Extend\Integration\Service\Api\Integration;
 
 class EnvironmentAndExtendStoreUuidTest extends TestCase
 {
@@ -50,6 +52,9 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
     /** @var Extend */
     private $extendServiceMock;
 
+    /** @var Integration */
+    private $integrationMock;
+
     /** @var string */
     private $defaultCurrency = 'USD';
 
@@ -57,11 +62,13 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
     {
         $this->storeIntegrationRepositoryMock = $this->createStub(StoreIntegrationRepositoryInterface::class);
         $this->storeManagerMock = $this->createStub(StoreManagerInterface::class);
-        $this->scopeConfigMock = $this->createStub(ScopeConfigInterface::class);
+        $this->scopeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $this->activeEnvironmentURLBuilderMock = $this->createStub(ActiveEnvironmentURLBuilder::class);
         $this->loggerMock = $this->createStub(LoggerInterface::class);
         $this->requestMock = $this->createStub(Http::class);
         $this->extendServiceMock = $this->createStub(Extend::class);
+
+        $this->integrationMock = $this->createMock(Integration::class);
 
         $this->storeMock = $this->createStub(Store::class);
         $this->currencyMock = $this->createStub(Currency::class);
@@ -77,8 +84,23 @@ class EnvironmentAndExtendStoreUuidTest extends TestCase
             $this->activeEnvironmentURLBuilderMock,
             $this->loggerMock,
             $this->requestMock,
-            $this->extendServiceMock
+            $this->extendServiceMock,
+            $this->integrationMock
         );
+    }
+
+    public function testGetExtendStoreUuidReportsLookupFailure()
+    {
+        $this->storeMock->method('getId')->willReturn(1);
+        $this->scopeConfigMock->method('getValue')->willReturn(2);
+        $exception = new Exception('Store integration was not found');
+        $this->storeIntegrationRepositoryMock->method('getByStoreIdAndIntegrationId')
+            ->willThrowException($exception);
+        $this->integrationMock->expects($this->once())
+            ->method('logErrorToLoggingService')
+            ->with($exception->getMessage(), $this->storeMock->getId(), 'error', $exception);
+
+        $this->assertSame('', $this->environmentAndExtendStoreUuid->getExtendStoreUuid());
     }
 
     public function testGetCurrencyCodeReturnsStoreCurrency()
