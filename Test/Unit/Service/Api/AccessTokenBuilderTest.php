@@ -105,7 +105,6 @@ class AccessTokenBuilderTest extends TestCase
 
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->scopeConfig
-            ->expects($this->any())
             ->method('getValue')
             ->with(\Extend\Integration\Service\Api\Integration::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
@@ -123,7 +122,6 @@ class AccessTokenBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->activeEnvironmentURLBuilder
-            ->expects($this->any())
             ->method('getApiURL')
             ->willReturn($this->activeEnvironmentApiURL);
 

@@ -155,8 +155,8 @@ class NvpTest extends TestCase
     {
         $this->extend->expects($this->once())->method('isEnabled')->willReturn(true);
         $this->subject->expects($this->once())->method('getData')->with('quote')->willReturn($this->quote);
-        $this->quote->expects($this->any())->method('getExtensionAttributes')->willReturn($this->quoteExtensionAttributes);
-        $this->quoteExtensionAttributes->expects($this->any())->method('getShippingProtection')->willReturn(null);
+        $this->quote->method('getExtensionAttributes')->willReturn($this->quoteExtensionAttributes);
+        $this->quoteExtensionAttributes->method('getShippingProtection')->willReturn(null);
         $this->shippingProtectionTotalRepository->expects($this->once())->method('getAndSaturateExtensionAttributes');
         $this->assertEquals(
             $this->nvp->beforeCall($this->subject, $this->title, $this->request),
@@ -210,7 +210,7 @@ class NvpTest extends TestCase
     {
         $this->extend->expects($this->once())->method('isEnabled')->willReturn(true);
         $this->subject->expects($this->once())->method('getData')->with('quote')->willReturn($this->quote);
-        $this->quote->expects($this->any())->method('getExtensionAttributes')->willReturn($this->quoteExtensionAttributes);
+        $this->quote->method('getExtensionAttributes')->willReturn($this->quoteExtensionAttributes);
         $this->shippingProtectionTotalRepository->expects($this->once())->method('getAndSaturateExtensionAttributes');
         $this->quoteExtensionAttributes
             ->expects($this->exactly(2))

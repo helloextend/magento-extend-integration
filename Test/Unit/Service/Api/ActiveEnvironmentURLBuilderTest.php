@@ -37,7 +37,6 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
         $this->prodIntegrationEndpoint = $this->prodIntegrationBaseURL . '/auth/start';
         $this->scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $this->scopeConfig
-            ->expects($this->any())
             ->method('getValue')
             ->with(ActiveEnvironmentURLBuilder::INTEGRATION_ENVIRONMENT_CONFIG)
             ->willReturn($this->integrationId);
@@ -50,7 +49,6 @@ class ActiveEnvironmentURLBuilderTest extends TestCase
             ->getMock();
         $this->integrationService = $this->createMock(IntegrationServiceInterface::class);
         $this->integrationService
-            ->expects($this->any())
             ->method('get')
             ->with($this->integrationId)
             ->willReturn($this->integration);

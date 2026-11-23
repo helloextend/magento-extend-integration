@@ -105,15 +105,12 @@ class InfoPluginTest extends TestCase
         ->disableOriginalConstructor()
         ->getMock();
         $this->order
-        ->expects($this->any())
         ->method('getStoreId')
         ->willReturn($this->mockStoreId);
         $this->order
-        ->expects($this->any())
         ->method('getIncrementId')
         ->willReturn($this->mockTransactionId);
         $this->order
-        ->expects($this->any())
         ->method('getItems')
         ->willReturn([$this->mockOrderItem]);
         $this->subject = $this->getMockBuilder(Info::class)
@@ -121,17 +118,14 @@ class InfoPluginTest extends TestCase
         ->disableOriginalConstructor()
         ->getMock();
         $this->subject
-        ->expects($this->any())
         ->method('getOrder')
         ->willReturn($this->order);
         $this->storeIntegration = $this->createMock(StoreIntegrationInterface::class);
         $this->storeIntegration
-        ->expects($this->any())
         ->method('getIntegrationId')
         ->willReturn($this->mockIntegrationId);
         $this->integrationStoresRepository = $this->createMock(StoreIntegrationRepositoryInterface::class);
         $this->integrationStoresRepository
-        ->expects($this->any())
         ->method('getByStoreIdAndActiveEnvironment')
         ->with($this->mockStoreId)
         ->willReturn($this->storeIntegration);
@@ -141,13 +135,11 @@ class InfoPluginTest extends TestCase
         ->getMock();
         $this->mockIdentityLinkUrl = $this->mockMerchantPortalBaseURL . 'magento';
         $this->integration
-        ->expects($this->any())
         ->method('getData')
         ->with(Integration::IDENTITY_LINK_URL)
         ->willReturn($this->mockIdentityLinkUrl);
         $this->integrationService = $this->createMock(IntegrationServiceInterface::class);
         $this->integrationService
-        ->expects($this->any())
         ->method('get')
         ->with($this->mockIntegrationId)
         ->willReturn($this->integration);
@@ -169,7 +161,6 @@ class InfoPluginTest extends TestCase
     public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsExtendPlans()
     {
         $this->mockOrderItem
-        ->expects($this->any())
         ->method('getSku')
         ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
 
@@ -199,7 +190,6 @@ class InfoPluginTest extends TestCase
     public function testAfterGetItemsHtmlAppliesLinkToContractsSearchForOrderWhenOrderContainsLegacyExtendPlans()
     {
         $this->mockOrderItem
-        ->expects($this->any())
         ->method('getSku')
         ->willReturn(Extend::WARRANTY_PRODUCT_LEGACY_SKU);
 
@@ -229,7 +219,6 @@ class InfoPluginTest extends TestCase
     public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenOrderDoesNotContainExtendPlans()
     {
         $this->mockOrderItem
-        ->expects($this->any())
         ->method('getSku')
         ->willReturn('sku');
 
@@ -243,12 +232,10 @@ class InfoPluginTest extends TestCase
     public function testAfterGetItemsHtmlDoesNotApplyLinkToContractsSearchForOrderWhenExceptionIsThrownWhileFetchingDataForLink()
     {
         $this->mockOrderItem
-        ->expects($this->any())
         ->method('getSku')
         ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
 
         $this->integrationStoresRepository
-        ->expects($this->any())
         ->method('getByStoreIdAndActiveEnvironment')
         ->with($this->mockStoreId)
         ->willThrowException(new Exception());

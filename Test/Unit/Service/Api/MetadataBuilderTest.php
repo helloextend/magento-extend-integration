@@ -50,13 +50,11 @@ class MetadataBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->identityService
-            ->expects($this->any())
             ->method('generateId')
             ->willReturn($this->generatedUUIDMock);
 
         $this->storeIntegration = $this->createMock(StoreIntegrationInterface::class);
         $this->storeIntegration
-            ->expects($this->any())
             ->method('getStoreUuid')
             ->willReturn($this->storeUUID);
 
@@ -64,7 +62,6 @@ class MetadataBuilderTest extends TestCase
             StoreIntegrationRepositoryInterface::class
         );
         $this->storeIntegrationRepository
-            ->expects($this->any())
             ->method('getByStoreIdAndActiveEnvironment')
             ->willReturnMap([
                 [$this->magentoStoreIdMocks[0], $this->storeIntegration],
@@ -76,7 +73,6 @@ class MetadataBuilderTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->accessTokenBuilder
-            ->expects($this->any())
             ->method('getAccessToken')
             ->willReturn($this->extendAccessToken);
 
@@ -86,7 +82,6 @@ class MetadataBuilderTest extends TestCase
             ->getMock();
 
         $this->composerInformation
-            ->expects($this->any())
             ->method('getInstalledMagentoPackages')
             ->willReturn(['helloextend/integration' => ['version' => $this->moduleVersion]]);
 
@@ -114,13 +109,11 @@ class MetadataBuilderTest extends TestCase
         $this->oauthService->method('loadConsumer')->willReturn($mockConsumer);
 
         $this->oauthService
-            ->expects($this->any())
             ->method('loadConsumer')
             ->willReturn(['helloextend/integration' => $this->magentoVersion]);
 
         $this->productMetadata = $this->createMock(ProductMetadataInterface::class);
         $this->productMetadata
-            ->expects($this->any())
             ->method('getVersion')
             ->willReturn($this->magentoVersion);
 

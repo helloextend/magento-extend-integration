@@ -128,7 +128,6 @@ class BatchProductObserverHandlerTest extends TestCase
     public function testExecutesIntegrationWithExpectedPayload()
     {
         $this->metadataBuilder
-            ->expects($this->any())
             ->method('execute')
             ->willReturn($this->metadataMock);
 
@@ -170,7 +169,6 @@ class BatchProductObserverHandlerTest extends TestCase
     public function testLogsErrorsToLoggingService()
     {
         $this->metadataBuilder
-            ->expects($this->any())
             ->method('execute')
             ->willThrowException(new Exception());
         $this->logger->expects($this->once())->method('error');

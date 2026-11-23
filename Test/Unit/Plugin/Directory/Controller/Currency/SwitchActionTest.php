@@ -53,11 +53,9 @@ class SwitchActionTest extends TestCase
             ->onlyMethods(['getSku', 'getId'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extendProduct->expects($this->any())
-            ->method('getSku')
+        $this->extendProduct->method('getSku')
             ->willReturn(Extend::WARRANTY_PRODUCT_SKU);
-        $this->extendProduct->expects($this->any())
-            ->method('getId')
+        $this->extendProduct->method('getId')
             ->willReturn(1);
 
         $this->merchantItem = $this->createStub(CartItemInterface::class);
