@@ -664,7 +664,7 @@ class QuotePluginTest extends TestCase
 
     private function setExtendEnabled(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->extendMock->method('isEnabled')->willReturn(true);
         } else {
             $this->extendMock->method('isEnabled')->willReturn(false);
@@ -673,7 +673,7 @@ class QuotePluginTest extends TestCase
 
     private function setCartBalancingEnabled(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->envViewModelMock->method('isCartBalancingEnabled')->willReturn(true);
         } else {
             $this->envViewModelMock->method('isCartBalancingEnabled')->willReturn(false);
@@ -682,7 +682,7 @@ class QuotePluginTest extends TestCase
 
     private function setExistingQuoteItems(array $quoteItems)
     {
-        if (isset($quoteItems) && count($quoteItems) > 0) {
+        if (count($quoteItems) > 0) {
             $this->quoteMock->method('getAllVisibleItems')->willReturn($quoteItems);
             $this->quoteMock->method('getItemById')->willReturnMap(
                 array_map(

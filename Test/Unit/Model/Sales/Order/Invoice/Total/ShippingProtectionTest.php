@@ -322,16 +322,16 @@ class ShippingProtectionTest extends TestCase
 
     private function setInvoiceExtensionAttributesHasShippingProtection(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->extensionAttributesMock->method('getShippingProtection')->willReturn($this->baseShippingProtectionModelMock);
-        } elseif (isset($condition)) {
+        } else {
             $this->extensionAttributesMock->method('getShippingProtection')->willReturn(null);
         }
     }
 
     private function setInvoiceHasOrder(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->invoiceMock->method('getOrder')->willReturn($this->orderMock);
             $this->invoiceMock->method('getOrderId')->willReturn(123);
         }
@@ -339,7 +339,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setInvoiceIsInShippingProtectionTotalRepositoryAlready(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->orderMock->method('getInvoiceCollection')->willReturn($this->invoiceCollectionMock);
             $this->invoiceCollectionMock->method('getAllIds')->willReturn([123]);
             $this->shippingProtectionTotalRepositoryMock->method('get')->willReturn($this->shippingProtectionTotalMock);
@@ -348,7 +348,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setInvoiceHasSingleVirtualItem(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->invoiceMock->method('getAllItems')->willReturn([$this->invoiceItemMock]);
             $this->invoiceItemMock->method('getOrderItem')->willReturn($this->orderItemMock);
             $this->orderItemMock->method('getIsVirtual')->willReturn('1');
@@ -357,7 +357,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setInvoiceHasSingleNonVirtualItem(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->invoiceMock->method('getAllItems')->willReturn([$this->invoiceItemMock]);
             $this->invoiceItemMock->method('getOrderItem')->willReturn($this->orderItemMock);
             $this->orderItemMock->method('getIsVirtual')->willReturn('0');

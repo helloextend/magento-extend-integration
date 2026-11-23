@@ -82,7 +82,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setSingleCondition(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
           // do one setup thing
         } else {
           // do another setup thing

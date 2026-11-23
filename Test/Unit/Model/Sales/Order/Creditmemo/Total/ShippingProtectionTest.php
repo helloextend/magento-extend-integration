@@ -126,7 +126,7 @@ class ShippingProtectionTest extends TestCase
         $this->preExistingCreditmemoShippingProtectionprice = 8.22;
 
       // create mock constructor args for the tested class
-        $this->shippingProtectionTotalRepositoryMock = $this->createStub(ShippingProtectionTotalRepositoryInterface::class);
+        $this->shippingProtectionTotalRepositoryMock = $this->createMock(ShippingProtectionTotalRepositoryInterface::class);
         $this->shippingProtectionFactoryMock = $this->createStub(ShippingProtectionFactory::class);
         $this->shippingProtectionFactoryMock
         ->method('create')
@@ -321,7 +321,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setShippingProtectionToExtensionAttributes(bool $shippingProtectionExists)
     {
-        if (isset($shippingProtectionExists) && $shippingProtectionExists) {
+        if ($shippingProtectionExists) {
             $this->extensionAttributesMock->method('getShippingProtection')->willReturn($this->baseShippingProtectionModelMock);
             $this->creditmemoMock->method('getOrder')->willReturn($this->orderMock);
         } else {
@@ -331,7 +331,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setExistingCreditMemo(bool $existingCreditMemo)
     {
-        if (isset($existingCreditMemo) && $existingCreditMemo) {
+        if ($existingCreditMemo) {
             $this->creditmemoCollectionMock->method('getItems')->willReturn([$this->preExistingCreditmemoMock]);
         } else {
             $this->creditmemoCollectionMock->method('getItems')->willReturn([]);

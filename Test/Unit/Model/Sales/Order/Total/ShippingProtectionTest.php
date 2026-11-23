@@ -154,7 +154,7 @@ class ShippingProtectionTest extends TestCase
 
     private function setExtensionAttributesHasShippingProtection(bool $condition)
     {
-        if (isset($condition) && $condition) {
+        if ($condition) {
             $this->extensionAttributesMock->method('getShippingProtection')->willReturn($this->baseShippingProtectionModelMock);
         } else {
             $this->extensionAttributesMock->method('getShippingProtection')->willReturn(null);
