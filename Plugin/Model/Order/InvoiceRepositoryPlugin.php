@@ -81,7 +81,7 @@ class InvoiceRepositoryPlugin
 
         $extensionAttributes = $invoice->getExtensionAttributes();
         if ($extensionAttributes === null) {
-            $extensionAttributes = $this->invoiceExtensionFactory->create();
+            $extensionAttributes = $this->invoiceExtension->create();
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 

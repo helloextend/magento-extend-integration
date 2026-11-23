@@ -12,7 +12,6 @@ use Magento\Sales\Api\Data\CreditmemoExtensionFactory;
 use Magento\Sales\Api\Data\InvoiceExtensionFactory;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use function Extend\Integration\Block\Adminhtml\Sales\__;
 
 class Totals extends \Magento\Framework\View\Element\Template
 {
@@ -83,10 +82,10 @@ class Totals extends \Magento\Framework\View\Element\Template
                         $extensionAttributes = $this->orderExtensionFactory->create();
                         break;
                     case 'invoice':
-                        $extensionAttributes = $this->invoiceExtensionFactory->create();
+                        $extensionAttributes = $this->invoiceExtension->create();
                         break;
                     case 'creditmemo':
-                        $extensionAttributes = $this->creditmemoExtensionFactory->create();
+                        $extensionAttributes = $this->creditmemoExtension->create();
                         break;
                     default:
                         return 0;

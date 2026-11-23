@@ -86,10 +86,10 @@ class Totals extends \Magento\Framework\View\Element\Template
                         $extensionAttributes = $this->orderExtensionFactory->create();
                         break;
                     case 'invoice':
-                        $extensionAttributes = $this->invoiceExtensionFactory->create();
+                        $extensionAttributes = $this->invoiceExtension->create();
                         break;
                     case 'creditmemo':
-                        $extensionAttributes = $this->creditmemoExtensionFactory->create();
+                        $extensionAttributes = $this->creditmemoExtension->create();
                         break;
                 }
             }

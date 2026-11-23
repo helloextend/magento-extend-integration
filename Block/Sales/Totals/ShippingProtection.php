@@ -112,6 +112,8 @@ class ShippingProtection extends \Magento\Framework\View\Element\Template
             if ($extensionAttributes === null) {
                 $extensionAttributes = $this->orderExtensionFactory->create();
             }
+        } else {
+            return null;
         }
         $shippingProtection = $extensionAttributes->getShippingProtection();
 
