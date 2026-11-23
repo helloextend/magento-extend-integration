@@ -2,14 +2,13 @@
 
 namespace Extend\Integration\Test\Unit\Model\Config\Frontend;
 
-use Extend\Integration\Test\Utils\PHPUnitUtils;
 use Extend\Integration\Model\Config\Frontend\RecreatePPProduct;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class RecreatePPProductTest extends TestCase
+class RecreatePPProductTest extends BackendBlockTestCase
 {
 
   /**
@@ -44,6 +43,7 @@ class RecreatePPProductTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->urlMock = $this->createMock(\Magento\Framework\Url::class);
         $this->urlMock->method('getUrl')
         ->willReturnArgument(0);
@@ -117,8 +117,7 @@ class RecreatePPProductTest extends TestCase
         ])
         ->onlyMethods([
         'addData',
-        'getTemplate',
-        'setTemplate'
+        'getTemplate'
         ])
         ->getMock();
 
@@ -128,25 +127,20 @@ class RecreatePPProductTest extends TestCase
         ->getMock();
     }
 
-    public function testPrepareLayoutWhenTemplateIsSet()
+    public function testTemplateWhenTemplateIsSet()
     {
-        $this->model->expects($this->once())
-        ->method('getTemplate')
-        ->willReturn('some_template');
-        $this->model->expects($this->never())
-        ->method('setTemplate');
-        PHPUnitUtils::callMethod($this->model, '_prepareLayout');
+        $block = new RecreatePPProduct(
+            $this->contextMock,
+            ['template' => 'some_template'],
+            $this->secureRendererMock
+        );
+        $this->assertSame('some_template', $block->getTemplate());
     }
 
-    public function testPrepareLayoutWhenTemplateIsNotSet()
+    public function testTemplateWhenTemplateIsNotSet()
     {
-        $this->model->expects($this->once())
-        ->method('getTemplate')
-        ->willReturn(null);
-        $this->model->expects($this->once())
-        ->method('setTemplate')
-        ->with('Extend_Integration::system/config/recreate_pp_product.phtml');
-        PHPUnitUtils::callMethod($this->model, '_prepareLayout');
+        $block = new RecreatePPProduct($this->contextMock, [], $this->secureRendererMock);
+        $this->assertSame('Extend_Integration::system/config/recreate_pp_product.phtml', $block->getTemplate());
     }
 
     public function testGetElementHtmlWhenButtonLabelIsNotSet()

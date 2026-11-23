@@ -9,18 +9,9 @@ namespace Extend\Integration\Model\Config\Frontend;
 class CreateDemoIntegration extends \Magento\Config\Block\System\Config\Form\Field
 {
     /**
-     * Set template to itself
-     *
-     * @return \Magento\Customer\Block\Adminhtml\System\Config\Validatevat
+     * @var string
      */
-    protected function _prepareLayout()
-    {
-        parent::_prepareLayout();
-        if (!$this->getTemplate()) {
-            $this->setTemplate('Extend_Integration::system/config/create_demo_integration.phtml');
-        }
-        return $this;
-    }
+    protected $_template = 'Extend_Integration::system/config/create_demo_integration.phtml';
 
     /**
      * Get the button label and url.
