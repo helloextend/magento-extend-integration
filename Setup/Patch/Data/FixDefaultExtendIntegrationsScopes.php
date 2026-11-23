@@ -86,6 +86,7 @@ class FixDefaultExtendIntegrationsScopes implements DataPatchInterface, PatchRev
                 )
             );
         }
+        return $this;
     }
 
     /**

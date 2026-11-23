@@ -110,5 +110,6 @@ class AddExistingExtendOAuthClientPatch implements DataPatchInterface
                 )
             );
         }
+        return $this;
     }
 }
