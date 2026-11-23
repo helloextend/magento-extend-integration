@@ -69,7 +69,7 @@ class AttributeSetInstaller
             ];
 
             $extendProductAttributeSet->setData($data)->validate();
-            $extendProductAttributeSet->save();
+            $this->attributeSetResource->save($extendProductAttributeSet);
             $extendProductAttributeSet->initFromSkeleton($defaultAttributeSetId);
 
             return $this->attributeSetRepository->save($extendProductAttributeSet);
