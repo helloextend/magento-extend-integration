@@ -16,9 +16,9 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\IntegrationException;
 use Magento\Framework\Phrase;
 use Magento\Integration\Api\IntegrationServiceInterface;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class FinishIntegrationTest extends TestCase
+class FinishIntegrationTest extends BackendBlockTestCase
 {
   /**
    * @var FinishIntegration
@@ -72,6 +72,7 @@ class FinishIntegrationTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->context = $this->createMock(\Magento\Backend\Block\Template\Context::class);
         $this->environment = $this->createMock(Environment::class);
         $this->integrationService = $this->createMock(IntegrationServiceInterface::class);

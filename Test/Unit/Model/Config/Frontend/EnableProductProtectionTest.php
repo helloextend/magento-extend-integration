@@ -12,9 +12,9 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class EnableProductProtectionTest extends TestCase
+class EnableProductProtectionTest extends BackendBlockTestCase
 {
 
   /**
@@ -75,6 +75,7 @@ class EnableProductProtectionTest extends TestCase
    */
     protected function setUp(): void
     {
+        parent::setUp();
 
       // setting up mocks - these are arguments for the EnableProductProtection constructor
         $this->contextMock = $this->getMockBuilder(Context::class)
@@ -270,8 +271,7 @@ class EnableProductProtectionTest extends TestCase
       // The module calls getValue with a variable arg count (v1: path,'stores',storeId; v2: path
       // only). willReturnMap matches on exact passed args and resolves a mixed-arity map
       // differently across PHPUnit 9.6 vs 12.5, so dispatch on the path argument instead.
-        $this->scopeConfigMock->expects($this->any())
-        ->method('getValue')
+        $this->scopeConfigMock->method('getValue')
         ->willReturnCallback(function ($path) use ($isV1Enabled, $isV2Enabled) {
             if ($path === 'warranty/enableExtend/enable') {
                 return $isV1Enabled ? 1 : 0;
@@ -283,8 +283,7 @@ class EnableProductProtectionTest extends TestCase
         });
 
       // setup: Extend_Warranty disabled
-        $this->managerMock->expects($this->any())
-        ->method('isEnabled')
+        $this->managerMock->method('isEnabled')
         ->with('Extend_Warranty')
         ->willReturn($isExtendWarrantyEnabled);
     }

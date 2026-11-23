@@ -11,9 +11,9 @@ use Magento\Framework\Module\Manager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class EnableCartBalancingTest extends TestCase
+class EnableCartBalancingTest extends BackendBlockTestCase
 {
 
   /**
@@ -68,6 +68,7 @@ class EnableCartBalancingTest extends TestCase
    */
     protected function setUp(): void
     {
+        parent::setUp();
 
       // setting up mocks - these are arguments for the EnableCartBalancing constructor
         $this->contextMock = $this->getMockBuilder(Context::class)

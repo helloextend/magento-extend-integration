@@ -10,9 +10,9 @@ use Extend\Integration\Block\Adminhtml\Integration\Edit\Tab\HowToActivate;
 use Extend\Integration\Model\Config\Source\Environment;
 use Extend\Integration\Service\Api\AccessTokenBuilder;
 use Magento\Integration\Api\IntegrationServiceInterface;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class HowToActivateTest extends TestCase
+class HowToActivateTest extends BackendBlockTestCase
 {
     /**
      * @var HowToActivate
@@ -91,6 +91,7 @@ class HowToActivateTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->urlBuilder = $this->createMock(\Magento\Framework\Url::class);
         $this->urlBuilder->method('getCurrentUrl')->willReturn($this->callbackUrl);
         $this->context = $this->createStub(\Magento\Backend\Block\Template\Context::class);

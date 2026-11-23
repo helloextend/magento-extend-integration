@@ -11,9 +11,9 @@ use Magento\Framework\Module\Manager;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
-use PHPUnit\Framework\TestCase;
+use Extend\Integration\Test\Unit\Fixture\BackendBlockTestCase;
 
-class EnableShippingProtectionTest extends TestCase
+class EnableShippingProtectionTest extends BackendBlockTestCase
 {
 
   /**
@@ -58,6 +58,7 @@ class EnableShippingProtectionTest extends TestCase
    */
     protected function setUp(): void
     {
+        parent::setUp();
 
         $this->contextMock = $this->getMockBuilder(Context::class)
         ->disableOriginalConstructor()
