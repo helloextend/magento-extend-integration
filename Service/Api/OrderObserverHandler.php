@@ -10,7 +10,7 @@ use Extend\Integration\Service\Api\Integration;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order;
-use Psr\log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class OrderObserverHandler extends BaseObserverHandler
 {

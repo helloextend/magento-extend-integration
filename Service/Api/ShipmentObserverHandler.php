@@ -9,7 +9,7 @@ namespace Extend\Integration\Service\Api;
 use Extend\Integration\Service\Api\Integration;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Sales\Model\Order\Shipment;
-use \Psr\log\LoggerInterface;
+use \Psr\Log\LoggerInterface;
 
 class ShipmentObserverHandler extends BaseObserverHandler
 {

@@ -14,7 +14,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\Data\CategoryInterface;
 use Extend\Integration\Api\StoreIntegrationRepositoryInterface;
 use Extend\Integration\Service\Api\Integration;
-use Psr\log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class CategoryObserverHandler extends BaseObserverHandler
 {

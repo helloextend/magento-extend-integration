@@ -14,7 +14,7 @@ use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
 use Magento\Catalog\Api\Data\ProductSearchResultsInterface;
 use Magento\Eav\Model\Config;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Psr\log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Exception;
 
 class ProductRepositoryPlugin

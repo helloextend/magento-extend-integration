@@ -10,7 +10,7 @@ use Extend\Integration\Service\Api\Integration;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product;
-use Psr\log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Exception;
 
 class BatchProductObserverHandler extends BaseObserverHandler

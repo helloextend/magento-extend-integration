@@ -8,7 +8,7 @@ namespace Extend\Integration\Service\Api;
 
 use Extend\Integration\Service\Api\Integration;
 use Magento\Store\Model\StoreManagerInterface;
-use Psr\log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 abstract class BaseObserverHandler
 {
