@@ -127,7 +127,7 @@ class ShippingProtectionTotalRepository implements
                 $serializedData = $this->checkoutSession->getData($sessionCacheKey);
                 $totalData = $this->serializer->unserialize($serializedData);
 
-                if ($totalData && !empty($totalData)) {
+                if ($totalData) {
                     // Check if this is a negative cache entry (sentinel value)
                     if (isset($totalData['_extend_no_sp_data'])) {
                         // Return empty SP total for cached negative result
