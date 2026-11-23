@@ -102,7 +102,6 @@ class OrderObserverHandlerTest extends TestCase
             ->getMock();
         $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
-            ->expects($this->any())
             ->method('getStore')
             ->willReturn($this->store);
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
@@ -115,10 +114,6 @@ class OrderObserverHandlerTest extends TestCase
             'topic' => 'products/delete',
             'magento_store_uuids' => [$this->magentoStoreIdMock],
         ];
-        $this->metadataBuilder
-            ->expects($this->any())
-            ->method('execute')
-            ->willReturn($this->metadataMock);
         $this->orderIdMock = 'testId';
         $this->orderStatusMock = 'testStatus';
         $this->order = $this->getMockBuilder(Order::class)
@@ -126,28 +121,11 @@ class OrderObserverHandlerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->order
-            ->expects($this->any())
             ->method('getId')
             ->willReturn($this->orderIdMock);
         $this->order
-            ->expects($this->any())
             ->method('getStatus')
             ->willReturn($this->orderStatusMock);
-        $this->integration
-            ->expects($this->any())
-            ->method('execute')
-            ->with(
-                $this->equalTo($this->integrationEndpoint),
-                $this->equalTo(
-                    array_merge($this->metadataMock, [
-                        'data' => [
-                            'order_id' => $this->orderIdMock,
-                            'order_status' => $this->orderStatusMock,
-                            'additional_fields' => [],
-                        ],
-                    ])
-                )
-            );
         $this->objectManager = new ObjectManager($this);
         $this->OrderObserverHandler = $this->objectManager->getObject(OrderObserverHandler::class, [
             'logger' => $this->logger,
@@ -159,21 +137,30 @@ class OrderObserverHandlerTest extends TestCase
 
     public function testExecutesIntegrationWithExpectedPayload()
     {
+        $data = ['order_id' => $this->orderIdMock, 'order_status' => $this->orderStatusMock, 'additional_fields' => []];
+        $body = array_merge($this->metadataMock, ['data' => $data]);
+        $headers = ['Content-Type' => 'application/json'];
+        $this->metadataBuilder->expects($this->once())
+            ->method('execute')
+            ->with($this->anything(), $this->integrationEndpoint, $data)
+            ->willReturn([$headers, $body]);
+        $this->integration->expects($this->once())
+            ->method('execute')
+            ->with($this->integrationEndpoint, $body, $headers);
         $this->OrderObserverHandler->execute($this->integrationEndpoint, $this->order, []);
     }
 
     public function testLogsErrorsToLoggingService()
     {
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->onlyMethods(['execute', 'logErrorToLoggingService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration
-            ->expects($this->any())
+        $exception = new Exception('Metadata could not be built');
+        $this->metadataBuilder->expects($this->once())
             ->method('execute')
-            ->willThrowException(new Exception());
-        $this->logger->expects($this->any())->method('error');
-        $this->integration->expects($this->any())->method('logErrorToLoggingService');
+            ->willThrowException($exception);
+        $this->logger->expects($this->once())->method('error');
+        $this->integration->expects($this->never())->method('execute');
+        $this->integration->expects($this->once())
+            ->method('logErrorToLoggingService')
+            ->with($exception->getMessage(), $this->store->getId(), 'error', $exception);
         $this->OrderObserverHandler->execute($this->integrationEndpoint, $this->order, []);
     }
 }

@@ -108,7 +108,6 @@ class ShipmentObserverHandlerTest extends TestCase
             ->getMock();
         $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
-            ->expects($this->any())
             ->method('getStore')
             ->willReturn($this->store);
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
@@ -121,21 +120,15 @@ class ShipmentObserverHandlerTest extends TestCase
             'topic' => 'products/delete',
             'magento_store_uuids' => [$this->magentoStoreIdMock],
         ];
-        $this->metadataBuilder
-            ->expects($this->any())
-            ->method('execute')
-            ->willReturn($this->metadataMock);
         $this->orderIdMock = 'testOrderId';
         $this->order = $this->getMockBuilder(Order::class)
             ->onlyMethods(['getId', 'getStoreId'])
             ->disableOriginalConstructor()
             ->getMock();
         $this->order
-            ->expects($this->any())
             ->method('getId')
             ->willReturn($this->orderIdMock);
         $this->order
-            ->expects($this->any())
             ->method('getStoreId')
             ->willReturn($this->magentoStoreIdMock);
         $this->shipmentIdMock = 'testShipmentId';
@@ -144,28 +137,11 @@ class ShipmentObserverHandlerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->shipment
-            ->expects($this->any())
             ->method('getId')
             ->willReturn($this->shipmentIdMock);
         $this->shipment
-            ->expects($this->any())
             ->method('getOrder')
             ->willReturn($this->order);
-        $this->integration
-            ->expects($this->any())
-            ->method('execute')
-            ->with(
-                $this->equalTo($this->integrationEndpoint),
-                $this->equalTo(
-                    array_merge($this->metadataMock, [
-                        'data' => [
-                            'shipment_id' => $this->shipmentIdMock,
-                            'order_id' => $this->orderIdMock,
-                            'additional_fields' => [],
-                        ],
-                    ])
-                )
-            );
         $this->objectManager = new ObjectManager($this);
         $this->ShipmentObserverHandler = $this->objectManager->getObject(
             ShipmentObserverHandler::class,
@@ -180,21 +156,32 @@ class ShipmentObserverHandlerTest extends TestCase
 
     public function testExecutesIntegrationWithExpectedPayload()
     {
+        $data = ['shipment_id' => $this->shipmentIdMock, 'order_id' => $this->orderIdMock];
+        $body = array_merge($this->metadataMock, ['data' => $data]);
+        $headers = ['Content-Type' => 'application/json'];
+        $this->metadataBuilder->expects($this->once())
+            ->method('execute')
+            ->with($this->anything(), $this->integrationEndpoint, $data)
+            ->willReturn([$headers, $body]);
+        $this->logger->expects($this->never())->method('error');
+        $this->integration->expects($this->never())->method('logErrorToLoggingService');
+        $this->integration->expects($this->once())
+            ->method('execute')
+            ->with($this->integrationEndpoint, $body, $headers);
         $this->ShipmentObserverHandler->execute($this->integrationEndpoint, $this->shipment, []);
     }
 
     public function testLogsErrorsToLoggingService()
     {
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->onlyMethods(['execute', 'logErrorToLoggingService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration
-            ->expects($this->any())
+        $exception = new Exception('Metadata could not be built');
+        $this->metadataBuilder->expects($this->once())
             ->method('execute')
-            ->willThrowException(new Exception());
-        $this->logger->expects($this->any())->method('error');
-        $this->integration->expects($this->any())->method('logErrorToLoggingService');
+            ->willThrowException($exception);
+        $this->logger->expects($this->once())->method('error');
+        $this->integration->expects($this->never())->method('execute');
+        $this->integration->expects($this->once())
+            ->method('logErrorToLoggingService')
+            ->with($exception->getMessage(), $this->store->getId(), 'error', $exception);
         $this->ShipmentObserverHandler->execute($this->integrationEndpoint, $this->shipment, []);
     }
 }

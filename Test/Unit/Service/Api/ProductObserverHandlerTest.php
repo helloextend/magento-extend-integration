@@ -98,12 +98,10 @@ class ProductObserverHandlerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->store
-            ->expects($this->any())
             ->method('getId')
             ->willReturn($this->magentoStoreIdMock);
         $this->storeManager = $this->createMock(StoreManagerInterface::class);
         $this->storeManager
-            ->expects($this->any())
             ->method('getStore')
             ->willReturn($this->store);
         $this->metadataBuilder = $this->getMockBuilder(MetadataBuilder::class)
@@ -116,10 +114,6 @@ class ProductObserverHandlerTest extends TestCase
             'topic' => 'products/delete',
             'magento_store_uuids' => [$this->magentoStoreIdMock],
         ];
-        $this->metadataBuilder
-            ->expects($this->any())
-            ->method('execute')
-            ->willReturn($this->metadataMock);
         $this->productIdMock = 'testProductId';
         $this->productSkuMock = 'testProductSku';
         $this->product = $this->getMockBuilder(Product::class)
@@ -127,30 +121,14 @@ class ProductObserverHandlerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->product
-            ->expects($this->any())
             ->method('getId')
             ->willReturn($this->productIdMock);
         $this->product
-            ->expects($this->any())
             ->method('getStoreIds')
             ->willReturn([$this->magentoStoreIdMock]);
         $this->product
-            ->expects($this->any())
             ->method('getSku')
             ->willReturn($this->productSkuMock);
-        $this->integration
-            ->expects($this->any())
-            ->method('execute')
-            ->with(
-                $this->equalTo($this->integrationEndpoint),
-                $this->equalTo(
-                    array_merge($this->metadataMock, [
-                        'data' => [
-                            'product_id' => $this->productIdMock,
-                        ],
-                    ])
-                )
-            );
         $this->objectManager = new ObjectManager($this);
         $this->ProductObserverHandler = $this->objectManager->getObject(
             ProductObserverHandler::class,
@@ -165,21 +143,30 @@ class ProductObserverHandlerTest extends TestCase
 
     public function testExecutesIntegrationWithExpectedPayload()
     {
+        $data = ['product_id' => $this->productIdMock, 'product_sku' => $this->productSkuMock];
+        $body = array_merge($this->metadataMock, ['data' => $data]);
+        $headers = ['Content-Type' => 'application/json'];
+        $this->metadataBuilder->expects($this->once())
+            ->method('execute')
+            ->with($this->anything(), $this->integrationEndpoint, $data)
+            ->willReturn([$headers, $body]);
+        $this->integration->expects($this->once())
+            ->method('execute')
+            ->with($this->integrationEndpoint, $body, $headers);
         $this->ProductObserverHandler->execute($this->integrationEndpoint, $this->product, []);
     }
 
     public function testLogsErrorsToLoggingService()
     {
-        $this->integration = $this->getMockBuilder(Integration::class)
-            ->onlyMethods(['execute', 'logErrorToLoggingService'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->integration
-            ->expects($this->any())
+        $exception = new Exception('Metadata could not be built');
+        $this->metadataBuilder->expects($this->once())
             ->method('execute')
-            ->willThrowException(new Exception());
-        $this->logger->expects($this->any())->method('error');
-        $this->integration->expects($this->any())->method('logErrorToLoggingService');
+            ->willThrowException($exception);
+        $this->logger->expects($this->once())->method('error');
+        $this->integration->expects($this->never())->method('execute');
+        $this->integration->expects($this->once())
+            ->method('logErrorToLoggingService')
+            ->with($exception->getMessage(), $this->store->getId(), 'error', $exception);
         $this->ProductObserverHandler->execute($this->integrationEndpoint, $this->product, []);
     }
 }
