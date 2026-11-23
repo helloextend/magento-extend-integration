@@ -135,6 +135,7 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                 )
             );
         }
+        return $this;
     }
 
     /**
@@ -170,11 +171,12 @@ class ExtendProductPatch implements DataPatchInterface, PatchRevertableInterface
                     $integrations = $this->environment->toOptionArray();
 
                     foreach ($integrations as $integrationData) {
-                        if (isset($integrationData['value'])) {
-                            $integration = $this->integrationService->get(
-                                $integrationData['value']
-                            );
+                        if (!isset($integrationData['value'])) {
+                            continue;
                         }
+                        $integration = $this->integrationService->get(
+                            $integrationData['value']
+                        );
                         $consumerId = $integration->getConsumerId();
                         $oauthConsumerKey = $this->oauthService
                             ->loadConsumer($consumerId)
